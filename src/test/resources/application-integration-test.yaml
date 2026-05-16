@@ -1,0 +1,12 @@
+spring:
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+security:
+  jwt:
+    secret: integration-test-secret-must-be-at-least-32-chars
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 604800000
