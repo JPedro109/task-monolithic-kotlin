@@ -20,10 +20,10 @@ class UserLoginUseCaseImpl(
     override fun execute(input: UserLoginInputDTO): UserLoginOutputDTO {
         val usernameResult = UsernameValueObject.of(input.username)
         if (usernameResult.isFail) {
-            throw usernameResult.getRealError()
+            throw usernameResult.getFailureError()
         }
 
-        val username = usernameResult.getRealValue()
+        val username = usernameResult.getSuccessValue()
 
         val user = userRepository.findByUsername(username) ?: throw InvalidCredentialsException()
 

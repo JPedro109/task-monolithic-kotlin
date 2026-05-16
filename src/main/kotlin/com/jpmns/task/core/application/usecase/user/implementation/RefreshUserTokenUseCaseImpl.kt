@@ -20,10 +20,10 @@ class RefreshUserTokenUseCaseImpl(
 
         val idResult = IdValueObject.of(decoded.sub)
         if (idResult.isFail) {
-            throw idResult.getRealError()
+            throw idResult.getFailureError()
         }
 
-        val id = idResult.getRealValue()
+        val id = idResult.getSuccessValue()
 
         userRepository.findById(id) ?: throw UserNotFoundException()
 

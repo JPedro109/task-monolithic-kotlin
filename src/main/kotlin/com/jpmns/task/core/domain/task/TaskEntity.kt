@@ -27,8 +27,8 @@ class TaskEntity(
         val taskNameResult = TaskNameValueObject.of(taskName)
         validateOrThrow(listOf(userIdResult, taskNameResult))
 
-        this.userId = userIdResult.getRealValue()
-        this.taskName = taskNameResult.getRealValue()
+        this.userId = userIdResult.getSuccessValue()
+        this.taskName = taskNameResult.getSuccessValue()
         this.finished = finished
     }
 
@@ -37,7 +37,7 @@ class TaskEntity(
 
         validateOrThrow(listOf(result))
 
-        this.taskName = result.getRealValue()
+        this.taskName = result.getSuccessValue()
     }
 
     fun markAsFinished() {

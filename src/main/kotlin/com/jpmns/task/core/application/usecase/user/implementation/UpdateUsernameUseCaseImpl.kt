@@ -18,18 +18,18 @@ class UpdateUsernameUseCaseImpl(
     override fun execute(input: UpdateUsernameInputDTO): UpdateUsernameOutputDTO {
         val idResult = IdValueObject.of(input.userId)
         if (idResult.isFail) {
-            throw idResult.getRealError()
+            throw idResult.getFailureError()
         }
 
-        val id = idResult.getRealValue()
+        val id = idResult.getSuccessValue()
 
         val user = userRepository.findById(id) ?: throw UserNotFoundException()
 
         val newUsernameResult = UsernameValueObject.of(input.newUsername)
         if (newUsernameResult.isFail) {
-            throw newUsernameResult.getRealError()
+            throw newUsernameResult.getFailureError()
         }
-        val newUsername = newUsernameResult.getRealValue()
+        val newUsername = newUsernameResult.getSuccessValue()
 
         if (userRepository.existsByUsername(newUsername)) {
             throw UsernameAlreadyExistsException()

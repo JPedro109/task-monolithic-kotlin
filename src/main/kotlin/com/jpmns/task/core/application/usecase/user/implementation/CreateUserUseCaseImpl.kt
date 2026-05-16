@@ -21,10 +21,10 @@ class CreateUserUseCaseImpl(
     override fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
         val usernameResult = UsernameValueObject.of(input.username)
         if (usernameResult.isFail) {
-            throw usernameResult.getRealError()
+            throw usernameResult.getFailureError()
         }
 
-        val username = usernameResult.getRealValue()
+        val username = usernameResult.getSuccessValue()
 
         if (userRepository.existsByUsername(username)) {
             throw UsernameAlreadyExistsException()

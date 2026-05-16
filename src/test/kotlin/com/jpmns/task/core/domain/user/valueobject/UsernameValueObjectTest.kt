@@ -17,7 +17,7 @@ class UsernameValueObjectTest {
         val result = UsernameValueObject.of(username.asString())
 
         assertThat(result.isFail).isFalse()
-        assertThat(result.getRealValue().asString()).isEqualTo(username.asString())
+        assertThat(result.getSuccessValue().asString()).isEqualTo(username.asString())
     }
 
     @Test

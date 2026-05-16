@@ -65,7 +65,7 @@ class UserRepositoryAdapterTest {
     fun `should find a user by id and return the domain entity`() {
         val user = UserFixture.aUser()
         val userIdVO = user.id
-        val id = IdValueObject.of(userIdVO.asString()).getRealValue()
+        val id = IdValueObject.of(userIdVO.asString()).getSuccessValue()
         val formattedId = UUID.fromString(userIdVO.asString())
         val model = buildUserModel()
 
@@ -81,7 +81,7 @@ class UserRepositoryAdapterTest {
     fun `should return null when user is not found by id`() {
         val user = UserFixture.aUser()
         val userIdVO = user.id
-        val id = IdValueObject.of(userIdVO.asString()).getRealValue()
+        val id = IdValueObject.of(userIdVO.asString()).getSuccessValue()
 
         every { dao.findById(any()) } returns Optional.empty()
 
@@ -94,7 +94,7 @@ class UserRepositoryAdapterTest {
     fun `should find a user by username and return the domain entity`() {
         val user = UserFixture.aUser()
         val usernameVO = user.username
-        val username = UsernameValueObject.of(usernameVO.asString()).getRealValue()
+        val username = UsernameValueObject.of(usernameVO.asString()).getSuccessValue()
         val model = buildUserModel()
 
         every { dao.findByUsername(usernameVO.asString()) } returns model
@@ -109,7 +109,7 @@ class UserRepositoryAdapterTest {
     fun `should return null when user is not found by username`() {
         val user = UserFixture.aUser()
         val usernameVO = user.username
-        val username = UsernameValueObject.of(usernameVO.asString()).getRealValue()
+        val username = UsernameValueObject.of(usernameVO.asString()).getSuccessValue()
 
         every { dao.findByUsername(any()) } returns null
 
@@ -122,7 +122,7 @@ class UserRepositoryAdapterTest {
     fun `should return true when username exists`() {
         val user = UserFixture.aUser()
         val usernameVO = user.username
-        val username = UsernameValueObject.of(usernameVO.asString()).getRealValue()
+        val username = UsernameValueObject.of(usernameVO.asString()).getSuccessValue()
 
         every { dao.existsByUsername(usernameVO.asString()) } returns true
 
@@ -135,7 +135,7 @@ class UserRepositoryAdapterTest {
     fun `should return false when username does not exist`() {
         val user = UserFixture.aUser()
         val usernameVO = user.username
-        val username = UsernameValueObject.of(usernameVO.asString()).getRealValue()
+        val username = UsernameValueObject.of(usernameVO.asString()).getSuccessValue()
 
         every { dao.existsByUsername(any()) } returns false
 
@@ -148,7 +148,7 @@ class UserRepositoryAdapterTest {
     fun `should delete a user by id`() {
         val user = UserFixture.aUser()
         val userIdVO = user.id
-        val id = IdValueObject.of(userIdVO.asString()).getRealValue()
+        val id = IdValueObject.of(userIdVO.asString()).getSuccessValue()
         val formattedId = UUID.fromString(userIdVO.asString())
 
         every { dao.deleteById(any()) } returns Unit

@@ -8,9 +8,9 @@ sealed class Result<out T, out E> {
     val isFail: Boolean
         get() = this is Failure
 
-    fun getRealValue(): T = (this as Success).value
+    fun getSuccessValue(): T = (this as Success).value
 
-    fun getRealError(): E = (this as Failure).error
+    fun getFailureError(): E = (this as Failure).error
 
     companion object {
         fun <T, E> success(value: T): Result<T, E> = Success(value)

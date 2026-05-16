@@ -18,10 +18,10 @@ class UpdateUserPasswordUseCaseImpl(
     override fun execute(input: UpdateUserPasswordInputDTO) {
         val idResult = IdValueObject.of(input.userId)
         if (idResult.isFail) {
-            throw idResult.getRealError()
+            throw idResult.getFailureError()
         }
 
-        val id = idResult.getRealValue()
+        val id = idResult.getSuccessValue()
 
         val user = userRepository.findById(id) ?: throw UserNotFoundException()
 

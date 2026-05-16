@@ -14,7 +14,7 @@ class TaskNameValueObjectTest {
         val result = TaskNameValueObject.of(taskName.asString())
 
         assertThat(result.isFail).isFalse()
-        assertThat(result.getRealValue().asString()).isEqualTo(taskName.asString())
+        assertThat(result.getSuccessValue().asString()).isEqualTo(taskName.asString())
     }
 
     @Test

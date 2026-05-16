@@ -15,10 +15,10 @@ class ListTasksUseCaseImpl(
     override fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
         val userIdResult = IdValueObject.of(input.userId)
         if (userIdResult.isFail) {
-            throw userIdResult.getRealError()
+            throw userIdResult.getFailureError()
         }
 
-        val userId = userIdResult.getRealValue()
+        val userId = userIdResult.getSuccessValue()
 
         return taskRepository.findAllByUserId(userId).map { task ->
             TaskOutputDTO(

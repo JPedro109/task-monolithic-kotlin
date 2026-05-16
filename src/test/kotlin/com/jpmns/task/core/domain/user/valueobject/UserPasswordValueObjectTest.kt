@@ -16,7 +16,7 @@ class UserPasswordValueObjectTest {
         val result = UserPasswordValueObject.of(password.asString())
 
         assertThat(result.isFail).isFalse()
-        assertThat(result.getRealValue().asString()).isEqualTo(password.asString())
+        assertThat(result.getSuccessValue().asString()).isEqualTo(password.asString())
     }
 
     @Test

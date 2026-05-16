@@ -17,7 +17,7 @@ class IdValueObjectTest {
         val result = IdValueObject.of(id.asString())
 
         assertThat(result.isFail).isFalse()
-        assertThat(result.getRealValue().asString()).isEqualTo(id.asString())
+        assertThat(result.getSuccessValue().asString()).isEqualTo(id.asString())
     }
 
     @Test

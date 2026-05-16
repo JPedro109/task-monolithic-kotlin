@@ -16,10 +16,10 @@ class DeleteTaskUseCaseImpl(
     override fun execute(input: DeleteTaskInputDTO) {
         val taskIdResult = IdValueObject.of(input.taskId)
         if (taskIdResult.isFail) {
-            throw taskIdResult.getRealError()
+            throw taskIdResult.getFailureError()
         }
 
-        val taskId = taskIdResult.getRealValue()
+        val taskId = taskIdResult.getSuccessValue()
 
         val task = taskRepository.findById(taskId)
             ?: throw TaskNotFoundException()
