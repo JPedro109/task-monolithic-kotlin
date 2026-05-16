@@ -1,9 +1,9 @@
 package com.jpmns.task.shared.type
 
 sealed class Result<out T, out E> {
-    data class Success<T>(val value: T) : Result<T, Nothing>()
+    private data class Success<T>(val value: T) : Result<T, Nothing>()
 
-    data class Failure<E>(val error: E) : Result<Nothing, E>()
+    private data class Failure<E>(val error: E) : Result<Nothing, E>()
 
     val isFail: Boolean
         get() = this is Failure
