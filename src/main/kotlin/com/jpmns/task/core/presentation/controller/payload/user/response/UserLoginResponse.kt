@@ -5,7 +5,7 @@ import com.jpmns.task.core.presentation.controller.documentation.payload.user.re
 
 data class UserLoginResponse(
     override val accessToken: String,
-    override val refreshToken: String,
+    override val refreshToken: String
 ) : UserLoginResponseDoc {
     companion object {
         fun of(dto: UserLoginOutputDTO): UserLoginResponse =

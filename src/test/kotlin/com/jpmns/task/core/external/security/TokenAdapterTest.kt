@@ -90,7 +90,7 @@ class TokenAdapterTest {
         val otherAdapter = TokenAdapter(
             "another-secret-key-must-be-at-least-32-chars!",
             ACCESS_EXPIRATION_MS,
-            REFRESH_EXPIRATION_MS,
+            REFRESH_EXPIRATION_MS
         )
         val sub = UUID.randomUUID().toString()
         val token = otherAdapter.generateAccessToken(sub)

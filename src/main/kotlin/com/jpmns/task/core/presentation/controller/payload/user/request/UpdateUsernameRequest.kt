@@ -8,5 +8,5 @@ import com.jpmns.task.core.presentation.controller.documentation.payload.user.re
 data class UpdateUsernameRequest(
     @field:NotBlank
     @field:Size(min = 3, max = 50)
-    override val newUsername: String,
+    override val newUsername: String
 ) : UpdateUsernameRequestDoc

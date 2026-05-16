@@ -11,7 +11,7 @@ data class CreateUserRequest(
     override val username: String,
     @field:NotBlank
     @field:Size(min = 8)
-    override val password: String,
+    override val password: String
 ) : CreateUserRequestDoc {
     override fun toString(): String =
         "CreateUserRequest(username=$username, password=[REDACTED])"

@@ -5,7 +5,7 @@ import com.jpmns.task.core.presentation.controller.documentation.payload.user.re
 
 data class UpdateUsernameResponse(
     override val id: String,
-    override val username: String,
+    override val username: String
 ) : UpdateUsernameResponseDoc {
     companion object {
         fun of(dto: UpdateUsernameOutputDTO): UpdateUsernameResponse =

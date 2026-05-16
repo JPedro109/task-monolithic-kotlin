@@ -8,5 +8,5 @@ import com.jpmns.task.core.presentation.controller.documentation.payload.task.re
 data class CreateTaskRequest(
     @field:NotBlank
     @field:Size(max = 255)
-    override val taskName: String,
+    override val taskName: String
 ) : CreateTaskRequestDoc

@@ -13,7 +13,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 @Service
 class UpdateUserPasswordUseCaseImpl(
     private val userRepository: UserRepository,
-    private val passwordEncoder: PasswordEncoder,
+    private val passwordEncoder: PasswordEncoder
 ) : UpdateUserPasswordUseCase {
     override fun execute(input: UpdateUserPasswordInputDTO) {
         val idResult = IdValueObject.of(input.userId)

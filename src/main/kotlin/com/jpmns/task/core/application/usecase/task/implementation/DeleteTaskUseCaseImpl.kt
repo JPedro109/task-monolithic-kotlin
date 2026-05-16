@@ -11,7 +11,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 
 @Service
 class DeleteTaskUseCaseImpl(
-    private val taskRepository: TaskRepository,
+    private val taskRepository: TaskRepository
 ) : DeleteTaskUseCase {
     override fun execute(input: DeleteTaskInputDTO) {
         val taskIdResult = IdValueObject.of(input.taskId)

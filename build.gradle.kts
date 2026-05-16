@@ -113,8 +113,8 @@ tasks.jacocoTestReport {
                         "com/jpmns/task/TaskApplicationKt*"
                     )
                 }
-            },
-        ),
+            }
+        )
     )
 }
 
@@ -147,8 +147,8 @@ detekt {
     source.setFrom(
         files(
             "src/main/kotlin",
-            "src/test/kotlin",
-        ),
+            "src/test/kotlin"
+        )
     )
 }
 

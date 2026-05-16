@@ -34,7 +34,7 @@ class UserController(
     private val createUserUseCase: CreateUserUseCase,
     private val deleteUserUseCase: DeleteUserUseCase,
     private val updateUserPasswordUseCase: UpdateUserPasswordUseCase,
-    private val updateUsernameUseCase: UpdateUsernameUseCase,
+    private val updateUsernameUseCase: UpdateUsernameUseCase
 ) : UserControllerDoc {
     @PostMapping
     override fun createUser(@Valid @RequestBody request: CreateUserRequest): ResponseEntity<CreateUserResponse> {
@@ -66,7 +66,7 @@ class UserController(
 
     @PatchMapping("/password")
     override fun updatePassword(
-        @Valid @RequestBody request: UpdateUserPasswordRequest,
+        @Valid @RequestBody request: UpdateUserPasswordRequest
     ): ResponseEntity<Void> {
         logger.info("Update password request received: $request")
 
@@ -86,7 +86,7 @@ class UserController(
 
     @PatchMapping("/username")
     override fun updateUsername(
-        @Valid @RequestBody request: UpdateUsernameRequest,
+        @Valid @RequestBody request: UpdateUsernameRequest
     ): ResponseEntity<UpdateUsernameResponse> {
         logger.info("Update username request received")
 

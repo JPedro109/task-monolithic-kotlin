@@ -39,7 +39,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.BAD_REQUEST,
-            "Request body is missing or malformed",
+            "Request body is missing or malformed"
         )
 
         problem.title = "Bad Request"
@@ -53,7 +53,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.UNPROCESSABLE_ENTITY,
-            ex.errors.joinToString(", "),
+            ex.errors.joinToString(", ")
         )
 
         problem.title = "Domain Error"
@@ -67,7 +67,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.NOT_FOUND,
-            ex.message ?: TITLE_NOT_FOUND,
+            ex.message ?: TITLE_NOT_FOUND
         )
 
         problem.title = TITLE_NOT_FOUND
@@ -81,7 +81,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.NOT_FOUND,
-            ex.message ?: TITLE_NOT_FOUND,
+            ex.message ?: TITLE_NOT_FOUND
         )
 
         problem.title = TITLE_NOT_FOUND
@@ -95,7 +95,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.CONFLICT,
-            ex.message ?: "Conflict",
+            ex.message ?: "Conflict"
         )
 
         problem.title = "Conflict"
@@ -109,7 +109,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.UNAUTHORIZED,
-            ex.message ?: TITLE_UNAUTHORIZED,
+            ex.message ?: TITLE_UNAUTHORIZED
         )
 
         problem.title = TITLE_UNAUTHORIZED
@@ -123,7 +123,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.UNAUTHORIZED,
-            ex.message ?: TITLE_UNAUTHORIZED,
+            ex.message ?: TITLE_UNAUTHORIZED
         )
 
         problem.title = TITLE_UNAUTHORIZED
@@ -137,7 +137,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.FORBIDDEN,
-            ex.message ?: "Forbidden",
+            ex.message ?: "Forbidden"
         )
 
         problem.title = "Forbidden"
@@ -151,7 +151,7 @@ class GlobalExceptionHandler {
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.INTERNAL_SERVER_ERROR,
-            "Internal server error",
+            "Internal server error"
         )
 
         problem.title = "Internal Server Error"

@@ -15,7 +15,7 @@ import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 class UserLoginUseCaseImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val token: Token,
+    private val token: Token
 ) : UserLoginUseCase {
     override fun execute(input: UserLoginInputDTO): UserLoginOutputDTO {
         val usernameResult = UsernameValueObject.of(input.username)

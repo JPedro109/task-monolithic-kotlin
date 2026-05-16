@@ -12,7 +12,7 @@ object UserMapper {
             username = entity.username.asString(),
             password = entity.password.asString(),
             createdAt = entity.createdAt,
-            updatedAt = entity.updatedAt,
+            updatedAt = entity.updatedAt
         )
 
     fun toDomain(model: UserJpaModel): UserEntity =
@@ -21,6 +21,6 @@ object UserMapper {
             username = model.username,
             password = model.password,
             createdAt = model.createdAt,
-            updatedAt = model.updatedAt,
+            updatedAt = model.updatedAt
         )
 }

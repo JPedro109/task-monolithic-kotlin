@@ -13,7 +13,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 @Service
 class RefreshUserTokenUseCaseImpl(
     private val userRepository: UserRepository,
-    private val token: Token,
+    private val token: Token
 ) : RefreshUserTokenUseCase {
     override fun execute(input: RefreshUserTokenInputDTO): RefreshUserTokenOutputDTO {
         val decoded = token.tokenValidation(input.refreshToken)

@@ -7,7 +7,7 @@ import com.jpmns.task.core.application.port.security.PasswordEncoder
 
 @Component
 class PasswordEncoderAdapter(
-    private val bCryptPasswordEncoder: BCryptPasswordEncoder,
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) : PasswordEncoder {
     override fun encode(rawPassword: String): String =
         bCryptPasswordEncoder.encode(rawPassword).toString()

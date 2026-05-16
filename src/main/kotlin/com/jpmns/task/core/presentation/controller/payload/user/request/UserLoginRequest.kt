@@ -8,7 +8,7 @@ data class UserLoginRequest(
     @field:NotBlank
     override val username: String,
     @field:NotBlank
-    override val password: String,
+    override val password: String
 ) : UserLoginRequestDoc {
     override fun toString(): String =
         "UserLoginRequest(username=$username, password=[REDACTED])"

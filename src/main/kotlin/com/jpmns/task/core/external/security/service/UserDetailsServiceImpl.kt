@@ -13,7 +13,7 @@ import com.jpmns.task.core.domain.common.exception.DomainException
 
 @Service
 class UserDetailsServiceImpl(
-    private val getUserByIdUseCase: GetUserByIdUseCase,
+    private val getUserByIdUseCase: GetUserByIdUseCase
 ) : UserDetailsService {
     override fun loadUserByUsername(username: String): UserDetails {
         val userOutput = try {

@@ -11,7 +11,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 
 @Service
 class GetUserByIdUseCaseImpl(
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) : GetUserByIdUseCase {
     override fun execute(input: GetUserByIdInputDTO): UserOutputDTO {
         val idResult = IdValueObject.of(input.id)

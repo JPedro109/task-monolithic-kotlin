@@ -16,7 +16,7 @@ import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 @Service
 class CreateUserUseCaseImpl(
     private val userRepository: UserRepository,
-    private val passwordEncoder: PasswordEncoder,
+    private val passwordEncoder: PasswordEncoder
 ) : CreateUserUseCase {
     override fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
         val usernameResult = UsernameValueObject.of(input.username)
@@ -35,7 +35,7 @@ class CreateUserUseCaseImpl(
         val user = UserEntity(
             id = UUID.randomUUID().toString(),
             username = input.username,
-            password = encodedPassword,
+            password = encodedPassword
         )
         val saved = userRepository.save(user)
 

@@ -21,7 +21,7 @@ class TracingContextFilter : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain,
+        filterChain: FilterChain
     ) {
         val correlationId = request.getHeader(HEADER_CORRELATION_ID) ?: UUID.randomUUID().toString()
 
@@ -49,7 +49,7 @@ class TracingContextFilter : OncePerRequestFilter() {
     private fun populate(
         request: HttpServletRequest,
         baggageBuilder: BaggageBuilder,
-        correlationId: String,
+        correlationId: String
     ) {
         baggageBuilder.addValue(MDC_CORRELATION_ID, correlationId)
 

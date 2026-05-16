@@ -13,7 +13,7 @@ import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 
 @Service
 class UpdateUsernameUseCaseImpl(
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) : UpdateUsernameUseCase {
     override fun execute(input: UpdateUsernameInputDTO): UpdateUsernameOutputDTO {
         val idResult = IdValueObject.of(input.userId)

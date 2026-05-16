@@ -13,7 +13,7 @@ import com.jpmns.task.core.external.persistence.mapper.UserMapper
 
 @Repository
 class UserRepositoryAdapter(
-    private val dao: UserJpaDao,
+    private val dao: UserJpaDao
 ) : UserRepository {
     override fun save(user: UserEntity): UserEntity {
         var model = dao.save(UserMapper.toModel(user))

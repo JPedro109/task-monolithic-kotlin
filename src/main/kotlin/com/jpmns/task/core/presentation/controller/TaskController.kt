@@ -38,7 +38,7 @@ class TaskController(
     private val listTasksUseCase: ListTasksUseCase,
     private val updateTaskUseCase: UpdateTaskUseCase,
     private val deleteTaskUseCase: DeleteTaskUseCase,
-    private val markTaskAsFinishedUseCase: MarkTaskAsFinishedUseCase,
+    private val markTaskAsFinishedUseCase: MarkTaskAsFinishedUseCase
 ) : TaskControllerDoc {
     @PostMapping
     override fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> {
@@ -75,7 +75,7 @@ class TaskController(
     @PutMapping("/{taskId}")
     override fun updateTask(
         @PathVariable taskId: String,
-        @Valid @RequestBody request: UpdateTaskRequest,
+        @Valid @RequestBody request: UpdateTaskRequest
     ): ResponseEntity<TaskResponse> {
         logger.info("Update task request received for taskId: $taskId")
 

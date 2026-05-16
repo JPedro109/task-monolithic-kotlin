@@ -16,12 +16,12 @@ import com.jpmns.task.core.application.port.security.Token
 @Component
 class JwtAuthenticationFilter(
     private val token: Token,
-    private val userDetailsService: UserDetailsService,
+    private val userDetailsService: UserDetailsService
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain,
+        filterChain: FilterChain
     ) {
         val authHeader = request.getHeader("Authorization")
 
@@ -39,7 +39,7 @@ class JwtAuthenticationFilter(
             val authentication = UsernamePasswordAuthenticationToken(
                 userDetails.username,
                 null,
-                userDetails.authorities,
+                userDetails.authorities
             )
 
             authentication.details = WebAuthenticationDetailsSource().buildDetails(request)

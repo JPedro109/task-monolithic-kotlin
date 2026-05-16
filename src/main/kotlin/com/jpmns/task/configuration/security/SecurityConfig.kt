@@ -30,7 +30,7 @@ class SecurityConfig {
     fun securityFilterChain(
         http: HttpSecurity,
         jwtFilter: JwtAuthenticationFilter,
-        tracingFilter: TracingContextFilter,
+        tracingFilter: TracingContextFilter
     ): SecurityFilterChain =
         http
             .csrf { it.disable() }

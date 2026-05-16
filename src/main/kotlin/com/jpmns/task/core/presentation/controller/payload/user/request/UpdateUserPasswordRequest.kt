@@ -10,7 +10,7 @@ data class UpdateUserPasswordRequest(
     override val currentPassword: String,
     @field:NotBlank
     @field:Size(min = 8)
-    override val newPassword: String,
+    override val newPassword: String
 ) : UpdateUserPasswordRequestDoc {
     override fun toString(): String =
         "UpdateUserPasswordRequest(" +

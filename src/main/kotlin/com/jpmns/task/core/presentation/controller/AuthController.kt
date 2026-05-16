@@ -23,7 +23,7 @@ import com.jpmns.task.core.presentation.controller.payload.user.response.UserLog
 @RequestMapping("/api/v1/auth")
 class AuthController(
     private val userLoginUseCase: UserLoginUseCase,
-    private val refreshUserTokenUseCase: RefreshUserTokenUseCase,
+    private val refreshUserTokenUseCase: RefreshUserTokenUseCase
 ) : AuthControllerDoc {
     @PostMapping("/login")
     override fun login(@Valid @RequestBody request: UserLoginRequest): ResponseEntity<UserLoginResponse> {

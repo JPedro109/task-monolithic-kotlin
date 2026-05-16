@@ -10,7 +10,7 @@ data class TaskResponse(
     override val userId: String,
     override val taskName: String,
     override val finished: Boolean,
-    override val createdAt: Instant,
+    override val createdAt: Instant
 ) : TaskResponseDoc {
     companion object {
         fun of(dto: TaskOutputDTO): TaskResponse =

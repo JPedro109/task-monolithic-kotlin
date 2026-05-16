@@ -17,7 +17,7 @@ class SwaggerConfig {
                 Info()
                     .title("Task Service API")
                     .description("Restful API for personal task management")
-                    .version("1.0.0"),
+                    .version("1.0.0")
             )
             .components(
                 Components()
@@ -26,7 +26,7 @@ class SwaggerConfig {
                         SecurityScheme()
                             .type(SecurityScheme.Type.HTTP)
                             .scheme("bearer")
-                            .bearerFormat("JWT"),
-                    ),
+                            .bearerFormat("JWT")
+                    )
             )
 }

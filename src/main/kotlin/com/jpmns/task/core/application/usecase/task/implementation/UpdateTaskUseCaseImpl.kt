@@ -12,7 +12,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 
 @Service
 class UpdateTaskUseCaseImpl(
-    private val taskRepository: TaskRepository,
+    private val taskRepository: TaskRepository
 ) : UpdateTaskUseCase {
     override fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
         val taskIdResult = IdValueObject.of(input.taskId)

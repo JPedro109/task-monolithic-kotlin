@@ -11,7 +11,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 
 @Service
 class MarkTaskAsFinishedUseCaseImpl(
-    private val taskRepository: TaskRepository,
+    private val taskRepository: TaskRepository
 ) : MarkTaskAsFinishedUseCase {
     override fun execute(input: MarkTaskAsFinishedInputDTO) {
         val taskIdResult = IdValueObject.of(input.taskId)

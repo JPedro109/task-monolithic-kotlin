@@ -10,7 +10,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 
 @Service
 class DeleteUserUseCaseImpl(
-    private val userRepository: UserRepository,
+    private val userRepository: UserRepository
 ) : DeleteUserUseCase {
     override fun execute(input: DeleteUserInputDTO) {
         val idResult = IdValueObject.of(input.userId)

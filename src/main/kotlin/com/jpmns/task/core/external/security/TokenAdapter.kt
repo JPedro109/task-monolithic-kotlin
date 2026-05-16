@@ -18,7 +18,7 @@ import io.jsonwebtoken.security.Keys
 class TokenAdapter(
     @param:Value("\${security.jwt.secret}") private val secret: String,
     @param:Value("\${security.jwt.access-token-expiration-ms}") private val accessTokenExpirationMs: Long,
-    @param:Value("\${security.jwt.refresh-token-expiration-ms}") private val refreshTokenExpirationMs: Long,
+    @param:Value("\${security.jwt.refresh-token-expiration-ms}") private val refreshTokenExpirationMs: Long
 ) : Token {
     private val signingKey: SecretKey by lazy {
         Keys.hmacShaKeyFor(secret.toByteArray())

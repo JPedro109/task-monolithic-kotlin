@@ -29,7 +29,7 @@ class TaskNameValueObject private constructor(private val value: String) {
         fun of(taskName: String): Result<TaskNameValueObject, DomainException> {
             if (taskName.length > MAX_TASK_NAME_LENGTH) {
                 return Result.fail(
-                    InvalidTaskNameException(),
+                    InvalidTaskNameException()
                 )
             }
             return Result.success(TaskNameValueObject(taskName))

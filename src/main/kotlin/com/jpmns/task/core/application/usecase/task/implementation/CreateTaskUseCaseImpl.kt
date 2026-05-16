@@ -12,14 +12,14 @@ import com.jpmns.task.core.domain.task.TaskEntity
 
 @Service
 class CreateTaskUseCaseImpl(
-    private val taskRepository: TaskRepository,
+    private val taskRepository: TaskRepository
 ) : CreateTaskUseCase {
     override fun execute(input: CreateTaskInputDTO): TaskOutputDTO {
         val task = TaskEntity(
             id = UUID.randomUUID().toString(),
             userId = input.userId,
             taskName = input.taskName,
-            finished = false,
+            finished = false
         )
 
         val saved = taskRepository.save(task)
