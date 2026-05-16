@@ -1,6 +1,5 @@
 package com.jpmns.task.core.presentation.controller
 
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,7 +35,6 @@ import io.mockk.every
 
 @WebMvcTest(UserController::class)
 @Import(SecurityConfig::class, GlobalExceptionHandler::class)
-@DisplayName("UserController Tests")
 class UserControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -60,7 +58,6 @@ class UserControllerTest {
     private lateinit var userDetailsService: UserDetailsService
 
     @Nested
-    @DisplayName("POST /api/v1/users")
     inner class CreateUser {
         @Test
         fun `should return 201 with user data when creation succeeds`() {
@@ -137,7 +134,6 @@ class UserControllerTest {
     }
 
     @Nested
-    @DisplayName("DELETE /api/v1/users")
     inner class DeleteUser {
         @Test
         @WithJwtTokenMock
@@ -171,7 +167,6 @@ class UserControllerTest {
     }
 
     @Nested
-    @DisplayName("PATCH /api/v1/users/password")
     inner class UpdatePassword {
         @Test
         @WithJwtTokenMock
@@ -232,7 +227,6 @@ class UserControllerTest {
     }
 
     @Nested
-    @DisplayName("PATCH /api/v1/users/username")
     inner class UpdateUsername {
         @Test
         @WithJwtTokenMock

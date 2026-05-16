@@ -1,6 +1,5 @@
 package com.jpmns.task.integration
 
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,13 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.jpmns.task.integration.common.abstracts.IntegrationTestBase
 import com.jpmns.task.integration.common.sql.SqlCreateSeed
 
-@DisplayName("Auth Integration Tests")
 class AuthIntegrationTest : IntegrationTestBase() {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
     @Nested
-    @DisplayName("POST /api/v1/auth/login")
     inner class Login {
         @Test
         @SqlCreateSeed
@@ -82,7 +79,6 @@ class AuthIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("POST /api/v1/auth/refresh")
     inner class Refresh {
         @Test
         @SqlCreateSeed

@@ -4,14 +4,12 @@ import java.time.Instant
 import java.util.UUID
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 import com.jpmns.task.core.external.persistence.model.TaskJpaModel
 import com.jpmns.task.shared.fixture.TaskFixture
 import com.jpmns.task.shared.fixture.UserFixture
 
-@DisplayName("TaskMapper Tests")
 class TaskMapperTest {
     @Test
     fun `should map a TaskEntity to a TaskJpaModel correctly`() {

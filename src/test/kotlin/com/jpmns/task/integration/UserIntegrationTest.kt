@@ -1,6 +1,5 @@
 package com.jpmns.task.integration
 
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -15,7 +14,6 @@ import com.jpmns.task.integration.common.abstracts.IntegrationTestBase
 import com.jpmns.task.integration.common.sql.SqlCreateSeed
 import com.jpmns.task.shared.security.WithJwtTokenMock
 
-@DisplayName("User Integration Tests")
 class UserIntegrationTest : IntegrationTestBase() {
     companion object {
         private const val EXISTING_USERNAME = "john"
@@ -23,7 +21,6 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("POST /api/v1/users")
     inner class CreateUser {
         @Test
         fun `should return 201 with id and username when input is valid`() {
@@ -89,7 +86,6 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("DELETE /api/v1/users")
     inner class DeleteUser {
         @Test
         @SqlCreateSeed
@@ -110,7 +106,6 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("PATCH /api/v1/users/username")
     inner class UpdateUsername {
         @Test
         @SqlCreateSeed
@@ -161,7 +156,6 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("PATCH /api/v1/users/password")
     inner class UpdatePassword {
         @Test
         @SqlCreateSeed

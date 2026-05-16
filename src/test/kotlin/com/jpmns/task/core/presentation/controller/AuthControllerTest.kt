@@ -1,6 +1,5 @@
 package com.jpmns.task.core.presentation.controller
 
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,7 +29,6 @@ import io.mockk.every
 
 @WebMvcTest(AuthController::class)
 @Import(SecurityConfig::class, GlobalExceptionHandler::class)
-@DisplayName("AuthController Tests")
 class AuthControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -48,7 +46,6 @@ class AuthControllerTest {
     private lateinit var userDetailsService: UserDetailsService
 
     @Nested
-    @DisplayName("POST /api/v1/auth/login")
     inner class Login {
         @Test
         fun `should return 200 with tokens when login succeeds`() {
@@ -114,7 +111,6 @@ class AuthControllerTest {
     }
 
     @Nested
-    @DisplayName("POST /api/v1/auth/refresh")
     inner class Refresh {
         @Test
         fun `should return 200 with new tokens when refresh succeeds`() {

@@ -2,7 +2,6 @@ package com.jpmns.task.core.presentation.controller
 
 import java.time.Instant
 
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,7 +39,6 @@ import io.mockk.every
 
 @WebMvcTest(TaskController::class)
 @Import(SecurityConfig::class, GlobalExceptionHandler::class)
-@DisplayName("TaskController Tests")
 class TaskControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -80,7 +78,6 @@ class TaskControllerTest {
     }
 
     @Nested
-    @DisplayName("POST /api/v1/tasks")
     inner class CreateTask {
         @Test
         @WithJwtTokenMock
@@ -130,7 +127,6 @@ class TaskControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/tasks")
     inner class ListTasks {
         @Test
         @WithJwtTokenMock
@@ -169,7 +165,6 @@ class TaskControllerTest {
     }
 
     @Nested
-    @DisplayName("PUT /api/v1/tasks/{taskId}")
     inner class UpdateTask {
         @Test
         @WithJwtTokenMock
@@ -250,7 +245,6 @@ class TaskControllerTest {
     }
 
     @Nested
-    @DisplayName("DELETE /api/v1/tasks/{taskId}")
     inner class DeleteTask {
         @Test
         @WithJwtTokenMock
@@ -306,7 +300,6 @@ class TaskControllerTest {
     }
 
     @Nested
-    @DisplayName("PATCH /api/v1/tasks/{taskId}/finish")
     inner class MarkAsFinished {
         @Test
         @WithJwtTokenMock

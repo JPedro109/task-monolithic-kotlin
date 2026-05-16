@@ -3,7 +3,6 @@ package com.jpmns.task.integration
 import java.util.UUID
 
 import org.hamcrest.Matchers.hasSize
-import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -20,7 +19,6 @@ import com.jpmns.task.integration.common.abstracts.IntegrationTestBase
 import com.jpmns.task.integration.common.sql.SqlCreateSeed
 import com.jpmns.task.shared.security.WithJwtTokenMock
 
-@DisplayName("Task Integration Tests")
 class TaskIntegrationTest : IntegrationTestBase() {
     companion object {
         private const val EXISTING_TASK_ID = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
@@ -28,7 +26,6 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("POST /api/v1/tasks")
     inner class CreateTask {
         @Test
         @SqlCreateSeed
@@ -84,7 +81,6 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("GET /api/v1/tasks")
     inner class ListTasks {
         @Test
         @SqlCreateSeed
@@ -107,7 +103,6 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("PUT /api/v1/tasks/{taskId}")
     inner class UpdateTask {
         @Test
         @SqlCreateSeed
@@ -172,7 +167,6 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("DELETE /api/v1/tasks/{taskId}")
     inner class DeleteTask {
         @Test
         @SqlCreateSeed
@@ -214,7 +208,6 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
-    @DisplayName("PATCH /api/v1/tasks/{taskId}/finish")
     inner class MarkTaskAsFinished {
         @Test
         @SqlCreateSeed
