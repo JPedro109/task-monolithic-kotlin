@@ -33,12 +33,12 @@ class TracingContextFilter : OncePerRequestFilter() {
 
         val scope = baggageBuilder.build().makeCurrent()
 
-        try {
+        runCatching {
             filterChain.doFilter(request, response)
-        } finally {
+        }.also {
             scope.close()
             clear()
-        }
+        }.getOrThrow()
     }
 
     private fun isApplicationRequest(request: HttpServletRequest): Boolean {
