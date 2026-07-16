@@ -52,7 +52,6 @@ springdoc:
 management:
   endpoints:
     web:
-      base-path: /
       exposure:
         include: health,info,metrics
       path-mapping:
