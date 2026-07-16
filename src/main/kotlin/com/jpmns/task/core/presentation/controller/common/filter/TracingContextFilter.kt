@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 import com.jpmns.task.core.presentation.controller.common.resolver.AuthenticatedUserResolver
-import com.jpmns.task.shared.extension.addValue
 
 import io.opentelemetry.api.baggage.Baggage
 import io.opentelemetry.api.baggage.BaggageBuilder
@@ -51,24 +50,22 @@ class TracingContextFilter : OncePerRequestFilter() {
         baggageBuilder: BaggageBuilder,
         correlationId: String
     ) {
-        baggageBuilder.addValue(MDC_CORRELATION_ID, correlationId)
+        baggageBuilder.put(MDC_CORRELATION_ID, correlationId)
 
         AuthenticatedUserResolver
             .getUserIdOrNull()
-            ?.also { baggageBuilder.addValue(MDC_USER_ID, it) }
+            ?.also { baggageBuilder.put(MDC_USER_ID, it) }
 
         request.requestURI?.also {
-            baggageBuilder.addValue(MDC_PATH, it)
+            MDC.put(MDC_PATH, it)
         }
 
         request.method?.also {
-            baggageBuilder.addValue(MDC_METHOD, it)
+            MDC.put(MDC_METHOD, it)
         }
     }
 
     private fun clear() {
-        MDC.remove(MDC_USER_ID)
-        MDC.remove(MDC_CORRELATION_ID)
         MDC.remove(MDC_PATH)
         MDC.remove(MDC_METHOD)
     }
