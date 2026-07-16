@@ -34,11 +34,11 @@ security:
 
 springdoc:
   api-docs:
-    enabled: ${DOC_ENABLED:false}
+    enabled: ${DOC_ENABLED:true}
   swagger-ui:
     operation-sorter: method
     path: /docs
-    enabled: ${DOC_ENABLED:false}
+    enabled: ${DOC_ENABLED:true}
 
 management:
   endpoints:
@@ -96,9 +96,8 @@ management:
           - user-id
 
 logging:
-  level:
-    com.jpmns.task: ${app.log.level}
-    org:
-      security: off
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    level:
+        com.jpmns.task: ${app.log.level}
+        org.springframework.security: OFF
+    pattern:
+        correlation: "[correlation-id=%X{correlation-id}] [user-id=%X{user-id}] [method=%X{method}] [uri=%X{path}] "
