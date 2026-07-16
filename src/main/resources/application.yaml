@@ -76,16 +76,13 @@ management:
           show-details: always
   metrics:
     enable:
-      spring:
-        security: false
       all: true
-      jvm: true
+      spring:
+          security: false
     distribution:
       percentiles-histogram:
         http.server.requests: true
       distribution:
-        sla:
-          http.server.requests: 5ms, 10ms, 100ms, 150ms, 250ms, 500ms, 1s, 3s, 5s, 10s, 15s, 20s, 25s, 30s
         slo:
           http.server.requests: 5ms, 10ms, 100ms, 150ms, 250ms, 500ms, 1s, 3s, 5s, 10s, 15s, 20s, 25s, 30s
     export:
