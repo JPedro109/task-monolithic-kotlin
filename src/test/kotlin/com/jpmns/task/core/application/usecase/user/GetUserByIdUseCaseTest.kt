@@ -40,7 +40,6 @@ class GetUserByIdUseCaseTest {
 
         assertThat(output.id).isEqualTo(userId.asString())
         assertThat(output.username).isEqualTo(user.username.asString())
-        assertThat(output.password).isEqualTo(user.password.asString())
         assertThat(output.createdAt).isEqualTo(user.createdAt)
         assertThat(output.updatedAt).isEqualTo(user.updatedAt)
 

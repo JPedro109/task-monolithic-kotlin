@@ -26,7 +26,6 @@ class GetUserByIdUseCaseImpl(
         return UserOutputDTO(
             id = user.id.asString(),
             username = user.username.asString(),
-            password = user.password.asString(),
             createdAt = user.createdAt,
             updatedAt = user.updatedAt
         )

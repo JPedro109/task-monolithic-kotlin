@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
@@ -29,6 +28,7 @@ import com.jpmns.task.core.application.usecase.task.interfaces.DeleteTaskUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.ListTasksUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.MarkTaskAsFinishedUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.UpdateTaskUseCase
+import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.TaskFixture
 import com.jpmns.task.shared.fixture.UserFixture
@@ -62,7 +62,7 @@ class TaskControllerTest {
     private lateinit var token: Token
 
     @MockkBean
-    private lateinit var userDetailsService: UserDetailsService
+    private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
 
     private fun buildTaskOutput(): TaskOutputDTO {
         val task = TaskFixture.aTask()

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
@@ -22,6 +21,7 @@ import com.jpmns.task.core.application.usecase.user.dto.output.UpdateUsernameOut
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
+import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
 import com.jpmns.task.core.application.usecase.user.interfaces.CreateUserUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.DeleteUserUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUserPasswordUseCase
@@ -55,7 +55,7 @@ class UserControllerTest {
     private lateinit var token: Token
 
     @MockkBean
-    private lateinit var userDetailsService: UserDetailsService
+    private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
 
     @Nested
     inner class CreateUser {

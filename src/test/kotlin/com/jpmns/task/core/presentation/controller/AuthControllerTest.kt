@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -19,6 +18,7 @@ import com.jpmns.task.core.application.port.security.exception.InvalidTokenExcep
 import com.jpmns.task.core.application.usecase.user.dto.output.RefreshUserTokenOutputDTO
 import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDTO
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
+import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
 import com.jpmns.task.core.application.usecase.user.interfaces.RefreshUserTokenUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.UserLoginUseCase
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
@@ -43,7 +43,7 @@ class AuthControllerTest {
     private lateinit var token: Token
 
     @MockkBean
-    private lateinit var userDetailsService: UserDetailsService
+    private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
 
     @Nested
     inner class Login {
