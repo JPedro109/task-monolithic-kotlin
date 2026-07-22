@@ -34,11 +34,11 @@ security:
 
 springdoc:
   api-docs:
-    enabled: ${DOC_ENABLED:true}
+    enabled: ${DOC_ENABLED:false}
   swagger-ui:
     operation-sorter: method
     path: /docs
-    enabled: ${DOC_ENABLED:true}
+    enabled: ${DOC_ENABLED:false}
 
 management:
   endpoints:
@@ -47,11 +47,6 @@ management:
         include: health,info,metrics
       path-mapping:
         health: healthcheck
-  health:
-    livenessstate:
-      enabled: true
-    readinessstate:
-      enabled: true
   endpoint:
     health:
       probes:
