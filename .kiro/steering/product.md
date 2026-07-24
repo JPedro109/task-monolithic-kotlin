@@ -1,23 +1,23 @@
-# Product Overview
+# Visão Geral do Produto
 
-Task Service is a RESTful API for task management built with Kotlin and Spring Boot, following Clean Architecture principles.
+O Task Service é uma API RESTful para gerenciamento de tarefas construída com Kotlin e Spring Boot, seguindo os princípios de Clean Architecture.
 
-## Core Functionality
+## Funcionalidades Principais
 
-- User registration and authentication (JWT-based with access/refresh tokens)
-- Full CRUD operations on tasks (create, list, update, delete, mark as finished)
-- Each user can only access their own tasks (resource isolation)
+- Cadastro e autenticação de usuários (baseado em JWT com tokens de acesso e refresh)
+- Operações CRUD completas em tarefas (criar, listar, atualizar, deletar, marcar como concluída)
+- Cada usuário só pode acessar suas próprias tarefas (isolamento de recursos)
 
-## API Surface
+## Superfície da API
 
 - **Auth**: Login (`POST /api/v1/auth/login`), Refresh (`POST /api/v1/auth/refresh`)
-- **Users**: Create, delete, update password, update username (`/api/v1/users`)
-- **Tasks**: Create, list, update name, delete, finish (`/api/v1/tasks`)
+- **Usuários**: Criar, deletar, atualizar senha, atualizar username (`/api/v1/users`)
+- **Tarefas**: Criar, listar, atualizar nome, deletar, concluir (`/api/v1/tasks`)
 
-## Key Constraints
+## Restrições Principais
 
-- All task endpoints require Bearer token authentication
-- Users can only manage their own tasks
-- JWT secret must be at least 32 characters
-- Swagger UI available at `/docs`
-- Health/metrics at `/healthcheck`, `/info`, `/metrics`
+- Todos os endpoints de tarefas requerem autenticação via Bearer token
+- Usuários só podem gerenciar suas próprias tarefas
+- O segredo JWT deve ter no mínimo 32 caracteres
+- Swagger UI disponível em `/docs`
+- Health/métricas em `/healthcheck`, `/info`, `/metrics`

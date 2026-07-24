@@ -1,73 +1,73 @@
-# Tech Stack
+# Stack Tecnológica
 
-## Language & Runtime
+## Linguagem & Runtime
 
-- Kotlin 2.0.21 targeting JVM 21
-- Compiler flag: `-Xjsr305=strict` (strict null-safety interop with Java)
+- Kotlin 2.0.21 com alvo JVM 21
+- Flag do compilador: `-Xjsr305=strict` (interoperabilidade estrita de null-safety com Java)
 
 ## Framework
 
 - Spring Boot 3.4.5
-- Spring Security (JWT authentication via JJWT 0.12.6)
+- Spring Security (autenticação JWT via JJWT 0.12.6)
 - Spring Data JPA (Hibernate)
 - Spring Validation (Jakarta Bean Validation)
 
-## Database
+## Banco de Dados
 
-- PostgreSQL 15 (production)
-- Flyway for schema migrations
-- H2 for unit tests, Testcontainers (PostgreSQL) for integration tests
+- PostgreSQL 15 (produção)
+- Flyway para migrações de schema
+- H2 para testes unitários, Testcontainers (PostgreSQL) para testes de integração
 
-## Observability
+## Observabilidade
 
 - Spring Boot Actuator
-- Micrometer with OTLP registry
-- OpenTelemetry (tracing + metrics export)
+- Micrometer com registry OTLP
+- OpenTelemetry (exportação de tracing + métricas)
 - Prometheus + Grafana (via Docker Compose)
 
-## Documentation
+## Documentação
 
 - SpringDoc OpenAPI (springdoc-openapi-starter-webmvc-ui 2.8.8)
 
-## Build System
+## Sistema de Build
 
-- Gradle with Kotlin DSL
+- Gradle com Kotlin DSL
 - Plugins: `kotlin-jvm`, `kotlin-spring`, `kotlin-jpa`, `spring-boot`, `spring-dependency-management`
 
-## Code Quality
+## Qualidade de Código
 
-- **ktlint** 1.5.0 — formatting (zero warnings policy)
-- **detekt** 1.23.8 — static analysis (custom config in `detekt.yml`)
-- **JaCoCo** — code coverage with 85% minimum threshold
+- **ktlint** 1.5.0 — formatação (política de zero warnings)
+- **detekt** 1.23.8 — análise estática (configuração customizada em `detekt.yml`)
+- **JaCoCo** — cobertura de código com threshold mínimo de 85%
 
-## Testing
+## Testes
 
 - JUnit 5 (JUnit Platform)
 - MockK 1.13.13 + SpringMockK 4.0.2
 - Testcontainers (PostgreSQL)
 - Spring Security Test
 
-## Common Commands
+## Comandos Comuns
 
 ```bash
-# Run the application
+# Rodar a aplicação
 ./gradlew bootRun
 
-# Run tests (requires Docker for Testcontainers)
+# Rodar os testes (requer Docker para o Testcontainers)
 ./gradlew test
 
-# Full quality check (tests + coverage + ktlint + detekt)
+# Verificação completa de qualidade (testes + cobertura + ktlint + detekt)
 ./gradlew check
 
-# Format code with ktlint
+# Formatar o código com ktlint
 ./gradlew ktlintFormat
 
-# Start infrastructure (PostgreSQL, Prometheus, Grafana, OTEL Collector)
+# Subir a infraestrutura (PostgreSQL, Prometheus, Grafana, OTEL Collector)
 cd docker && docker compose up -d
 ```
 
-## Notes
+## Observações
 
-- `allOpen` plugin opens JPA entities, `@Service`, `@Component`, `@Repository` classes
-- `noArg` plugin generates no-arg constructors for JPA entities
-- Coverage excludes: configuration classes, DTOs, and exception classes
+- O plugin `allOpen` abre entidades JPA, classes `@Service`, `@Component` e `@Repository`
+- O plugin `noArg` gera construtores sem argumentos para entidades JPA
+- A cobertura exclui: classes de configuração, DTOs e classes de exceção

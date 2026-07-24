@@ -1,87 +1,87 @@
-# Project Structure
+# Estrutura do Projeto
 
-## Architecture: Clean Architecture (Ports & Adapters)
+## Arquitetura: Clean Architecture (Ports & Adapters)
 
 ```
 src/main/kotlin/com/jpmns/task/
-├── TaskApplication.kt              # Spring Boot entry point
-├── configuration/                  # Spring configuration beans
+├── TaskApplication.kt              # Ponto de entrada do Spring Boot
+├── configuration/                  # Beans de configuração do Spring
 │   ├── security/                   # SecurityConfig (filter chain, CORS, CSRF)
-│   ├── swagger/                    # SwaggerConfig (OpenAPI metadata)
-│   └── tracing/                    # OtelBaggageConfig (observability)
+│   ├── swagger/                    # SwaggerConfig (metadados OpenAPI)
+│   └── tracing/                    # OtelBaggageConfig (observabilidade)
 ├── core/
-│   ├── domain/                     # Domain layer (entities, value objects, exceptions)
+│   ├── domain/                     # Camada de domínio (entidades, value objects, exceções)
 │   │   ├── common/
-│   │   │   ├── abstracts/          # Base Entity class
-│   │   │   ├── exception/          # Domain exceptions
-│   │   │   └── valueobject/        # Shared value objects (IdValueObject)
+│   │   │   ├── abstracts/          # Classe base Entity
+│   │   │   ├── exception/          # Exceções de domínio
+│   │   │   └── valueobject/        # Value objects compartilhados (IdValueObject)
 │   │   ├── task/
 │   │   │   ├── TaskEntity.kt
 │   │   │   └── valueobject/        # TaskNameValueObject
 │   │   └── user/
 │   │       ├── UserEntity.kt
 │   │       └── valueobject/        # UsernameValueObject, PasswordValueObject
-│   ├── application/                # Application layer (use cases, ports)
+│   ├── application/                # Camada de aplicação (casos de uso, ports)
 │   │   ├── port/
-│   │   │   ├── persistence/repository/   # Repository interfaces (TaskRepository, UserRepository)
-│   │   │   └── security/                 # Security port interfaces (Token, PasswordEncoder)
+│   │   │   ├── persistence/repository/   # Interfaces de repositório (TaskRepository, UserRepository)
+│   │   │   └── security/                 # Interfaces de port de segurança (Token, PasswordEncoder)
 │   │   └── usecase/
 │   │       ├── task/
-│   │       │   ├── interfaces/     # Use case interfaces (e.g., CreateTaskUseCase)
-│   │       │   ├── implementation/ # Use case implementations (e.g., CreateTaskUseCaseImpl)
-│   │       │   ├── dto/            # Input/Output DTOs
-│   │       │   └── exception/      # Use case-specific exceptions
-│   │       └── user/               # Same structure as task/
-│   ├── external/                   # Infrastructure adapters
+│   │       │   ├── interfaces/     # Interfaces de casos de uso (ex: CreateTaskUseCase)
+│   │       │   ├── implementation/ # Implementações dos casos de uso (ex: CreateTaskUseCaseImpl)
+│   │       │   ├── dto/            # DTOs de entrada/saída
+│   │       │   └── exception/      # Exceções específicas do caso de uso
+│   │       └── user/               # Mesma estrutura de task/
+│   ├── external/                   # Adaptadores de infraestrutura
 │   │   ├── persistence/
-│   │   │   ├── dao/                # Spring Data JPA interfaces
-│   │   │   ├── model/             # JPA entity models (DB representation)
-│   │   │   ├── mapper/            # Domain ↔ JPA model mappers
-│   │   │   └── repository/        # Repository adapter implementations
+│   │   │   ├── dao/                # Interfaces Spring Data JPA
+│   │   │   ├── model/             # Modelos de entidade JPA (representação no banco)
+│   │   │   ├── mapper/            # Mappers domínio ↔ modelo JPA
+│   │   │   └── repository/        # Implementações dos adaptadores de repositório
 │   │   └── security/
-│   │       ├── filter/             # JWT authentication filter
-│   │       ├── service/            # UserDetailsService implementation
-│   │       ├── TokenAdapter.kt     # JWT token adapter
+│   │       ├── filter/             # Filtro de autenticação JWT
+│   │       ├── service/            # Implementação do UserDetailsService
+│   │       ├── TokenAdapter.kt     # Adaptador de token JWT
 │   │       └── PasswordEncoderAdapter.kt
-│   └── presentation/              # Presentation layer
+│   └── presentation/              # Camada de apresentação
 │       ├── controller/
 │       │   ├── AuthController.kt
 │       │   ├── TaskController.kt
 │       │   ├── UserController.kt
-│       │   ├── common/            # Shared controller concerns (exception handlers)
-│       │   ├── documentation/     # Swagger annotations/interfaces
-│       │   └── payload/           # Request/Response DTOs
-│       └── scheduler/             # Scheduled tasks (if any)
-└── shared/                        # Cross-cutting utilities
-    ├── extension/                 # Kotlin extension functions
-    └── type/                      # Shared types (Result<T, E>)
+│       │   ├── common/            # Preocupações comuns dos controllers (handlers de exceção)
+│       │   ├── documentation/     # Anotações/interfaces Swagger
+│       │   └── payload/           # DTOs de requisição/resposta
+│       └── scheduler/             # Tarefas agendadas (se houver)
+└── shared/                        # Utilitários transversais
+    ├── extension/                 # Funções de extensão Kotlin
+    └── type/                      # Tipos compartilhados (Result<T, E>)
 ```
 
-## Key Conventions
+## Convenções Principais
 
-- **Use cases**: One interface per use case in `interfaces/`, one implementation in `implementation/` (suffix `Impl`)
-- **Value objects**: Created via `of()` factory method returning `Result<T, E>`; validated at construction
-- **Entities**: Extend base `Entity` class; validate all value objects in `init` block via `validateOrThrow()`
-- **Ports**: Interfaces in `application/port/`; adapters in `external/`
-- **DTOs**: Separate input/output DTOs per use case; never expose domain entities to controllers
-- **Persistence**: JPA models in `external/persistence/model/` are distinct from domain entities; mappers handle conversion
-- **Controllers**: Thin — delegate to use cases, handle HTTP concerns only
+- **Casos de uso**: Uma interface por caso de uso em `interfaces/`, uma implementação em `implementation/` (sufixo `Impl`)
+- **Value objects**: Criados via método factory `of()` retornando `Result<T, E>`; validados na construção
+- **Entidades**: Estendem a classe base `Entity`; validam todos os value objects no bloco `init` via `validateOrThrow()`
+- **Ports**: Interfaces em `application/port/`; adaptadores em `external/`
+- **DTOs**: DTOs de entrada/saída separados por caso de uso; nunca expor entidades de domínio para os controllers
+- **Persistência**: Modelos JPA em `external/persistence/model/` são distintos das entidades de domínio; mappers fazem a conversão
+- **Controllers**: Enxutos — delegam para casos de uso, tratam apenas preocupações HTTP
 
-## Test Structure
+## Estrutura de Testes
 
 ```
-src/test/kotlin/com/jpmns/task/     # Mirrors main source structure
+src/test/kotlin/com/jpmns/task/     # Espelha a estrutura do código principal
 src/test/resources/
-├── application-integration-test.yaml  # Integration test config
-└── sql/                               # SQL scripts for test data setup
+├── application-integration-test.yaml  # Configuração dos testes de integração
+└── sql/                               # Scripts SQL para configuração de dados de teste
 ```
 
-## Infrastructure
+## Infraestrutura
 
 ```
 docker/
 ├── docker-compose.yml              # PostgreSQL, Prometheus, Grafana, OTEL Collector
-├── grafana/                        # Dashboard + provisioning configs
-├── otel-collector/                 # OTEL Collector config
-└── prometheus/                     # Prometheus scrape config
+├── grafana/                        # Configurações de dashboard e provisioning
+├── otel-collector/                 # Configuração do OTEL Collector
+└── prometheus/                     # Configuração de scrape do Prometheus
 ```
