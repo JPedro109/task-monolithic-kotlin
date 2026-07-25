@@ -12,4 +12,10 @@ object UserFixture {
         username = DEFAULT_USERNAME,
         password = DEFAULT_PASSWORD
     )
+
+    fun aUserWithId(id: String): UserEntity = UserEntity(
+        id = id,
+        username = DEFAULT_USERNAME,
+        password = DEFAULT_PASSWORD
+    )
 }

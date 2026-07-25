@@ -39,51 +39,30 @@ class UserLoginUseCaseTest {
         val user = UserFixture.aUser()
         val username = user.username
         val password = user.password
+        val userId = user.id
+        val usernameString = username.asString()
+        val passwordString = password.asString()
+        val userIdString = userId.asString()
         val accessToken = "generated-access-token"
         val refreshToken = "generated-refresh-token"
         val input = UserLoginInputDTO(
-            username = username.asString(),
-            password = password.asString()
+            username = usernameString,
+            password = passwordString
         )
 
         every { userRepository.findByUsername(username) } returns user
-        every {
-            passwordEncoder.matches(
-                rawPassword = password.asString(),
-                encodedPassword = password.asString()
-            )
-        } returns true
-        every { token.generateAccessToken(user.id.asString()) } returns accessToken
-        every { token.generateRefreshToken(user.id.asString()) } returns refreshToken
+        every { passwordEncoder.matches(rawPassword = passwordString, encodedPassword = passwordString) } returns true
+        every { token.generateAccessToken(userIdString) } returns accessToken
+        every { token.generateRefreshToken(userIdString) } returns refreshToken
 
         val output = useCase.execute(input)
 
         assertThat(output.accessToken).isEqualTo(accessToken)
         assertThat(output.refreshToken).isEqualTo(refreshToken)
-
         verify { userRepository.findByUsername(username) }
-        verify { passwordEncoder.matches(rawPassword = password.asString(), encodedPassword = password.asString()) }
-        verify { token.generateAccessToken(user.id.asString()) }
-        verify { token.generateRefreshToken(user.id.asString()) }
-    }
-
-    @Test
-    fun `should throw when username is invalid`() {
-        val user = UserFixture.aUser()
-        val password = user.password
-        val invalidUsername = "ab"
-        val input = UserLoginInputDTO(
-            username = invalidUsername,
-            password = password.asString()
-        )
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
-        verify(exactly = 0) { userRepository.findByUsername(any()) }
-        verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
-        verify(exactly = 0) { token.generateAccessToken(any()) }
-        verify(exactly = 0) { token.generateRefreshToken(any()) }
+        verify { passwordEncoder.matches(rawPassword = passwordString, encodedPassword = passwordString) }
+        verify { token.generateAccessToken(userIdString) }
+        verify { token.generateRefreshToken(userIdString) }
     }
 
     @Test
@@ -91,16 +70,17 @@ class UserLoginUseCaseTest {
         val user = UserFixture.aUser()
         val username = user.username
         val password = user.password
+        val usernameString = username.asString()
+        val passwordString = password.asString()
         val input = UserLoginInputDTO(
-            username = username.asString(),
-            password = password.asString()
+            username = usernameString,
+            password = passwordString
         )
 
         every { userRepository.findByUsername(username) } returns null
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(InvalidCredentialsException::class.java)
-
         verify { userRepository.findByUsername(username) }
         verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
         verify(exactly = 0) { token.generateAccessToken(any()) }
@@ -112,25 +92,40 @@ class UserLoginUseCaseTest {
         val user = UserFixture.aUser()
         val username = user.username
         val password = user.password
+        val usernameString = username.asString()
+        val passwordString = password.asString()
         val wrongPassword = "wrong-password"
         val input = UserLoginInputDTO(
-            username = username.asString(),
+            username = usernameString,
             password = wrongPassword
         )
 
         every { userRepository.findByUsername(username) } returns user
-        every {
-            passwordEncoder.matches(
-                rawPassword = wrongPassword,
-                encodedPassword = password.asString()
-            )
-        } returns false
+        every { passwordEncoder.matches(rawPassword = wrongPassword, encodedPassword = passwordString) } returns false
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(InvalidCredentialsException::class.java)
-
         verify { userRepository.findByUsername(username) }
-        verify { passwordEncoder.matches(rawPassword = wrongPassword, encodedPassword = password.asString()) }
+        verify { passwordEncoder.matches(rawPassword = wrongPassword, encodedPassword = passwordString) }
+        verify(exactly = 0) { token.generateAccessToken(any()) }
+        verify(exactly = 0) { token.generateRefreshToken(any()) }
+    }
+
+    @Test
+    fun `should throw when username is invalid`() {
+        val user = UserFixture.aUser()
+        val password = user.password
+        val passwordString = password.asString()
+        val invalidUsername = "ab"
+        val input = UserLoginInputDTO(
+            username = invalidUsername,
+            password = passwordString
+        )
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+        verify(exactly = 0) { userRepository.findByUsername(any()) }
+        verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
         verify(exactly = 0) { token.generateAccessToken(any()) }
         verify(exactly = 0) { token.generateRefreshToken(any()) }
     }

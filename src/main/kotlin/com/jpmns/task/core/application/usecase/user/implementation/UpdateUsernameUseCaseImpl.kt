@@ -9,6 +9,7 @@ import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundExcept
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
 import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUsernameUseCase
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
+import com.jpmns.task.core.domain.user.UserEntity
 import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 
 @Service
@@ -36,11 +37,15 @@ class UpdateUsernameUseCaseImpl(
         }
 
         user.updateUsername(input.newUsername)
+
         val saved = userRepository.save(user)
 
-        return UpdateUsernameOutputDTO(
-            id = saved.id.asString(),
-            username = saved.username.asString()
-        )
+        return toOutput(saved)
     }
+
+    private fun toOutput(user: UserEntity): UpdateUsernameOutputDTO =
+        UpdateUsernameOutputDTO(
+            id = user.id.asString(),
+            username = user.username.asString()
+        )
 }

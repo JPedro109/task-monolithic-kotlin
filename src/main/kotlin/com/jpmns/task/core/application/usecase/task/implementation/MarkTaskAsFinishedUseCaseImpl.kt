@@ -24,11 +24,13 @@ class MarkTaskAsFinishedUseCaseImpl(
         val task = taskRepository.findById(taskId)
             ?: throw TaskNotFoundException()
 
-        if (task.userId.asString() != input.userId) {
+        val userIsOwner = task.userId.asString() == input.userId
+        if (!userIsOwner) {
             throw TaskAccessDeniedException()
         }
 
         task.markAsFinished()
+
         taskRepository.save(task)
     }
 }

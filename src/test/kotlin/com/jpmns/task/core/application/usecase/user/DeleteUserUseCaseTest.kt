@@ -39,23 +39,8 @@ class DeleteUserUseCaseTest {
         every { userRepository.deleteById(userId) } just Runs
 
         useCase.execute(input)
-
         verify { userRepository.findById(userId) }
         verify { userRepository.deleteById(userId) }
-    }
-
-    @Test
-    fun `should throw when user id is invalid`() {
-        val invalidUserId = "invalid-id"
-        val input = DeleteUserInputDTO(
-            userId = invalidUserId
-        )
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
-        verify(exactly = 0) { userRepository.findById(any()) }
-        verify(exactly = 0) { userRepository.deleteById(any()) }
     }
 
     @Test
@@ -72,6 +57,20 @@ class DeleteUserUseCaseTest {
             .isInstanceOf(UserNotFoundException::class.java)
 
         verify { userRepository.findById(userId) }
+        verify(exactly = 0) { userRepository.deleteById(any()) }
+    }
+
+    @Test
+    fun `should throw when user id is invalid`() {
+        val invalidUserId = "invalid-id"
+        val input = DeleteUserInputDTO(
+            userId = invalidUserId
+        )
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+
+        verify(exactly = 0) { userRepository.findById(any()) }
         verify(exactly = 0) { userRepository.deleteById(any()) }
     }
 }

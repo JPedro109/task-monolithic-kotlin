@@ -13,6 +13,5 @@ data class UpdateUserPasswordRequest(
     override val newPassword: String
 ) : UpdateUserPasswordRequestDoc {
     override fun toString(): String =
-        "UpdateUserPasswordRequest(" +
-            "currentPassword=[REDACTED], newPassword=[REDACTED])"
+        "UpdateUserPasswordRequest{currentPassword='[PROTECTED]', newPassword='[PROTECTED]'}"
 }

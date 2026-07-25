@@ -1,6 +1,5 @@
 package com.jpmns.task.core.external.persistence.mapper
 
-import java.time.Instant
 import java.util.UUID
 
 import org.assertj.core.api.Assertions.assertThat
@@ -29,16 +28,17 @@ class UserMapperTest {
     @Test
     fun `should map a UserJpaModel to a UserEntity correctly`() {
         val user = UserFixture.aUser()
-        val id = UUID.fromString(user.id.asString())
+        val userIdVO = user.id
         val username = user.username.asString()
         val password = user.password.asString()
-        val now = Instant.now()
+        val createdAt = user.createdAt
+        val id = UUID.fromString(userIdVO.asString())
         val model = UserJpaModel(
             id = id,
             username = username,
             password = password,
-            createdAt = now,
-            updatedAt = now
+            createdAt = createdAt,
+            updatedAt = null
         )
 
         val entity = UserMapper.toDomain(model)
@@ -51,16 +51,18 @@ class UserMapperTest {
 
     @Test
     fun `should preserve username when mapping from model to domain`() {
+        val user = UserFixture.aUser()
+        val userIdVO = user.id
+        val createdAt = user.createdAt
         val customUsername = "customuserpassword"
         val password = "other-password"
-        val id = UUID.randomUUID()
-        val now = Instant.now()
+        val id = UUID.fromString(userIdVO.asString())
         val model = UserJpaModel(
             id = id,
             username = customUsername,
             password = password,
-            createdAt = now,
-            updatedAt = now
+            createdAt = createdAt,
+            updatedAt = null
         )
 
         val entity = UserMapper.toDomain(model)
@@ -70,16 +72,18 @@ class UserMapperTest {
 
     @Test
     fun `should preserve password when mapping from model to domain`() {
+        val user = UserFixture.aUser()
+        val userIdVO = user.id
+        val createdAt = user.createdAt
         val customPassword = "custom-password"
         val username = "otherusername"
-        val id = UUID.randomUUID()
-        val now = Instant.now()
+        val id = UUID.fromString(userIdVO.asString())
         val model = UserJpaModel(
             id = id,
             username = username,
             password = customPassword,
-            createdAt = now,
-            updatedAt = now
+            createdAt = createdAt,
+            updatedAt = null
         )
 
         val entity = UserMapper.toDomain(model)
@@ -90,9 +94,10 @@ class UserMapperTest {
     @Test
     fun `should map createdAt from entity to model`() {
         val user = UserFixture.aUser()
+        val createdAt = user.createdAt
 
         val model = UserMapper.toModel(user)
 
-        assertThat(model.createdAt).isEqualTo(user.createdAt)
+        assertThat(model.createdAt).isEqualTo(createdAt)
     }
 }

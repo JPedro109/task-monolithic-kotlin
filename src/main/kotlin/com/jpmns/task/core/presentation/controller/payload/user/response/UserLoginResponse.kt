@@ -7,6 +7,9 @@ data class UserLoginResponse(
     override val accessToken: String,
     override val refreshToken: String
 ) : UserLoginResponseDoc {
+    override fun toString(): String =
+        "UserLoginResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
+
     companion object {
         fun of(dto: UserLoginOutputDTO): UserLoginResponse =
             UserLoginResponse(

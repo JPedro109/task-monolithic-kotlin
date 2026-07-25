@@ -31,6 +31,7 @@ class UpdateUserPasswordUseCaseImpl(
 
         val encodedNewPassword = passwordEncoder.encode(input.newPassword)
         user.updatePassword(encodedNewPassword)
+
         userRepository.save(user)
     }
 }

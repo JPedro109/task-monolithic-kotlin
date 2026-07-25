@@ -2,6 +2,7 @@ package com.jpmns.task.core.presentation.controller
 
 import jakarta.validation.Valid
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -53,7 +54,7 @@ class AuthController(
         return ResponseEntity.ok(response)
     }
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(AuthController::class.java)
+    private companion object {
+        val logger: Logger = LoggerFactory.getLogger(AuthController::class.java)
     }
 }

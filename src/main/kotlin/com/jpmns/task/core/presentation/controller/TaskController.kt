@@ -2,6 +2,7 @@ package com.jpmns.task.core.presentation.controller
 
 import jakarta.validation.Valid
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -62,7 +63,7 @@ class TaskController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        var input = ListTasksInputDTO(userId = userId)
+        val input = ListTasksInputDTO(userId = userId)
 
         val output = listTasksUseCase.execute(input)
 
@@ -119,7 +120,7 @@ class TaskController(
         return ResponseEntity.noContent().build()
     }
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(TaskController::class.java)
+    private companion object {
+        val logger: Logger = LoggerFactory.getLogger(TaskController::class.java)
     }
 }

@@ -1,5 +1,6 @@
 package com.jpmns.task.integration
 
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,14 +19,12 @@ class AuthIntegrationTest : IntegrationTestBase() {
     private lateinit var objectMapper: ObjectMapper
 
     @Nested
+    @DisplayName("POST /api/v1/auth/login")
     inner class Login {
         @Test
         @SqlCreateSeed
         fun `should return 200 with access and refresh tokens when credentials are valid`() {
-            val username = "john"
-            val password = "password"
-
-            perform(username, password)
+            perform(EXISTING_USERNAME, EXISTING_PASSWORD)
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.accessToken").isNotEmpty)
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty)
@@ -43,7 +42,7 @@ class AuthIntegrationTest : IntegrationTestBase() {
         @Test
         fun `should return 401 when user does not exist`() {
             val nonExistenceUsername = "nonexistenceuser"
-            val password = "password"
+            val password = EXISTING_PASSWORD
 
             perform(nonExistenceUsername, password)
                 .andExpect(status().isUnauthorized)
@@ -52,7 +51,7 @@ class AuthIntegrationTest : IntegrationTestBase() {
         @Test
         fun `should return 400 when username is blank`() {
             val emptyUsername = ""
-            val password = "password"
+            val password = EXISTING_PASSWORD
 
             perform(emptyUsername, password)
                 .andExpect(status().isBadRequest)
@@ -60,10 +59,9 @@ class AuthIntegrationTest : IntegrationTestBase() {
 
         @Test
         fun `should return 400 when password is blank`() {
-            val username = "john"
             val emptyPassword = ""
 
-            perform(username, emptyPassword)
+            perform(EXISTING_USERNAME, emptyPassword)
                 .andExpect(status().isBadRequest)
         }
 
@@ -79,19 +77,19 @@ class AuthIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("POST /api/v1/auth/refresh")
     inner class Refresh {
         @Test
         @SqlCreateSeed
         fun `should return 200 with new access token when refresh token is valid`() {
-            val loginBody = """{"username": "john", "password": "password"}"""
-            val response = mockMvc.perform(
+            val loginResponse = mockMvc.perform(
                 post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(loginBody)
+                    .content("""{"username": "$EXISTING_USERNAME", "password": "$EXISTING_PASSWORD"}""")
             )
                 .andExpect(status().isOk)
                 .andReturn()
-            val json = objectMapper.readTree(response.response.contentAsString)
+            val json = objectMapper.readTree(loginResponse.response.contentAsString)
             val refreshToken = json.get("refreshToken").asText()
 
             perform(refreshToken)
@@ -124,5 +122,10 @@ class AuthIntegrationTest : IntegrationTestBase() {
                     .content(requestBody)
             )
         }
+    }
+
+    companion object {
+        private const val EXISTING_USERNAME = "john"
+        private const val EXISTING_PASSWORD = "password"
     }
 }

@@ -35,46 +35,26 @@ class UpdateUserPasswordUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val password = user.password
+        val currentPasswordString = password.asString()
         val newPassword = "new-password"
         val encodedNewPassword = "encoded-password"
         val input = UpdateUserPasswordInputDTO(
             userId = userId.asString(),
-            currentPassword = password.asString(),
+            currentPassword = currentPasswordString,
             newPassword = newPassword
         )
 
         every { userRepository.findById(userId) } returns user
-        every { passwordEncoder.matches(password.asString(), password.asString()) } returns true
+        every { passwordEncoder.matches(currentPasswordString, currentPasswordString) } returns true
         every { passwordEncoder.encode(newPassword) } returns encodedNewPassword
         every { userRepository.save(any()) } returns user
 
         useCase.execute(input)
 
         verify { userRepository.findById(userId) }
-        verify { passwordEncoder.matches(password.asString(), password.asString()) }
+        verify { passwordEncoder.matches(currentPasswordString, currentPasswordString) }
         verify { passwordEncoder.encode(newPassword) }
         verify { userRepository.save(any()) }
-    }
-
-    @Test
-    fun `should throw when user id is invalid`() {
-        val user = UserFixture.aUser()
-        val password = user.password
-        val invalidUserId = "invalid-id"
-        val newPassword = "new-password"
-        val input = UpdateUserPasswordInputDTO(
-            userId = invalidUserId,
-            currentPassword = password.asString(),
-            newPassword = newPassword
-        )
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
-        verify(exactly = 0) { userRepository.findById(any()) }
-        verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
-        verify(exactly = 0) { passwordEncoder.encode(any()) }
-        verify(exactly = 0) { userRepository.save(any()) }
     }
 
     @Test
@@ -82,10 +62,11 @@ class UpdateUserPasswordUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val password = user.password
+        val currentPasswordString = password.asString()
         val newPassword = "new-password"
         val input = UpdateUserPasswordInputDTO(
             userId = userId.asString(),
-            currentPassword = password.asString(),
+            currentPassword = currentPasswordString,
             newPassword = newPassword
         )
 
@@ -93,7 +74,6 @@ class UpdateUserPasswordUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(UserNotFoundException::class.java)
-
         verify { userRepository.findById(userId) }
         verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
         verify(exactly = 0) { passwordEncoder.encode(any()) }
@@ -105,6 +85,7 @@ class UpdateUserPasswordUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val password = user.password
+        val currentPasswordString = password.asString()
         val wrongPassword = "wrong-password"
         val newPassword = "new-password"
         val input = UpdateUserPasswordInputDTO(
@@ -114,13 +95,33 @@ class UpdateUserPasswordUseCaseTest {
         )
 
         every { userRepository.findById(userId) } returns user
-        every { passwordEncoder.matches(wrongPassword, password.asString()) } returns false
+        every { passwordEncoder.matches(wrongPassword, currentPasswordString) } returns false
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(InvalidCredentialsException::class.java)
-
         verify { userRepository.findById(userId) }
-        verify { passwordEncoder.matches(wrongPassword, password.asString()) }
+        verify { passwordEncoder.matches(wrongPassword, currentPasswordString) }
+        verify(exactly = 0) { passwordEncoder.encode(any()) }
+        verify(exactly = 0) { userRepository.save(any()) }
+    }
+
+    @Test
+    fun `should throw when user id is invalid`() {
+        val user = UserFixture.aUser()
+        val password = user.password
+        val currentPasswordString = password.asString()
+        val invalidUserId = "invalid-id"
+        val newPassword = "new-password"
+        val input = UpdateUserPasswordInputDTO(
+            userId = invalidUserId,
+            currentPassword = currentPasswordString,
+            newPassword = newPassword
+        )
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+        verify(exactly = 0) { userRepository.findById(any()) }
+        verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
         verify(exactly = 0) { passwordEncoder.encode(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
     }

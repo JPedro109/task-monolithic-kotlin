@@ -48,7 +48,6 @@ class CreateUserUseCaseTest {
 
         assertThat(output.id).isEqualTo(user.id.asString())
         assertThat(output.username).isEqualTo(username.asString())
-
         verify { userRepository.existsByUsername(username) }
         verify { passwordEncoder.encode(password.asString()) }
         verify { userRepository.save(any()) }
@@ -65,10 +64,10 @@ class CreateUserUseCaseTest {
         )
 
         every { userRepository.existsByUsername(username) } returns true
+        every { passwordEncoder.encode(password.asString()) } returns password.asString()
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(UsernameAlreadyExistsException::class.java)
-
         verify { userRepository.existsByUsername(username) }
         verify(exactly = 0) { userRepository.save(any()) }
     }
@@ -83,11 +82,11 @@ class CreateUserUseCaseTest {
             password = password.asString()
         )
 
+        every { passwordEncoder.encode(password.asString()) } returns password.asString()
+
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(DomainException::class.java)
-
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
-        verify(exactly = 0) { passwordEncoder.encode(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
     }
 }

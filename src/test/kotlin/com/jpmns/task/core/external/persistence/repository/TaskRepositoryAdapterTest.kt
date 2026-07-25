@@ -1,6 +1,5 @@
 package com.jpmns.task.core.external.persistence.repository
 
-import java.time.Instant
 import java.util.Optional
 import java.util.UUID
 
@@ -28,25 +27,6 @@ class TaskRepositoryAdapterTest {
     @InjectMockKs
     private lateinit var adapter: TaskRepositoryAdapter
 
-    private fun buildTaskModel(): TaskJpaModel {
-        val task = TaskFixture.aTask()
-        val user = UserFixture.aUser()
-        val taskId = UUID.fromString(task.id.asString())
-        val userId = UUID.fromString(user.id.asString())
-        val taskName = task.taskName.asString()
-        val finished = task.finished
-        val now = Instant.now()
-
-        return TaskJpaModel(
-            id = taskId,
-            userId = userId,
-            taskName = taskName,
-            finished = finished,
-            createdAt = now,
-            updatedAt = now
-        )
-    }
-
     @Test
     fun `should save a task and return the persisted domain entity`() {
         val task = TaskFixture.aTask()
@@ -67,10 +47,9 @@ class TaskRepositoryAdapterTest {
     @Test
     fun `should find a task by id and return the domain entity`() {
         val task = TaskFixture.aTask()
-        val taskId = task.id
-        val id = IdValueObject.of(taskId.asString()).getSuccessValue()
-        val formattedId = UUID.fromString(taskId.asString())
-
+        val taskIdVO = task.id
+        val id = IdValueObject.of(taskIdVO.asString()).getSuccessValue()
+        val formattedId = UUID.fromString(taskIdVO.asString())
         val model = buildTaskModel()
 
         every { dao.findById(formattedId) } returns Optional.of(model)
@@ -78,14 +57,14 @@ class TaskRepositoryAdapterTest {
         val result = adapter.findById(id)
 
         assertThat(result).isNotNull()
-        assertThat(result!!.id.asString()).isEqualTo(taskId.asString())
+        assertThat(result!!.id.asString()).isEqualTo(taskIdVO.asString())
     }
 
     @Test
     fun `should return null when task is not found by id`() {
         val task = TaskFixture.aTask()
-        val taskId = task.id
-        val id = IdValueObject.of(taskId.asString()).getSuccessValue()
+        val taskIdVO = task.id
+        val id = IdValueObject.of(taskIdVO.asString()).getSuccessValue()
 
         every { dao.findById(any()) } returns Optional.empty()
 
@@ -126,14 +105,35 @@ class TaskRepositoryAdapterTest {
     @Test
     fun `should delete a task by id`() {
         val task = TaskFixture.aTask()
-        val taskId = task.id
-        val id = IdValueObject.of(taskId.asString()).getSuccessValue()
-        val formattedId = UUID.fromString(taskId.asString())
+        val taskIdVO = task.id
+        val id = IdValueObject.of(taskIdVO.asString()).getSuccessValue()
+        val formattedId = UUID.fromString(taskIdVO.asString())
 
         every { dao.deleteById(any()) } returns Unit
 
         adapter.deleteById(id)
 
         verify { dao.deleteById(formattedId) }
+    }
+
+    private fun buildTaskModel(): TaskJpaModel {
+        val task = TaskFixture.aTask()
+        val user = UserFixture.aUser()
+        val taskIdVO = task.id
+        val userIdVO = user.id
+        val taskName = task.taskName.asString()
+        val finished = task.finished
+        val createdAt = task.createdAt
+        val taskId = UUID.fromString(taskIdVO.asString())
+        val userId = UUID.fromString(userIdVO.asString())
+
+        return TaskJpaModel(
+            id = taskId,
+            userId = userId,
+            taskName = taskName,
+            finished = finished,
+            createdAt = createdAt,
+            updatedAt = null
+        )
     }
 }

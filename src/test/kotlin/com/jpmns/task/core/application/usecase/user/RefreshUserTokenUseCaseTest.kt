@@ -36,28 +36,28 @@ class RefreshUserTokenUseCaseTest {
     fun `should refresh token successfully`() {
         val user = UserFixture.aUser()
         val userId = user.id
+        val userIdString = userId.asString()
         val refreshTokenValue = "valid-refresh-token"
         val newAccessToken = "new-access-token"
         val newRefreshToken = "new-refresh-token"
-        val decoded = DecodeTokenDto(sub = userId.asString())
+        val decoded = DecodeTokenDto(sub = userIdString)
         val input = RefreshUserTokenInputDTO(
             refreshToken = refreshTokenValue
         )
 
         every { token.tokenValidation(refreshTokenValue) } returns decoded
         every { userRepository.findById(userId) } returns user
-        every { token.generateAccessToken(userId.asString()) } returns newAccessToken
-        every { token.generateRefreshToken(userId.asString()) } returns newRefreshToken
+        every { token.generateAccessToken(userIdString) } returns newAccessToken
+        every { token.generateRefreshToken(userIdString) } returns newRefreshToken
 
         val output = useCase.execute(input)
 
         assertThat(output.accessToken).isEqualTo(newAccessToken)
         assertThat(output.refreshToken).isEqualTo(newRefreshToken)
-
         verify { token.tokenValidation(refreshTokenValue) }
         verify { userRepository.findById(userId) }
-        verify { token.generateAccessToken(userId.asString()) }
-        verify { token.generateRefreshToken(userId.asString()) }
+        verify { token.generateAccessToken(userIdString) }
+        verify { token.generateRefreshToken(userIdString) }
     }
 
     @Test
@@ -71,9 +71,30 @@ class RefreshUserTokenUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(InvalidTokenException::class.java)
-
         verify { token.tokenValidation(refreshTokenValue) }
         verify(exactly = 0) { userRepository.findById(any()) }
+        verify(exactly = 0) { token.generateAccessToken(any()) }
+        verify(exactly = 0) { token.generateRefreshToken(any()) }
+    }
+
+    @Test
+    fun `should throw when user is not found`() {
+        val user = UserFixture.aUser()
+        val userId = user.id
+        val userIdString = userId.asString()
+        val refreshTokenValue = "valid-refresh-token"
+        val decoded = DecodeTokenDto(sub = userIdString)
+        val input = RefreshUserTokenInputDTO(
+            refreshToken = refreshTokenValue
+        )
+
+        every { token.tokenValidation(refreshTokenValue) } returns decoded
+        every { userRepository.findById(userId) } returns null
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(UserNotFoundException::class.java)
+        verify { token.tokenValidation(refreshTokenValue) }
+        verify { userRepository.findById(userId) }
         verify(exactly = 0) { token.generateAccessToken(any()) }
         verify(exactly = 0) { token.generateRefreshToken(any()) }
     }
@@ -90,31 +111,8 @@ class RefreshUserTokenUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(DomainException::class.java)
-
         verify { token.tokenValidation(refreshTokenValue) }
         verify(exactly = 0) { userRepository.findById(any()) }
-        verify(exactly = 0) { token.generateAccessToken(any()) }
-        verify(exactly = 0) { token.generateRefreshToken(any()) }
-    }
-
-    @Test
-    fun `should throw when user is not found`() {
-        val user = UserFixture.aUser()
-        val userId = user.id
-        val refreshTokenValue = "valid-refresh-token"
-        val decoded = DecodeTokenDto(sub = userId.asString())
-        val input = RefreshUserTokenInputDTO(
-            refreshToken = refreshTokenValue
-        )
-
-        every { token.tokenValidation(refreshTokenValue) } returns decoded
-        every { userRepository.findById(userId) } returns null
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(UserNotFoundException::class.java)
-
-        verify { token.tokenValidation(refreshTokenValue) }
-        verify { userRepository.findById(userId) }
         verify(exactly = 0) { token.generateAccessToken(any()) }
         verify(exactly = 0) { token.generateRefreshToken(any()) }
     }

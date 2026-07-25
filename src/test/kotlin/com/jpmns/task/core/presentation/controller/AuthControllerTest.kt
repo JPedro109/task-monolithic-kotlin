@@ -1,5 +1,6 @@
 package com.jpmns.task.core.presentation.controller
 
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,19 +47,22 @@ class AuthControllerTest {
     private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
 
     @Nested
+    @DisplayName("POST /api/v1/auth/login")
     inner class Login {
         @Test
         fun `should return 200 with tokens when login succeeds`() {
             val user = UserFixture.aUser()
             val username = user.username
             val password = user.password
+            val usernameString = username.asString()
+            val passwordString = password.asString()
             val accessToken = "access-token"
             val refreshToken = "refresh-token"
             val output = UserLoginOutputDTO(accessToken, refreshToken)
 
             every { userLoginUseCase.execute(any()) } returns output
 
-            val result = perform(username.asString(), password.asString())
+            val result = perform(usernameString, passwordString)
 
             result.andExpect(status().isOk)
                 .andExpect(jsonPath("$.accessToken").value(accessToken))
@@ -69,11 +73,12 @@ class AuthControllerTest {
         fun `should return 401 when credentials are invalid`() {
             val user = UserFixture.aUser()
             val username = user.username
+            val usernameString = username.asString()
             val wrongPassword = "wrong-password"
 
             every { userLoginUseCase.execute(any()) } throws InvalidCredentialsException()
 
-            val result = perform(username.asString(), wrongPassword)
+            val result = perform(usernameString, wrongPassword)
 
             result.andExpect(status().isUnauthorized)
         }
@@ -92,9 +97,10 @@ class AuthControllerTest {
         fun `should return 400 when password is blank`() {
             val user = UserFixture.aUser()
             val username = user.username
+            val usernameString = username.asString()
             val emptyPassword = ""
 
-            val result = perform(username.asString(), emptyPassword)
+            val result = perform(usernameString, emptyPassword)
 
             result.andExpect(status().isBadRequest)
         }
@@ -111,6 +117,7 @@ class AuthControllerTest {
     }
 
     @Nested
+    @DisplayName("POST /api/v1/auth/refresh")
     inner class Refresh {
         @Test
         fun `should return 200 with new tokens when refresh succeeds`() {

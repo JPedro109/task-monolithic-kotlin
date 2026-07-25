@@ -24,12 +24,15 @@ class CreateTaskUseCaseImpl(
 
         val saved = taskRepository.save(task)
 
-        return TaskOutputDTO(
-            id = saved.id.asString(),
-            userId = saved.userId.asString(),
-            taskName = saved.taskName.asString(),
-            finished = saved.finished,
-            createdAt = saved.createdAt
-        )
+        return toOutput(saved)
     }
+
+    private fun toOutput(task: TaskEntity): TaskOutputDTO =
+        TaskOutputDTO(
+            id = task.id.asString(),
+            userId = task.userId.asString(),
+            taskName = task.taskName.asString(),
+            finished = task.finished,
+            createdAt = task.createdAt
+        )
 }

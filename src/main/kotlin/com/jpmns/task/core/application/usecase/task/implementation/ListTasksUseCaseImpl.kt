@@ -7,6 +7,7 @@ import com.jpmns.task.core.application.usecase.task.dto.input.ListTasksInputDTO
 import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDTO
 import com.jpmns.task.core.application.usecase.task.interfaces.ListTasksUseCase
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
+import com.jpmns.task.core.domain.task.TaskEntity
 
 @Service
 class ListTasksUseCaseImpl(
@@ -20,14 +21,15 @@ class ListTasksUseCaseImpl(
 
         val userId = userIdResult.getSuccessValue()
 
-        return taskRepository.findAllByUserId(userId).map { task ->
-            TaskOutputDTO(
-                id = task.id.asString(),
-                userId = task.userId.asString(),
-                taskName = task.taskName.asString(),
-                finished = task.finished,
-                createdAt = task.createdAt
-            )
-        }
+        return taskRepository.findAllByUserId(userId).map(::toOutput)
     }
+
+    private fun toOutput(task: TaskEntity): TaskOutputDTO =
+        TaskOutputDTO(
+            id = task.id.asString(),
+            userId = task.userId.asString(),
+            taskName = task.taskName.asString(),
+            finished = task.finished,
+            createdAt = task.createdAt
+        )
 }

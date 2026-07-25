@@ -35,6 +35,10 @@ class UpdateTaskUseCaseTest {
         val userId = task.userId
         val newTaskName = "Updated task name"
         val updatedTask = TaskFixture.aTaskWithName(newTaskName)
+        val updatedTaskId = updatedTask.id
+        val updatedTaskUserId = updatedTask.userId
+        val updatedTaskFinished = updatedTask.finished
+        val updatedTaskCreatedAt = updatedTask.createdAt
         val input = UpdateTaskInputDTO(
             taskId = taskId.asString(),
             userId = userId.asString(),
@@ -46,33 +50,14 @@ class UpdateTaskUseCaseTest {
 
         val output = useCase.execute(input)
 
-        assertThat(output.id).isEqualTo(updatedTask.id.asString())
-        assertThat(output.userId).isEqualTo(updatedTask.userId.asString())
+        assertThat(output.id).isEqualTo(updatedTaskId.asString())
+        assertThat(output.userId).isEqualTo(updatedTaskUserId.asString())
         assertThat(output.taskName).isEqualTo(newTaskName)
-        assertThat(output.finished).isEqualTo(updatedTask.finished)
-        assertThat(output.createdAt).isEqualTo(updatedTask.createdAt)
+        assertThat(output.finished).isEqualTo(updatedTaskFinished)
+        assertThat(output.createdAt).isEqualTo(updatedTaskCreatedAt)
 
         verify { taskRepository.findById(taskId) }
         verify { taskRepository.save(any()) }
-    }
-
-    @Test
-    fun `should throw when task id is invalid`() {
-        val task = TaskFixture.aTask()
-        val userId = task.userId
-        val invalidTaskId = "invalid-id"
-        val newTaskName = "New name"
-        val input = UpdateTaskInputDTO(
-            taskId = invalidTaskId,
-            userId = userId.asString(),
-            taskName = newTaskName
-        )
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
-        verify(exactly = 0) { taskRepository.findById(any()) }
-        verify(exactly = 0) { taskRepository.save(any()) }
     }
 
     @Test
@@ -136,6 +121,24 @@ class UpdateTaskUseCaseTest {
             .isInstanceOf(DomainException::class.java)
 
         verify { taskRepository.findById(taskId) }
+        verify(exactly = 0) { taskRepository.save(any()) }
+    }
+
+    @Test
+    fun `should throw when task id is invalid`() {
+        val task = TaskFixture.aTask()
+        val userId = task.userId
+        val invalidTaskId = "invalid-id"
+        val newTaskName = "New name"
+        val input = UpdateTaskInputDTO(
+            taskId = invalidTaskId,
+            userId = userId.asString(),
+            taskName = newTaskName
+        )
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+        verify(exactly = 0) { taskRepository.findById(any()) }
         verify(exactly = 0) { taskRepository.save(any()) }
     }
 }

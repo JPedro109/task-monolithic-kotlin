@@ -17,21 +17,6 @@ class UserJpaDaoTest {
     @Autowired
     private lateinit var userJpaDao: UserJpaDao
 
-    private fun buildUser(user: com.jpmns.task.core.domain.user.UserEntity): UserJpaModel {
-        val id = UUID.fromString(user.id.asString())
-        val username = user.username.asString()
-        val password = user.password.asString()
-        val createdAt = user.createdAt
-
-        return UserJpaModel(
-            id = id,
-            username = username,
-            password = password,
-            createdAt = createdAt,
-            updatedAt = null
-        )
-    }
-
     @Test
     fun `should save a user and return it with populated timestamps`() {
         val user = UserFixture.aUser()
@@ -65,7 +50,7 @@ class UserJpaDaoTest {
 
     @Test
     fun `should return empty Optional when user id does not exist`() {
-        val nonExistentId = UUID.randomUUID()
+        val nonExistentId = UUID.fromString(NON_EXISTENT_ID)
 
         val found = userJpaDao.findById(nonExistentId)
 
@@ -148,16 +133,8 @@ class UserJpaDaoTest {
     fun `should throw when saving a user with duplicate username`() {
         val user = UserFixture.aUser()
         val model = buildUser(user)
-        val duplicateId = UUID.randomUUID()
-        val duplicateUsername = user.username.asString()
-        val duplicatePassword = user.password.asString()
-        val duplicateModel = UserJpaModel(
-            id = duplicateId,
-            username = duplicateUsername,
-            password = duplicatePassword,
-            createdAt = null,
-            updatedAt = null
-        )
+        val duplicateUser = UserFixture.aUserWithId(DUPLICATE_USER_ID)
+        val duplicateModel = buildUser(duplicateUser)
         userJpaDao.save(model)
         userJpaDao.flush()
 
@@ -176,5 +153,25 @@ class UserJpaDaoTest {
         val all = userJpaDao.findAll()
 
         assertThat(all).hasSizeGreaterThanOrEqualTo(1)
+    }
+
+    private fun buildUser(user: com.jpmns.task.core.domain.user.UserEntity): UserJpaModel {
+        val id = UUID.fromString(user.id.asString())
+        val username = user.username.asString()
+        val password = user.password.asString()
+        val createdAt = user.createdAt
+
+        return UserJpaModel(
+            id = id,
+            username = username,
+            password = password,
+            createdAt = createdAt,
+            updatedAt = null
+        )
+    }
+
+    private companion object {
+        const val NON_EXISTENT_ID = "00000000-0000-0000-0000-000000000001"
+        const val DUPLICATE_USER_ID = "00000000-0000-0000-0000-000000000002"
     }
 }

@@ -1,6 +1,5 @@
 package com.jpmns.task.core.external.persistence.mapper
 
-import java.time.Instant
 import java.util.UUID
 
 import org.assertj.core.api.Assertions.assertThat
@@ -32,18 +31,20 @@ class TaskMapperTest {
     fun `should map a TaskJpaModel to a TaskEntity correctly`() {
         val task = TaskFixture.aTask()
         val user = UserFixture.aUser()
-        val taskId = UUID.fromString(task.id.asString())
-        val userId = UUID.fromString(user.id.asString())
+        val taskIdVO = task.id
+        val userIdVO = user.id
         val taskName = task.taskName.asString()
         val finished = task.finished
-        val now = Instant.now()
+        val createdAt = task.createdAt
+        val taskId = UUID.fromString(taskIdVO.asString())
+        val userId = UUID.fromString(userIdVO.asString())
         val model = TaskJpaModel(
             id = taskId,
             userId = userId,
             taskName = taskName,
             finished = finished,
-            createdAt = now,
-            updatedAt = now
+            createdAt = createdAt,
+            updatedAt = null
         )
 
         val entity = TaskMapper.toDomain(model)
@@ -60,16 +61,19 @@ class TaskMapperTest {
         val task = TaskFixture.aTask()
         val user = UserFixture.aUser()
         val customName = "Custom task name"
-        val taskId = UUID.fromString(task.id.asString())
-        val userId = UUID.fromString(user.id.asString())
-        val now = Instant.now()
+        val taskIdVO = task.id
+        val userIdVO = user.id
+        val finished = task.finished
+        val createdAt = task.createdAt
+        val taskId = UUID.fromString(taskIdVO.asString())
+        val userId = UUID.fromString(userIdVO.asString())
         val model = TaskJpaModel(
             id = taskId,
             userId = userId,
             taskName = customName,
-            finished = task.finished,
-            createdAt = now,
-            updatedAt = now
+            finished = finished,
+            createdAt = createdAt,
+            updatedAt = null
         )
 
         val entity = TaskMapper.toDomain(model)
@@ -91,17 +95,19 @@ class TaskMapperTest {
     fun `should map finished state correctly from model to domain`() {
         val task = TaskFixture.aTask()
         val user = UserFixture.aUser()
-        val taskId = UUID.fromString(task.id.asString())
-        val userId = UUID.fromString(user.id.asString())
+        val taskIdVO = task.id
+        val userIdVO = user.id
         val taskName = task.taskName.asString()
-        val now = Instant.now()
+        val createdAt = task.createdAt
+        val taskId = UUID.fromString(taskIdVO.asString())
+        val userId = UUID.fromString(userIdVO.asString())
         val model = TaskJpaModel(
             id = taskId,
             userId = userId,
             taskName = taskName,
             finished = true,
-            createdAt = now,
-            updatedAt = now
+            createdAt = createdAt,
+            updatedAt = null
         )
 
         val entity = TaskMapper.toDomain(model)

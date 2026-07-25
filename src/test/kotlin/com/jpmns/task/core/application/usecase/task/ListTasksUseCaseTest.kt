@@ -30,6 +30,11 @@ class ListTasksUseCaseTest {
     fun `should list tasks successfully`() {
         val task = TaskFixture.aTask()
         val user = UserFixture.aUser()
+        val taskId = task.id
+        val taskUserId = task.userId
+        val taskName = task.taskName
+        val finished = task.finished
+        val createdAt = task.createdAt
         val userId = user.id
         val input = ListTasksInputDTO(
             userId = userId.asString()
@@ -40,12 +45,11 @@ class ListTasksUseCaseTest {
         val output = useCase.execute(input)
 
         assertThat(output).hasSize(1)
-        assertThat(output[0].id).isEqualTo(task.id.asString())
-        assertThat(output[0].userId).isEqualTo(task.userId.asString())
-        assertThat(output[0].taskName).isEqualTo(task.taskName.asString())
-        assertThat(output[0].finished).isEqualTo(task.finished)
-        assertThat(output[0].createdAt).isEqualTo(task.createdAt)
-
+        assertThat(output[0].id).isEqualTo(taskId.asString())
+        assertThat(output[0].userId).isEqualTo(taskUserId.asString())
+        assertThat(output[0].taskName).isEqualTo(taskName.asString())
+        assertThat(output[0].finished).isEqualTo(finished)
+        assertThat(output[0].createdAt).isEqualTo(createdAt)
         verify { taskRepository.findAllByUserId(userId) }
     }
 
@@ -62,7 +66,6 @@ class ListTasksUseCaseTest {
         val output = useCase.execute(input)
 
         assertThat(output).isEmpty()
-
         verify { taskRepository.findAllByUserId(userId) }
     }
 
@@ -75,7 +78,6 @@ class ListTasksUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(DomainException::class.java)
-
         verify(exactly = 0) { taskRepository.findAllByUserId(any()) }
     }
 }

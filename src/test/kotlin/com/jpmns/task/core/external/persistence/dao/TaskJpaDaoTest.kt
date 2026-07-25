@@ -33,40 +33,6 @@ class TaskJpaDaoTest {
         userId = model.id
     }
 
-    private fun buildUser(user: com.jpmns.task.core.domain.user.UserEntity): UserJpaModel {
-        val id = UUID.fromString(user.id.asString())
-        val username = user.username.asString()
-        val password = user.password.asString()
-        val createdAt = user.createdAt
-
-        return UserJpaModel(
-            id = id,
-            username = username,
-            password = password,
-            createdAt = createdAt,
-            updatedAt = null
-        )
-    }
-
-    private fun buildTask(
-        task: com.jpmns.task.core.domain.task.TaskEntity,
-        userId: UUID
-    ): TaskJpaModel {
-        val id = UUID.fromString(task.id.asString())
-        val taskName = task.taskName.asString()
-        val finished = task.finished
-        val createdAt = task.createdAt
-
-        return TaskJpaModel(
-            id = id,
-            userId = userId,
-            taskName = taskName,
-            finished = finished,
-            createdAt = createdAt,
-            updatedAt = null
-        )
-    }
-
     @Test
     fun `should save a task and return it with populated timestamps`() {
         val task = TaskFixture.aTask()
@@ -100,7 +66,7 @@ class TaskJpaDaoTest {
 
     @Test
     fun `should return empty Optional when task id does not exist`() {
-        val nonExistentId = UUID.randomUUID()
+        val nonExistentId = UUID.fromString(NON_EXISTENT_TASK_ID)
 
         val found = taskJpaDao.findById(nonExistentId)
 
@@ -109,7 +75,7 @@ class TaskJpaDaoTest {
 
     @Test
     fun `should return empty list when user has no tasks`() {
-        val otherUserId = UUID.randomUUID()
+        val otherUserId = UUID.fromString(NON_EXISTENT_USER_ID)
 
         val tasks = taskJpaDao.findAllByUserId(otherUserId)
 
@@ -163,7 +129,7 @@ class TaskJpaDaoTest {
     @Test
     fun `should throw when saving a task with a non-existent user_id`() {
         val task = TaskFixture.aTask()
-        val nonExistentUserId = UUID.randomUUID()
+        val nonExistentUserId = UUID.fromString(NON_EXISTENT_USER_ID)
         val orphanModel = buildTask(task, nonExistentUserId)
 
         assertThatThrownBy {
@@ -195,5 +161,44 @@ class TaskJpaDaoTest {
         val all = taskJpaDao.findAll()
 
         assertThat(all).hasSizeGreaterThanOrEqualTo(1)
+    }
+
+    private fun buildUser(user: com.jpmns.task.core.domain.user.UserEntity): UserJpaModel {
+        val id = UUID.fromString(user.id.asString())
+        val username = user.username.asString()
+        val password = user.password.asString()
+        val createdAt = user.createdAt
+
+        return UserJpaModel(
+            id = id,
+            username = username,
+            password = password,
+            createdAt = createdAt,
+            updatedAt = null
+        )
+    }
+
+    private fun buildTask(
+        task: com.jpmns.task.core.domain.task.TaskEntity,
+        taskUserId: UUID
+    ): TaskJpaModel {
+        val id = UUID.fromString(task.id.asString())
+        val taskName = task.taskName.asString()
+        val finished = task.finished
+        val createdAt = task.createdAt
+
+        return TaskJpaModel(
+            id = id,
+            userId = taskUserId,
+            taskName = taskName,
+            finished = finished,
+            createdAt = createdAt,
+            updatedAt = null
+        )
+    }
+
+    private companion object {
+        const val NON_EXISTENT_TASK_ID = "00000000-0000-0000-0000-000000000001"
+        const val NON_EXISTENT_USER_ID = "00000000-0000-0000-0000-000000000002"
     }
 }

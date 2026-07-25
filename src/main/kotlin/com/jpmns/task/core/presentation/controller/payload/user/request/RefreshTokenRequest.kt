@@ -7,4 +7,7 @@ import com.jpmns.task.core.presentation.controller.documentation.payload.user.re
 data class RefreshTokenRequest(
     @field:NotBlank
     override val refreshToken: String
-) : RefreshTokenRequestDoc
+) : RefreshTokenRequestDoc {
+    override fun toString(): String =
+        "RefreshTokenRequest{refreshToken='[PROTECTED]'}"
+}

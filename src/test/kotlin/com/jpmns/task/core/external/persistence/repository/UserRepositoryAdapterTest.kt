@@ -1,6 +1,5 @@
 package com.jpmns.task.core.external.persistence.repository
 
-import java.time.Instant
 import java.util.Optional
 import java.util.UUID
 
@@ -27,22 +26,6 @@ class UserRepositoryAdapterTest {
 
     @InjectMockKs
     private lateinit var adapter: UserRepositoryAdapter
-
-    private fun buildUserModel(): UserJpaModel {
-        val user = UserFixture.aUser()
-        val id = UUID.fromString(user.id.asString())
-        val username = user.username.asString()
-        val password = user.password.asString()
-        val now = Instant.now()
-
-        return UserJpaModel(
-            id = id,
-            username = username,
-            password = password,
-            createdAt = now,
-            updatedAt = now
-        )
-    }
 
     @Test
     fun `should save a user and return the persisted domain entity`() {
@@ -156,5 +139,22 @@ class UserRepositoryAdapterTest {
         adapter.deleteById(id)
 
         verify { dao.deleteById(formattedId) }
+    }
+
+    private fun buildUserModel(): UserJpaModel {
+        val user = UserFixture.aUser()
+        val userIdVO = user.id
+        val username = user.username.asString()
+        val password = user.password.asString()
+        val createdAt = user.createdAt
+        val id = UUID.fromString(userIdVO.asString())
+
+        return UserJpaModel(
+            id = id,
+            username = username,
+            password = password,
+            createdAt = createdAt,
+            updatedAt = null
+        )
     }
 }

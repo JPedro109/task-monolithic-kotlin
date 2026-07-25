@@ -15,6 +15,13 @@ object TaskFixture {
         finished = DEFAULT_FINISHED
     )
 
+    fun aTaskWithUserId(userId: String): TaskEntity = TaskEntity(
+        id = DEFAULT_ID,
+        userId = userId,
+        taskName = DEFAULT_TASK_NAME,
+        finished = DEFAULT_FINISHED
+    )
+
     fun aTaskWithName(taskName: String): TaskEntity = TaskEntity(
         id = DEFAULT_ID,
         userId = DEFAULT_USER_ID,

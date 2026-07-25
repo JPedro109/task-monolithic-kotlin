@@ -1,5 +1,6 @@
 package com.jpmns.task.integration
 
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -21,6 +22,7 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("POST /api/v1/users")
     inner class CreateUser {
         @Test
         fun `should return 201 with id and username when input is valid`() {
@@ -50,27 +52,26 @@ class UserIntegrationTest : IntegrationTestBase() {
         @Test
         fun `should return 400 when password is too short`() {
             val username = "username"
-            val password = "ab"
+            val shortPassword = "ab"
 
-            perform(username, password)
+            perform(username, shortPassword)
                 .andExpect(status().isBadRequest)
         }
 
         @Test
         fun `should return 400 when username is blank`() {
-            val username = ""
-            val password = "ab"
+            val emptyUsername = ""
 
-            perform(username, password)
+            perform(emptyUsername, PASSWORD)
                 .andExpect(status().isBadRequest)
         }
 
         @Test
         fun `should return 400 when password is blank`() {
             val username = "username"
-            val password = ""
+            val emptyPassword = ""
 
-            perform(username, password)
+            perform(username, emptyPassword)
                 .andExpect(status().isBadRequest)
         }
 
@@ -86,6 +87,7 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("DELETE /api/v1/users")
     inner class DeleteUser {
         @Test
         @SqlCreateSeed
@@ -106,6 +108,7 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("PATCH /api/v1/users/username")
     inner class UpdateUsername {
         @Test
         @SqlCreateSeed
@@ -156,6 +159,7 @@ class UserIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("PATCH /api/v1/users/password")
     inner class UpdatePassword {
         @Test
         @SqlCreateSeed
@@ -171,10 +175,10 @@ class UserIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 401 when current password is wrong`() {
-            val currentPassword = "wrong-password"
+            val wrongCurrentPassword = "wrong-password"
             val newPassword = "new-password"
 
-            perform(currentPassword, newPassword)
+            perform(wrongCurrentPassword, newPassword)
                 .andExpect(status().isUnauthorized)
         }
 
@@ -182,9 +186,9 @@ class UserIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 400 when new password is too short`() {
-            val newPassword = "ab"
+            val shortNewPassword = "ab"
 
-            perform(PASSWORD, newPassword)
+            perform(PASSWORD, shortNewPassword)
                 .andExpect(status().isBadRequest)
         }
 

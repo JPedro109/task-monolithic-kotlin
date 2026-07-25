@@ -30,6 +30,9 @@ class GetUserByIdUseCaseTest {
     fun `should get user by id successfully`() {
         val user = UserFixture.aUser()
         val userId = user.id
+        val username = user.username
+        val createdAt = user.createdAt
+        val updatedAt = user.updatedAt
         val input = GetUserByIdInputDTO(
             id = userId.asString()
         )
@@ -39,24 +42,10 @@ class GetUserByIdUseCaseTest {
         val output = useCase.execute(input)
 
         assertThat(output.id).isEqualTo(userId.asString())
-        assertThat(output.username).isEqualTo(user.username.asString())
-        assertThat(output.createdAt).isEqualTo(user.createdAt)
-        assertThat(output.updatedAt).isEqualTo(user.updatedAt)
-
+        assertThat(output.username).isEqualTo(username.asString())
+        assertThat(output.createdAt).isEqualTo(createdAt)
+        assertThat(output.updatedAt).isEqualTo(updatedAt)
         verify { userRepository.findById(userId) }
-    }
-
-    @Test
-    fun `should throw when user id is invalid`() {
-        val invalidId = "invalid-id"
-        val input = GetUserByIdInputDTO(
-            id = invalidId
-        )
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
-        verify(exactly = 0) { userRepository.findById(any()) }
     }
 
     @Test
@@ -71,7 +60,18 @@ class GetUserByIdUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(UserNotFoundException::class.java)
-
         verify { userRepository.findById(userId) }
+    }
+
+    @Test
+    fun `should throw when user id is invalid`() {
+        val invalidId = "invalid-id"
+        val input = GetUserByIdInputDTO(
+            id = invalidId
+        )
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+        verify(exactly = 0) { userRepository.findById(any()) }
     }
 }

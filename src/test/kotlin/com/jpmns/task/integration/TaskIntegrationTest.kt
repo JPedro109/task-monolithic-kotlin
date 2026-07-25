@@ -1,8 +1,7 @@
 package com.jpmns.task.integration
 
-import java.util.UUID
-
 import org.hamcrest.Matchers.hasSize
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -17,35 +16,36 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 import com.jpmns.task.integration.common.abstracts.IntegrationTestBase
 import com.jpmns.task.integration.common.sql.SqlCreateSeed
+import com.jpmns.task.shared.fixture.TaskFixture
 import com.jpmns.task.shared.security.WithJwtTokenMock
 
 class TaskIntegrationTest : IntegrationTestBase() {
-    companion object {
-        private const val EXISTING_TASK_ID = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
-        private const val USER_ID_WITHOUT_TASK = "41a385a3-de9f-44bb-ac0f-7a9fd6ac11e1"
-    }
-
     @Nested
+    @DisplayName("POST /api/v1/tasks")
     inner class CreateTask {
         @Test
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 201 with task data when input is valid`() {
-            val taskName = "My first task"
+            val task = TaskFixture.aTask()
+            val taskName = task.taskName
+            val taskNameString = taskName.asString()
 
-            perform(taskName)
+            perform(taskNameString)
                 .andExpect(status().isCreated)
                 .andExpect(jsonPath("$.id").isNotEmpty)
-                .andExpect(jsonPath("$.taskName").value(taskName))
+                .andExpect(jsonPath("$.taskName").value(taskNameString))
                 .andExpect(jsonPath("$.finished").value(false))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty)
         }
 
         @Test
         fun `should return 401 when no token is provided`() {
-            val taskName = "My first task"
+            val task = TaskFixture.aTask()
+            val taskName = task.taskName
+            val taskNameString = taskName.asString()
 
-            perform(taskName)
+            perform(taskNameString)
                 .andExpect(status().isUnauthorized)
         }
 
@@ -53,9 +53,9 @@ class TaskIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 400 when taskName is blank`() {
-            val taskName = ""
+            val emptyTaskName = ""
 
-            perform(taskName)
+            perform(emptyTaskName)
                 .andExpect(status().isBadRequest)
         }
 
@@ -63,9 +63,9 @@ class TaskIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 400 when taskName exceeds 255 characters`() {
-            val taskName = "a".repeat(256)
+            val longTaskName = "a".repeat(256)
 
-            perform(taskName)
+            perform(longTaskName)
                 .andExpect(status().isBadRequest)
         }
 
@@ -81,15 +81,20 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("GET /api/v1/tasks")
     inner class ListTasks {
         @Test
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 200 with all tasks belonging to the authenticated user`() {
+            val task = TaskFixture.aTask()
+            val taskName = task.taskName
+            val taskNameString = taskName.asString()
+
             perform()
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$", hasSize<Any>(1)))
-                .andExpect(jsonPath("$[0].taskName").value("Buy groceries"))
+                .andExpect(jsonPath("$[0].taskName").value(taskNameString))
         }
 
         @Test
@@ -103,6 +108,7 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("PUT /api/v1/tasks/{id}")
     inner class UpdateTask {
         @Test
         @SqlCreateSeed
@@ -130,10 +136,9 @@ class TaskIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 404 when task does not exist`() {
-            val taskId = UUID.randomUUID().toString()
             val taskName = "Updated name"
 
-            perform(taskId, taskName)
+            perform(NON_EXISTENT_TASK_ID, taskName)
                 .andExpect(status().isNotFound)
         }
 
@@ -141,15 +146,15 @@ class TaskIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 400 when taskName is blank`() {
-            val taskName = ""
+            val emptyTaskName = ""
 
-            perform(EXISTING_TASK_ID, taskName)
+            perform(EXISTING_TASK_ID, emptyTaskName)
                 .andExpect(status().isBadRequest)
         }
 
         @Test
         fun `should return 401 when no token is provided`() {
-            val taskName = ""
+            val taskName = "Updated name"
 
             perform(EXISTING_TASK_ID, taskName)
                 .andExpect(status().isUnauthorized)
@@ -167,6 +172,7 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("DELETE /api/v1/tasks/{id}")
     inner class DeleteTask {
         @Test
         @SqlCreateSeed
@@ -191,9 +197,7 @@ class TaskIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 404 when task does not exist`() {
-            val taskId = UUID.randomUUID().toString()
-
-            perform(taskId)
+            perform(NON_EXISTENT_TASK_ID)
                 .andExpect(status().isNotFound)
         }
 
@@ -208,6 +212,7 @@ class TaskIntegrationTest : IntegrationTestBase() {
     }
 
     @Nested
+    @DisplayName("PATCH /api/v1/tasks/{id}/finish")
     inner class MarkTaskAsFinished {
         @Test
         @SqlCreateSeed
@@ -232,9 +237,7 @@ class TaskIntegrationTest : IntegrationTestBase() {
         @SqlCreateSeed
         @WithJwtTokenMock
         fun `should return 404 when task does not exist`() {
-            val taskId = UUID.randomUUID().toString()
-
-            perform(taskId)
+            perform(NON_EXISTENT_TASK_ID)
                 .andExpect(status().isNotFound)
         }
 
@@ -246,5 +249,11 @@ class TaskIntegrationTest : IntegrationTestBase() {
 
         private fun perform(taskId: String): ResultActions =
             mockMvc.perform(patch("/api/v1/tasks/$taskId/finish"))
+    }
+
+    companion object {
+        private const val EXISTING_TASK_ID = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+        private const val NON_EXISTENT_TASK_ID = "00000000-0000-0000-0000-000000000001"
+        private const val USER_ID_WITHOUT_TASK = "41a385a3-de9f-44bb-ac0f-7a9fd6ac11e1"
     }
 }

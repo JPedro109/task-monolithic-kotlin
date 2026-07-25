@@ -1,5 +1,6 @@
 package com.jpmns.task.core.presentation.controller.common.handler
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -159,9 +160,10 @@ class GlobalExceptionHandler {
         return problem
     }
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
-        private const val TITLE_NOT_FOUND = "Not Found"
-        private const val TITLE_UNAUTHORIZED = "Unauthorized"
+    private companion object {
+        val logger: Logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
+        const val TITLE_NOT_FOUND = "Not Found"
+        const val TITLE_UNAUTHORIZED = "Unauthorized"
     }
 }

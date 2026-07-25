@@ -1,7 +1,6 @@
 package com.jpmns.task.core.presentation.controller
 
-import java.time.Instant
-
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,9 +28,9 @@ import com.jpmns.task.core.application.usecase.task.interfaces.ListTasksUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.MarkTaskAsFinishedUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.UpdateTaskUseCase
 import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
+import com.jpmns.task.core.domain.task.TaskEntity
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.TaskFixture
-import com.jpmns.task.shared.fixture.UserFixture
 import com.jpmns.task.shared.security.WithJwtTokenMock
 import com.ninjasquad.springmockk.MockkBean
 
@@ -64,27 +63,15 @@ class TaskControllerTest {
     @MockkBean
     private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
 
-    private fun buildTaskOutput(): TaskOutputDTO {
-        val task = TaskFixture.aTask()
-        val user = UserFixture.aUser()
-
-        return TaskOutputDTO(
-            id = task.id.asString(),
-            userId = user.id.asString(),
-            taskName = task.taskName.asString(),
-            finished = task.finished,
-            createdAt = Instant.now()
-        )
-    }
-
     @Nested
+    @DisplayName("POST /api/v1/tasks")
     inner class CreateTask {
         @Test
         @WithJwtTokenMock
         fun `should return 201 with task data when creation succeeds`() {
             val task = TaskFixture.aTask()
             val taskName = task.taskName
-            val output = buildTaskOutput()
+            val output = getTaskOutput(task)
 
             every { createTaskUseCase.execute(any()) } returns output
 
@@ -127,11 +114,13 @@ class TaskControllerTest {
     }
 
     @Nested
+    @DisplayName("GET /api/v1/tasks")
     inner class ListTasks {
         @Test
         @WithJwtTokenMock
         fun `should return 200 with list of tasks`() {
-            val output = buildTaskOutput()
+            val task = TaskFixture.aTask()
+            val output = getTaskOutput(task)
 
             every { listTasksUseCase.execute(any()) } returns listOf(output)
 
@@ -165,6 +154,7 @@ class TaskControllerTest {
     }
 
     @Nested
+    @DisplayName("PUT /api/v1/tasks/{id}")
     inner class UpdateTask {
         @Test
         @WithJwtTokenMock
@@ -172,7 +162,7 @@ class TaskControllerTest {
             val task = TaskFixture.aTask()
             val taskId = task.id
             val updatedName = "Updated task name"
-            val output = buildTaskOutput()
+            val output = getTaskOutput(task)
 
             every { updateTaskUseCase.execute(any()) } returns output
 
@@ -245,6 +235,7 @@ class TaskControllerTest {
     }
 
     @Nested
+    @DisplayName("DELETE /api/v1/tasks/{id}")
     inner class DeleteTask {
         @Test
         @WithJwtTokenMock
@@ -300,6 +291,7 @@ class TaskControllerTest {
     }
 
     @Nested
+    @DisplayName("PATCH /api/v1/tasks/{id}/finish")
     inner class MarkAsFinished {
         @Test
         @WithJwtTokenMock
@@ -353,4 +345,13 @@ class TaskControllerTest {
         private fun perform(taskId: String): ResultActions =
             mockMvc.perform(patch("/api/v1/tasks/$taskId/finish"))
     }
+
+    private fun getTaskOutput(task: TaskEntity): TaskOutputDTO =
+        TaskOutputDTO(
+            id = task.id.asString(),
+            userId = task.userId.asString(),
+            taskName = task.taskName.asString(),
+            finished = task.finished,
+            createdAt = task.createdAt
+        )
 }

@@ -14,5 +14,5 @@ data class CreateUserRequest(
     override val password: String
 ) : CreateUserRequestDoc {
     override fun toString(): String =
-        "CreateUserRequest(username=$username, password=[REDACTED])"
+        "CreateUserRequest{username='$username', password='[PROTECTED]'}"
 }

@@ -8,6 +8,7 @@ import com.jpmns.task.core.application.usecase.user.dto.output.UserOutputDTO
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
+import com.jpmns.task.core.domain.user.UserEntity
 
 @Service
 class GetUserByIdUseCaseImpl(
@@ -23,11 +24,14 @@ class GetUserByIdUseCaseImpl(
 
         val user = userRepository.findById(id) ?: throw UserNotFoundException()
 
-        return UserOutputDTO(
+        return toOutput(user)
+    }
+
+    private fun toOutput(user: UserEntity): UserOutputDTO =
+        UserOutputDTO(
             id = user.id.asString(),
             username = user.username.asString(),
             createdAt = user.createdAt,
             updatedAt = user.updatedAt
         )
-    }
 }

@@ -49,23 +49,6 @@ class DeleteTaskUseCaseTest {
     }
 
     @Test
-    fun `should throw when task id is invalid`() {
-        val task = TaskFixture.aTask()
-        val userId = task.userId
-        val invalidTaskId = "invalid-id"
-        val input = DeleteTaskInputDTO(
-            taskId = invalidTaskId,
-            userId = userId.asString()
-        )
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
-        verify(exactly = 0) { taskRepository.findById(any()) }
-        verify(exactly = 0) { taskRepository.deleteById(any()) }
-    }
-
-    @Test
     fun `should throw when task is not found`() {
         val task = TaskFixture.aTask()
         val taskId = task.id
@@ -79,7 +62,6 @@ class DeleteTaskUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(TaskNotFoundException::class.java)
-
         verify { taskRepository.findById(taskId) }
         verify(exactly = 0) { taskRepository.deleteById(any()) }
     }
@@ -99,8 +81,23 @@ class DeleteTaskUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(TaskAccessDeniedException::class.java)
-
         verify { taskRepository.findById(taskId) }
+        verify(exactly = 0) { taskRepository.deleteById(any()) }
+    }
+
+    @Test
+    fun `should throw when task id is invalid`() {
+        val task = TaskFixture.aTask()
+        val userId = task.userId
+        val invalidTaskId = "invalid-id"
+        val input = DeleteTaskInputDTO(
+            taskId = invalidTaskId,
+            userId = userId.asString()
+        )
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+        verify(exactly = 0) { taskRepository.findById(any()) }
         verify(exactly = 0) { taskRepository.deleteById(any()) }
     }
 }

@@ -9,6 +9,7 @@ import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedEx
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
 import com.jpmns.task.core.application.usecase.task.interfaces.UpdateTaskUseCase
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
+import com.jpmns.task.core.domain.task.TaskEntity
 
 @Service
 class UpdateTaskUseCaseImpl(
@@ -24,19 +25,24 @@ class UpdateTaskUseCaseImpl(
 
         val task = taskRepository.findById(taskId) ?: throw TaskNotFoundException()
 
-        if (task.userId.asString() != input.userId) {
+        val userIsOwner = task.userId.asString() == input.userId
+        if (!userIsOwner) {
             throw TaskAccessDeniedException()
         }
 
         task.updateTaskName(input.taskName)
+
         val saved = taskRepository.save(task)
 
-        return TaskOutputDTO(
-            id = saved.id.asString(),
-            userId = saved.userId.asString(),
-            taskName = saved.taskName.asString(),
-            finished = saved.finished,
-            createdAt = saved.createdAt
-        )
+        return toOutput(saved)
     }
+
+    private fun toOutput(task: TaskEntity): TaskOutputDTO =
+        TaskOutputDTO(
+            id = task.id.asString(),
+            userId = task.userId.asString(),
+            taskName = task.taskName.asString(),
+            finished = task.finished,
+            createdAt = task.createdAt
+        )
 }

@@ -11,7 +11,6 @@ import com.jpmns.task.core.application.usecase.user.dto.output.CreateUserOutputD
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
 import com.jpmns.task.core.application.usecase.user.interfaces.CreateUserUseCase
 import com.jpmns.task.core.domain.user.UserEntity
-import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 
 @Service
 class CreateUserUseCaseImpl(
@@ -19,29 +18,25 @@ class CreateUserUseCaseImpl(
     private val passwordEncoder: PasswordEncoder
 ) : CreateUserUseCase {
     override fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
-        val usernameResult = UsernameValueObject.of(input.username)
-        if (usernameResult.isFail) {
-            throw usernameResult.getFailureError()
-        }
-
-        val username = usernameResult.getSuccessValue()
-
-        if (userRepository.existsByUsername(username)) {
-            throw UsernameAlreadyExistsException()
-        }
-
         val encodedPassword = passwordEncoder.encode(input.password)
-
         val user = UserEntity(
             id = UUID.randomUUID().toString(),
             username = input.username,
             password = encodedPassword
         )
+
+        if (userRepository.existsByUsername(user.username)) {
+            throw UsernameAlreadyExistsException()
+        }
+
         val saved = userRepository.save(user)
 
-        return CreateUserOutputDTO(
-            id = saved.id.asString(),
-            username = saved.username.asString()
-        )
+        return toOutput(saved)
     }
+
+    private fun toOutput(user: UserEntity): CreateUserOutputDTO =
+        CreateUserOutputDTO(
+            id = user.id.asString(),
+            username = user.username.asString()
+        )
 }

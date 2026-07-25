@@ -44,27 +44,9 @@ class UpdateUsernameUseCaseTest {
         val output = useCase.execute(input)
 
         assertThat(output.id).isEqualTo(userId.asString())
-
         verify { userRepository.findById(userId) }
         verify { userRepository.existsByUsername(any()) }
         verify { userRepository.save(any()) }
-    }
-
-    @Test
-    fun `should throw when user id is invalid`() {
-        val invalidUserId = "invalid-id"
-        val newUsername = "newusername"
-        val input = UpdateUsernameInputDTO(
-            userId = invalidUserId,
-            newUsername = newUsername
-        )
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
-        verify(exactly = 0) { userRepository.findById(any()) }
-        verify(exactly = 0) { userRepository.existsByUsername(any()) }
-        verify(exactly = 0) { userRepository.save(any()) }
     }
 
     @Test
@@ -81,27 +63,6 @@ class UpdateUsernameUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(UserNotFoundException::class.java)
-
-        verify { userRepository.findById(userId) }
-        verify(exactly = 0) { userRepository.existsByUsername(any()) }
-        verify(exactly = 0) { userRepository.save(any()) }
-    }
-
-    @Test
-    fun `should throw when new username is invalid`() {
-        val user = UserFixture.aUser()
-        val userId = user.id
-        val invalidUsername = "ab"
-        val input = UpdateUsernameInputDTO(
-            userId = userId.asString(),
-            newUsername = invalidUsername
-        )
-
-        every { userRepository.findById(userId) } returns user
-
-        assertThatThrownBy { useCase.execute(input) }
-            .isInstanceOf(DomainException::class.java)
-
         verify { userRepository.findById(userId) }
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
@@ -122,9 +83,43 @@ class UpdateUsernameUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(UsernameAlreadyExistsException::class.java)
-
         verify { userRepository.findById(userId) }
         verify { userRepository.existsByUsername(any()) }
+        verify(exactly = 0) { userRepository.save(any()) }
+    }
+
+    @Test
+    fun `should throw when new username is invalid`() {
+        val user = UserFixture.aUser()
+        val userId = user.id
+        val invalidUsername = "ab"
+        val input = UpdateUsernameInputDTO(
+            userId = userId.asString(),
+            newUsername = invalidUsername
+        )
+
+        every { userRepository.findById(userId) } returns user
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+        verify { userRepository.findById(userId) }
+        verify(exactly = 0) { userRepository.existsByUsername(any()) }
+        verify(exactly = 0) { userRepository.save(any()) }
+    }
+
+    @Test
+    fun `should throw when user id is invalid`() {
+        val invalidUserId = "invalid-id"
+        val newUsername = "newusername"
+        val input = UpdateUsernameInputDTO(
+            userId = invalidUserId,
+            newUsername = newUsername
+        )
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(DomainException::class.java)
+        verify(exactly = 0) { userRepository.findById(any()) }
+        verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
     }
 }

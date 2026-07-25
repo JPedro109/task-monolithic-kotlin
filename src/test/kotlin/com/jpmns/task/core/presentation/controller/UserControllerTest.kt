@@ -1,5 +1,6 @@
 package com.jpmns.task.core.presentation.controller
 
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -58,6 +59,7 @@ class UserControllerTest {
     private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
 
     @Nested
+    @DisplayName("POST /api/v1/users")
     inner class CreateUser {
         @Test
         fun `should return 201 with user data when creation succeeds`() {
@@ -65,15 +67,18 @@ class UserControllerTest {
             val userId = user.id
             val username = user.username
             val password = user.password
-            val output = CreateUserOutputDTO(userId.asString(), username.asString())
+            val userIdString = userId.asString()
+            val usernameString = username.asString()
+            val passwordString = password.asString()
+            val output = CreateUserOutputDTO(userIdString, usernameString)
 
             every { createUserUseCase.execute(any()) } returns output
 
-            val result = perform(username.asString(), password.asString())
+            val result = perform(usernameString, passwordString)
 
             result.andExpect(status().isCreated)
-                .andExpect(jsonPath("$.id").value(userId.asString()))
-                .andExpect(jsonPath("$.username").value(username.asString()))
+                .andExpect(jsonPath("$.id").value(userIdString))
+                .andExpect(jsonPath("$.username").value(usernameString))
         }
 
         @Test
@@ -81,10 +86,12 @@ class UserControllerTest {
             val user = UserFixture.aUser()
             val username = user.username
             val password = user.password
+            val usernameString = username.asString()
+            val passwordString = password.asString()
 
             every { createUserUseCase.execute(any()) } throws UsernameAlreadyExistsException()
 
-            val result = perform(username.asString(), password.asString())
+            val result = perform(usernameString, passwordString)
 
             result.andExpect(status().isConflict)
         }
@@ -93,9 +100,10 @@ class UserControllerTest {
         fun `should return 400 when username is blank`() {
             val user = UserFixture.aUser()
             val password = user.password
+            val passwordString = password.asString()
             val emptyUsername = ""
 
-            val result = perform(emptyUsername, password.asString())
+            val result = perform(emptyUsername, passwordString)
 
             result.andExpect(status().isBadRequest)
         }
@@ -104,9 +112,10 @@ class UserControllerTest {
         fun `should return 400 when username is shorter than 3 characters`() {
             val user = UserFixture.aUser()
             val password = user.password
+            val passwordString = password.asString()
             val shortUsername = "ab"
 
-            val result = perform(shortUsername, password.asString())
+            val result = perform(shortUsername, passwordString)
 
             result.andExpect(status().isBadRequest)
         }
@@ -115,9 +124,10 @@ class UserControllerTest {
         fun `should return 400 when password is shorter than 8 characters`() {
             val user = UserFixture.aUser()
             val username = user.username
+            val usernameString = username.asString()
             val shortPassword = "ab"
 
-            val result = perform(username.asString(), shortPassword)
+            val result = perform(usernameString, shortPassword)
 
             result.andExpect(status().isBadRequest)
         }
@@ -134,6 +144,7 @@ class UserControllerTest {
     }
 
     @Nested
+    @DisplayName("DELETE /api/v1/users")
     inner class DeleteUser {
         @Test
         @WithJwtTokenMock
@@ -167,6 +178,7 @@ class UserControllerTest {
     }
 
     @Nested
+    @DisplayName("PATCH /api/v1/users/password")
     inner class UpdatePassword {
         @Test
         @WithJwtTokenMock
@@ -227,6 +239,7 @@ class UserControllerTest {
     }
 
     @Nested
+    @DisplayName("PATCH /api/v1/users/username")
     inner class UpdateUsername {
         @Test
         @WithJwtTokenMock
@@ -234,15 +247,17 @@ class UserControllerTest {
             val user = UserFixture.aUser()
             val userId = user.id
             val username = user.username
-            val output = UpdateUsernameOutputDTO(userId.asString(), username.asString())
+            val userIdString = userId.asString()
+            val usernameString = username.asString()
+            val output = UpdateUsernameOutputDTO(userIdString, usernameString)
 
             every { updateUsernameUseCase.execute(any()) } returns output
 
-            val result = perform(username.asString())
+            val result = perform(usernameString)
 
             result.andExpect(status().isOk)
-                .andExpect(jsonPath("$.id").value(userId.asString()))
-                .andExpect(jsonPath("$.username").value(username.asString()))
+                .andExpect(jsonPath("$.id").value(userIdString))
+                .andExpect(jsonPath("$.username").value(usernameString))
         }
 
         @Test
@@ -250,10 +265,11 @@ class UserControllerTest {
         fun `should return 409 when new username already exists`() {
             val user = UserFixture.aUser()
             val username = user.username
+            val usernameString = username.asString()
 
             every { updateUsernameUseCase.execute(any()) } throws UsernameAlreadyExistsException()
 
-            val result = perform(username.asString())
+            val result = perform(usernameString)
 
             result.andExpect(status().isConflict)
         }
@@ -272,8 +288,9 @@ class UserControllerTest {
         fun `should return 401 when request has no token`() {
             val user = UserFixture.aUser()
             val username = user.username
+            val usernameString = username.asString()
 
-            val result = perform(username.asString())
+            val result = perform(usernameString)
 
             result.andExpect(status().isUnauthorized)
         }
@@ -283,10 +300,11 @@ class UserControllerTest {
         fun `should return 404 when user is not found`() {
             val user = UserFixture.aUser()
             val username = user.username
+            val usernameString = username.asString()
 
             every { updateUsernameUseCase.execute(any()) } throws UserNotFoundException()
 
-            val result = perform(username.asString())
+            val result = perform(usernameString)
 
             result.andExpect(status().isNotFound)
         }
