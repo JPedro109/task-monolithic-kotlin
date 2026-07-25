@@ -1,6 +1,5 @@
 package com.jpmns.task.core.domain.user.valueobject
 
-import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.core.domain.user.valueobject.exception.InvalidPasswordException
 import com.jpmns.task.shared.type.Result
 
@@ -22,7 +21,7 @@ class UserPasswordValueObject private constructor(private val value: String) {
     override fun hashCode(): Int = value.hashCode()
 
     companion object {
-        fun of(password: String): Result<UserPasswordValueObject, DomainException> {
+        fun of(password: String): Result<UserPasswordValueObject> {
             if (password.isEmpty()) {
                 return Result.fail(InvalidPasswordException())
             }

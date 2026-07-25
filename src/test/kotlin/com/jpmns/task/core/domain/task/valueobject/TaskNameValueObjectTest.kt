@@ -13,8 +13,8 @@ class TaskNameValueObjectTest {
 
         val result = TaskNameValueObject.of(taskName.asString())
 
-        assertThat(result.isFail).isFalse()
-        assertThat(result.getSuccessValue().asString()).isEqualTo(taskName.asString())
+        assertThat(result.isFailure).isFalse()
+        assertThat(result.getValueResult().asString()).isEqualTo(taskName.asString())
     }
 
     @Test
@@ -23,7 +23,7 @@ class TaskNameValueObjectTest {
 
         val result = TaskNameValueObject.of(taskName)
 
-        assertThat(result.isFail).isFalse()
+        assertThat(result.isFailure).isFalse()
     }
 
     @Test
@@ -32,6 +32,6 @@ class TaskNameValueObjectTest {
 
         val result = TaskNameValueObject.of(taskName)
 
-        assertThat(result.isFail).isTrue()
+        assertThat(result.isFailure).isTrue()
     }
 }

@@ -1,6 +1,5 @@
 package com.jpmns.task.core.domain.task.valueobject
 
-import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.core.domain.task.valueobject.exception.InvalidTaskNameException
 import com.jpmns.task.shared.type.Result
 
@@ -26,12 +25,13 @@ class TaskNameValueObject private constructor(private val value: String) {
     companion object {
         private const val MAX_TASK_NAME_LENGTH = 255
 
-        fun of(taskName: String): Result<TaskNameValueObject, DomainException> {
+        fun of(taskName: String): Result<TaskNameValueObject> {
             if (taskName.length > MAX_TASK_NAME_LENGTH) {
                 return Result.fail(
                     InvalidTaskNameException()
                 )
             }
+
             return Result.success(TaskNameValueObject(taskName))
         }
     }

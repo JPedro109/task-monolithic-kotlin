@@ -14,14 +14,9 @@ class DeleteTaskUseCaseImpl(
     private val taskRepository: TaskRepository
 ) : DeleteTaskUseCase {
     override fun execute(input: DeleteTaskInputDTO) {
-        val taskIdResult = IdValueObject.of(input.taskId)
-        if (taskIdResult.isFail) {
-            throw taskIdResult.getFailureError()
-        }
+        val taskIdResult = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
-        val taskId = taskIdResult.getSuccessValue()
-
-        val task = taskRepository.findById(taskId)
+        val task = taskRepository.findById(taskIdResult)
             ?: throw TaskNotFoundException()
 
         val userIsOwner = task.userId.asString() == input.userId
@@ -29,6 +24,6 @@ class DeleteTaskUseCaseImpl(
             throw TaskAccessDeniedException()
         }
 
-        taskRepository.deleteById(taskId)
+        taskRepository.deleteById(taskIdResult)
     }
 }

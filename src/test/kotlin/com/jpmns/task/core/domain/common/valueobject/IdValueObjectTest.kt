@@ -16,8 +16,8 @@ class IdValueObjectTest {
 
         val result = IdValueObject.of(id.asString())
 
-        assertThat(result.isFail).isFalse()
-        assertThat(result.getSuccessValue().asString()).isEqualTo(id.asString())
+        assertThat(result.isFailure).isFalse()
+        assertThat(result.getValueResult().asString()).isEqualTo(id.asString())
     }
 
     @Test
@@ -28,7 +28,7 @@ class IdValueObjectTest {
 
         val result = IdValueObject.of(uppercaseId)
 
-        assertThat(result.isFail).isFalse()
+        assertThat(result.isFailure).isFalse()
     }
 
     @ParameterizedTest
@@ -45,6 +45,6 @@ class IdValueObjectTest {
     fun `should fail for empty or malformed UUID strings`(id: String) {
         val result = IdValueObject.of(id)
 
-        assertThat(result.isFail).isTrue()
+        assertThat(result.isFailure).isTrue()
     }
 }

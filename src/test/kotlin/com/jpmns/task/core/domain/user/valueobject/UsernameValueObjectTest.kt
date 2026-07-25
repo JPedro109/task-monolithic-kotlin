@@ -16,8 +16,8 @@ class UsernameValueObjectTest {
 
         val result = UsernameValueObject.of(username.asString())
 
-        assertThat(result.isFail).isFalse()
-        assertThat(result.getSuccessValue().asString()).isEqualTo(username.asString())
+        assertThat(result.isFailure).isFalse()
+        assertThat(result.getValueResult().asString()).isEqualTo(username.asString())
     }
 
     @Test
@@ -26,7 +26,7 @@ class UsernameValueObjectTest {
 
         val result = UsernameValueObject.of(username)
 
-        assertThat(result.isFail).isFalse()
+        assertThat(result.isFailure).isFalse()
     }
 
     @Test
@@ -35,7 +35,7 @@ class UsernameValueObjectTest {
 
         val result = UsernameValueObject.of(username)
 
-        assertThat(result.isFail).isFalse()
+        assertThat(result.isFailure).isFalse()
     }
 
     @Test
@@ -44,7 +44,7 @@ class UsernameValueObjectTest {
 
         val result = UsernameValueObject.of(username)
 
-        assertThat(result.isFail).isTrue()
+        assertThat(result.isFailure).isTrue()
     }
 
     @ParameterizedTest
@@ -61,6 +61,6 @@ class UsernameValueObjectTest {
     fun `should fail for empty or invalid usernames`(username: String) {
         val result = UsernameValueObject.of(username)
 
-        assertThat(result.isFail).isTrue()
+        assertThat(result.isFailure).isTrue()
     }
 }

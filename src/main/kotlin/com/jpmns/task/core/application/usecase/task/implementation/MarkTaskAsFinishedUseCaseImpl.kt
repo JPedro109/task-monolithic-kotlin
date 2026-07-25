@@ -14,14 +14,9 @@ class MarkTaskAsFinishedUseCaseImpl(
     private val taskRepository: TaskRepository
 ) : MarkTaskAsFinishedUseCase {
     override fun execute(input: MarkTaskAsFinishedInputDTO) {
-        val taskIdResult = IdValueObject.of(input.taskId)
-        if (taskIdResult.isFail) {
-            throw taskIdResult.getFailureError()
-        }
+        val taskIdResult = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
-        val taskId = taskIdResult.getSuccessValue()
-
-        val task = taskRepository.findById(taskId)
+        val task = taskRepository.findById(taskIdResult)
             ?: throw TaskNotFoundException()
 
         val userIsOwner = task.userId.asString() == input.userId

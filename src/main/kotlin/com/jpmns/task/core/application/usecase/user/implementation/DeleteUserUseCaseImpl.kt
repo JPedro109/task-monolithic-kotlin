@@ -13,15 +13,10 @@ class DeleteUserUseCaseImpl(
     private val userRepository: UserRepository
 ) : DeleteUserUseCase {
     override fun execute(input: DeleteUserInputDTO) {
-        val idResult = IdValueObject.of(input.userId)
-        if (idResult.isFail) {
-            throw idResult.getFailureError()
-        }
+        val idResult = IdValueObject.of(input.userId).getValueResultOrThrow()
 
-        val id = idResult.getSuccessValue()
+        userRepository.findById(idResult) ?: throw UserNotFoundException()
 
-        userRepository.findById(id) ?: throw UserNotFoundException()
-
-        userRepository.deleteById(id)
+        userRepository.deleteById(idResult)
     }
 }

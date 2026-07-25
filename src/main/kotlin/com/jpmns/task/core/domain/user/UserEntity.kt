@@ -22,25 +22,23 @@ class UserEntity(
     init {
         val usernameResult = UsernameValueObject.of(username)
         val passwordResult = UserPasswordValueObject.of(password)
-        validateOrThrow(listOf(usernameResult, passwordResult))
 
-        this.username = usernameResult.getSuccessValue()
-        this.password = passwordResult.getSuccessValue()
+        val results = listOf(usernameResult, passwordResult)
+        validateOrThrow(results)
+
+        this.username = usernameResult.getValueResult()
+        this.password = passwordResult.getValueResult()
     }
 
     fun updateUsername(username: String) {
-        val result = UsernameValueObject.of(username)
+        val result = UsernameValueObject.of(username).getValueResultOrThrow()
 
-        validateOrThrow(listOf(result))
-
-        this.username = result.getSuccessValue()
+        this.username = result
     }
 
     fun updatePassword(encodedPassword: String) {
-        val result = UserPasswordValueObject.of(encodedPassword)
+        val result = UserPasswordValueObject.of(encodedPassword).getValueResultOrThrow()
 
-        validateOrThrow(listOf(result))
-
-        this.password = result.getSuccessValue()
+        this.password = result
     }
 }

@@ -102,7 +102,6 @@ class UpdateUsernameUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(DomainException::class.java)
-        verify { userRepository.findById(userId) }
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
     }

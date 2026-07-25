@@ -25,19 +25,19 @@ class TaskEntity(
     init {
         val userIdResult = IdValueObject.of(userId)
         val taskNameResult = TaskNameValueObject.of(taskName)
-        validateOrThrow(listOf(userIdResult, taskNameResult))
 
-        this.userId = userIdResult.getSuccessValue()
-        this.taskName = taskNameResult.getSuccessValue()
+        val results = listOf(userIdResult, taskNameResult)
+        validateOrThrow(results = results)
+
+        this.userId = userIdResult.getValueResult()
+        this.taskName = taskNameResult.getValueResult()
         this.finished = finished
     }
 
     fun updateTaskName(taskName: String) {
-        val result = TaskNameValueObject.of(taskName)
+        val result = TaskNameValueObject.of(taskName).getValueResultOrThrow()
 
-        validateOrThrow(listOf(result))
-
-        this.taskName = result.getSuccessValue()
+        this.taskName = result
     }
 
     fun markAsFinished() {

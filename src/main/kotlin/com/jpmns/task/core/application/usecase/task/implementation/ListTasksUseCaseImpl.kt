@@ -14,14 +14,9 @@ class ListTasksUseCaseImpl(
     private val taskRepository: TaskRepository
 ) : ListTasksUseCase {
     override fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
-        val userIdResult = IdValueObject.of(input.userId)
-        if (userIdResult.isFail) {
-            throw userIdResult.getFailureError()
-        }
+        val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
 
-        val userId = userIdResult.getSuccessValue()
-
-        return taskRepository.findAllByUserId(userId).map(::toOutput)
+        return taskRepository.findAllByUserId(userIdResult).map(::toOutput)
     }
 
     private fun toOutput(task: TaskEntity): TaskOutputDTO =

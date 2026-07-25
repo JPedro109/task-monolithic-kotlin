@@ -15,8 +15,8 @@ class UserPasswordValueObjectTest {
 
         val result = UserPasswordValueObject.of(password.asString())
 
-        assertThat(result.isFail).isFalse()
-        assertThat(result.getSuccessValue().asString()).isEqualTo(password.asString())
+        assertThat(result.isFailure).isFalse()
+        assertThat(result.getValueResult().asString()).isEqualTo(password.asString())
     }
 
     @Test
@@ -27,7 +27,7 @@ class UserPasswordValueObjectTest {
 
         val result = UserPasswordValueObject.of(passwordWithSpecialChars)
 
-        assertThat(result.isFail).isFalse()
+        assertThat(result.isFailure).isFalse()
     }
 
     @ParameterizedTest
@@ -35,6 +35,6 @@ class UserPasswordValueObjectTest {
     fun `should fail for empty password`(password: String) {
         val result = UserPasswordValueObject.of(password)
 
-        assertThat(result.isFail).isTrue()
+        assertThat(result.isFailure).isTrue()
     }
 }

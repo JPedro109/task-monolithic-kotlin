@@ -16,14 +16,9 @@ class UpdateUserPasswordUseCaseImpl(
     private val passwordEncoder: PasswordEncoder
 ) : UpdateUserPasswordUseCase {
     override fun execute(input: UpdateUserPasswordInputDTO) {
-        val idResult = IdValueObject.of(input.userId)
-        if (idResult.isFail) {
-            throw idResult.getFailureError()
-        }
+        val idResult = IdValueObject.of(input.userId).getValueResultOrThrow()
 
-        val id = idResult.getSuccessValue()
-
-        val user = userRepository.findById(id) ?: throw UserNotFoundException()
+        val user = userRepository.findById(idResult) ?: throw UserNotFoundException()
 
         if (!passwordEncoder.matches(input.currentPassword, user.password.asString())) {
             throw InvalidCredentialsException()

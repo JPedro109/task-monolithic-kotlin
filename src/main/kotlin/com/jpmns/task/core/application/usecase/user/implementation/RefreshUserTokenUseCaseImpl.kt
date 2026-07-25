@@ -18,14 +18,9 @@ class RefreshUserTokenUseCaseImpl(
     override fun execute(input: RefreshUserTokenInputDTO): RefreshUserTokenOutputDTO {
         val decoded = token.tokenValidation(input.refreshToken)
 
-        val idResult = IdValueObject.of(decoded.sub)
-        if (idResult.isFail) {
-            throw idResult.getFailureError()
-        }
+        val idResult = IdValueObject.of(decoded.sub).getValueResultOrThrow()
 
-        val id = idResult.getSuccessValue()
-
-        userRepository.findById(id) ?: throw UserNotFoundException()
+        userRepository.findById(idResult) ?: throw UserNotFoundException()
 
         val accessToken = token.generateAccessToken(decoded.sub)
         val refreshToken = token.generateRefreshToken(decoded.sub)

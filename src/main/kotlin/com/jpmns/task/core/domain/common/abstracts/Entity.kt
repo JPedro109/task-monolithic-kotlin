@@ -12,14 +12,16 @@ abstract class Entity(id: String, createdAt: Instant? = null) {
 
     init {
         val idResult = IdValueObject.of(id)
-        validateOrThrow(listOf(idResult))
 
-        this.id = idResult.getSuccessValue()
+        val results = listOf(idResult)
+        validateOrThrow(results)
+
+        this.id = idResult.getValueResult()
         this.createdAt = createdAt ?: Instant.now()
     }
 
-    protected fun validateOrThrow(results: List<Result<*, DomainException>>) {
-        val errors = results.filter { it.isFail }.map { it.getFailureError() }
+    protected fun validateOrThrow(results: List<Result<*>>) {
+        val errors = results.filter { it.isFailure }.map { it.getErrorResult() as DomainException }
 
         if (errors.isNotEmpty()) {
             throw DomainException.with(errors)

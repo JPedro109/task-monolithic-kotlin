@@ -1,20 +1,37 @@
 package com.jpmns.task.shared.type
 
-sealed class Result<out T, out E> {
-    private data class Success<T>(val value: T) : Result<T, Nothing>()
+sealed class Result<out T> {
+    data class Success<T>(val value: T) : Result<T>()
 
-    private data class Failure<E>(val error: E) : Result<Nothing, E>()
+    data class Failure(val error: RuntimeException) : Result<Nothing>()
 
-    val isFail: Boolean
+    val isFailure: Boolean
         get() = this is Failure
 
-    fun getSuccessValue(): T = (this as Success).value
+    fun getValueResult(): T = when (this) {
+        is Success -> value
 
-    fun getFailureError(): E = (this as Failure).error
+        is Failure -> error(
+            "The result is a failure, value does not exist"
+        )
+    }
+
+    fun getValueResultOrThrow(): T = when (this) {
+        is Success -> value
+        is Failure -> throw error
+    }
+
+    fun getErrorResult(): RuntimeException = when (this) {
+        is Success -> error(
+            "The result is a success, error does not exist"
+        )
+
+        is Failure -> error
+    }
 
     companion object {
-        fun <T, E> success(value: T): Result<T, E> = Success(value)
+        fun <T> success(value: T): Result<T> = Success(value)
 
-        fun <T, E> fail(error: E): Result<T, E> = Failure(error)
+        fun fail(error: RuntimeException): Result<Nothing> = Failure(error)
     }
 }

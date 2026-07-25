@@ -15,14 +15,9 @@ class GetUserByIdUseCaseImpl(
     private val userRepository: UserRepository
 ) : GetUserByIdUseCase {
     override fun execute(input: GetUserByIdInputDTO): UserOutputDTO {
-        val idResult = IdValueObject.of(input.id)
-        if (idResult.isFail) {
-            throw idResult.getFailureError()
-        }
+        val idResult = IdValueObject.of(input.id).getValueResultOrThrow()
 
-        val id = idResult.getSuccessValue()
-
-        val user = userRepository.findById(id) ?: throw UserNotFoundException()
+        val user = userRepository.findById(idResult) ?: throw UserNotFoundException()
 
         return toOutput(user)
     }

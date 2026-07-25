@@ -48,7 +48,7 @@ class TaskRepositoryAdapterTest {
     fun `should find a task by id and return the domain entity`() {
         val task = TaskFixture.aTask()
         val taskIdVO = task.id
-        val id = IdValueObject.of(taskIdVO.asString()).getSuccessValue()
+        val id = IdValueObject.of(taskIdVO.asString()).getValueResult()
         val formattedId = UUID.fromString(taskIdVO.asString())
         val model = buildTaskModel()
 
@@ -64,7 +64,7 @@ class TaskRepositoryAdapterTest {
     fun `should return null when task is not found by id`() {
         val task = TaskFixture.aTask()
         val taskIdVO = task.id
-        val id = IdValueObject.of(taskIdVO.asString()).getSuccessValue()
+        val id = IdValueObject.of(taskIdVO.asString()).getValueResult()
 
         every { dao.findById(any()) } returns Optional.empty()
 
@@ -77,7 +77,7 @@ class TaskRepositoryAdapterTest {
     fun `should find all tasks by userId and return domain entities`() {
         val user = UserFixture.aUser()
         val userIdVO = user.id
-        val id = IdValueObject.of(userIdVO.asString()).getSuccessValue()
+        val id = IdValueObject.of(userIdVO.asString()).getValueResult()
         val formattedUserId = UUID.fromString(userIdVO.asString())
         val model = buildTaskModel()
 
@@ -93,7 +93,7 @@ class TaskRepositoryAdapterTest {
     fun `should return empty list when user has no tasks`() {
         val user = UserFixture.aUser()
         val userIdVO = user.id
-        val id = IdValueObject.of(userIdVO.asString()).getSuccessValue()
+        val id = IdValueObject.of(userIdVO.asString()).getValueResult()
 
         every { dao.findAllByUserId(any()) } returns emptyList()
 
@@ -106,7 +106,7 @@ class TaskRepositoryAdapterTest {
     fun `should delete a task by id`() {
         val task = TaskFixture.aTask()
         val taskIdVO = task.id
-        val id = IdValueObject.of(taskIdVO.asString()).getSuccessValue()
+        val id = IdValueObject.of(taskIdVO.asString()).getValueResult()
         val formattedId = UUID.fromString(taskIdVO.asString())
 
         every { dao.deleteById(any()) } returns Unit

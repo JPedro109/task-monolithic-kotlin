@@ -18,14 +18,9 @@ class UserLoginUseCaseImpl(
     private val token: Token
 ) : UserLoginUseCase {
     override fun execute(input: UserLoginInputDTO): UserLoginOutputDTO {
-        val usernameResult = UsernameValueObject.of(input.username)
-        if (usernameResult.isFail) {
-            throw usernameResult.getFailureError()
-        }
+        val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
 
-        val username = usernameResult.getSuccessValue()
-
-        val user = userRepository.findByUsername(username) ?: throw InvalidCredentialsException()
+        val user = userRepository.findByUsername(usernameResult) ?: throw InvalidCredentialsException()
 
         val passwordIsValid = passwordEncoder.matches(
             rawPassword = input.password,

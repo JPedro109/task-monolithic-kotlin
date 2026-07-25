@@ -1,6 +1,5 @@
 package com.jpmns.task.core.domain.user.valueobject
 
-import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.core.domain.user.valueobject.exception.InvalidUsernameException
 import com.jpmns.task.shared.type.Result
 
@@ -24,12 +23,13 @@ class UsernameValueObject private constructor(private val value: String) {
     companion object {
         private val USERNAME_REGEX = Regex("^[a-zA-Z0-9_]{3,50}$")
 
-        fun of(username: String): Result<UsernameValueObject, DomainException> {
+        fun of(username: String): Result<UsernameValueObject> {
             if (!USERNAME_REGEX.matches(username)) {
                 return Result.fail(
                     InvalidUsernameException()
                 )
             }
+
             return Result.success(UsernameValueObject(username))
         }
     }
