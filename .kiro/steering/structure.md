@@ -20,11 +20,13 @@ src/main/kotlin/com/jpmns/task/
 │   │   │   └── valueobject/TaskNameValueObject.kt
 │   │   └── user/
 │   │       ├── UserEntity.kt
-│   │       └── valueobject/  (UsernameValueObject, UserPasswordValueObject)
+│   │       └── valueobject/  (UserEmailValueObject, UsernameValueObject, UserPasswordValueObject)
 │   ├── application/                      # Casos de uso e interfaces de porta
 │   │   ├── port/
 │   │   │   ├── persistence/repository/   # TaskRepository, UserRepository (interfaces)
-│   │   │   └── security/                 # Token, PasswordEncoder (interfaces + DTOs de segurança)
+│   │   │   └── security/                 # Token, PasswordEncoder (interfaces)
+│   │   │       ├── dto/                  # DecodeTokenDto e outros DTOs de porta de segurança
+│   │   │       └── exception/            # InvalidTokenException e outras exceções de porta
 │   │   └── usecase/
 │   │       ├── task/
 │   │       │   ├── interfaces/           # Uma interface por caso de uso
@@ -37,33 +39,32 @@ src/main/kotlin/com/jpmns/task/
 │   │   ├── persistence/
 │   │   │   ├── dao/                      # Interfaces Spring Data JPA (TaskJpaDao, UserJpaDao)
 │   │   │   ├── model/                    # Modelos @Entity do JPA (TaskJpaModel, UserJpaModel)
-│   │   │   ├── mapper/                   # Objetos de mapeamento estático (domínio ↔ modelo JPA)
+│   │   │   ├── mapper/                   # Classes de mapeamento estático (domínio ↔ modelo JPA)
 │   │   │   └── repository/               # Adaptadores @Repository implementando interfaces de porta
 │   │   └── security/
 │   │       ├── filter/JwtAuthenticationFilter.kt
+│   │       ├── service/UserDetailsServiceImpl.kt
 │   │       ├── PasswordEncoderAdapter.kt
 │   │       └── TokenAdapter.kt
 │   └── presentation/                     # Camada HTTP
-│       ├── controller/
-│       │   ├── AuthController.kt
-│       │   ├── TaskController.kt
-│       │   ├── UserController.kt
-│       │   ├── documentation/            # Interfaces *ControllerDoc com anotações @Operation do Swagger
-│       │   │   └── payload/              # Interfaces *Doc para payloads (anotações @Schema)
-│       │   ├── payload/                  # Classes de Request/Response por domínio
-│       │   │   ├── task/
-│       │   │   │   ├── request/          # CreateTaskRequest, UpdateTaskRequest
-│       │   │   │   └── response/         # TaskResponse
-│       │   │   └── user/
-│       │   │       ├── request/          # UserLoginRequest, CreateUserRequest, etc.
-│       │   │       └── response/         # UserLoginResponse, RefreshTokenResponse, etc.
-│       │   └── common/
-│       │       ├── handler/GlobalExceptionHandler.kt
-│       │       ├── filter/               # Filtros Servlet (ex: TracingContextFilter)
-│       │       └── resolver/AuthenticatedUserResolver.kt
-│       └── scheduled/                    # Tarefas agendadas (se houver)
+│       └── controller/
+│           ├── AuthController.kt
+│           ├── TaskController.kt
+│           ├── UserController.kt
+│           ├── documentation/            # Interfaces *ControllerDoc com anotações @Operation do Swagger
+│           │   └── payload/              # Interfaces *Doc para payloads (anotações @Schema)
+│           ├── payload/                  # Classes de Request/Response por domínio
+│           │   ├── task/
+│           │   │   ├── request/          # CreateTaskRequest, UpdateTaskRequest
+│           │   │   └── response/         # TaskResponse
+│           │   └── user/
+│           │       ├── request/          # UserLoginRequest, CreateUserRequest, etc.
+│           │       └── response/         # UserLoginResponse, RefreshTokenResponse, etc.
+│           └── common/
+│               ├── handler/GlobalExceptionHandler.kt
+│               ├── filter/               # Filtros Servlet (ex: TracingContextFilter)
+│               └── resolver/AuthenticatedUserResolver.kt
 └── shared/                               # Utilitários transversais
-    ├── extension/                        # Funções de extensão Kotlin
     └── type/Result.kt                    # Result<T, E> genérico para validação de value objects
 ```
 
@@ -74,7 +75,7 @@ src/main/kotlin/com/jpmns/task/
 - **Value objects** expõem o valor primitivo via método `asString()`. Não há getter genérico `getValue()` no value object em si.
 - **Casos de uso** são definidos como interfaces em `usecase/.../interfaces/` e implementados em `usecase/.../implementation/`. Controllers dependem apenas da interface.
 - **Port interfaces** (`TaskRepository`, `Token`, `PasswordEncoder`) ficam em `application/port/` e são implementadas por adaptadores em `external/`. As camadas de domínio e aplicação nunca importam de `external/`.
-- **Mappers** são `object` (singleton sem estado). Possuem métodos `toModel()` (domínio → JPA) e `toDomain()` (JPA → domínio). Nunca adicionam lógica de negócio.
+- **Mappers** são classes utilitárias estáticas sem estado: construtor `private`, todos os métodos no companion object. Possuem métodos `toModel()` (domínio → JPA) e `toDomain()` (JPA → domínio). Nunca adicionam lógica de negócio.
 - **Implementações de use case** nunca retornam entidades de domínio diretamente.
 - **Input DTOs** da camada de aplicação (`usecase/.../dto/input/`) são `data class` simples, sem anotações de framework. Recebem apenas tipos primitivos ou strings — nunca value objects.
 - **Output DTOs** da camada de aplicação (`usecase/.../dto/output/`) são `data class` simples, sem anotações de framework. Contêm apenas tipos primitivos, strings e `Instant`.
@@ -96,6 +97,8 @@ src/main/kotlin/com/jpmns/task/
 - **ktlint + detekt**: aplicados em todo build. Política de zero warnings.
 
 ## Convenções de código
+
+Funções de extensão e factory methods no `companion object` ficam junto aos métodos públicos. Helpers internos no `companion object` ficam no final.
 
 ### Imutabilidade e uso de `val`
 
@@ -127,6 +130,30 @@ val task = TaskEntity(UUID.randomUUID().toString(), input.userId, input.taskName
 
 Não há exceções a esta regra.
 
+### Separação de fases lógicas
+
+Separe cada fase lógica de um método com **uma linha em branco**. Não insira linhas em branco dentro de uma mesma fase. Não agrupe instruções não relacionadas. Preserve o estilo do código ao redor.
+
+Fases típicas de um use case:
+
+```kotlin
+override fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
+    val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+
+    val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
+    val userIsOwner = task.userId.asString() == input.userId
+    if (!userIsOwner) {
+        throw TaskAccessDeniedException()
+    }
+
+    task.updateTaskName(input.taskName)
+
+    val saved = taskRepository.save(task)
+
+    return toOutput(saved)
+}
+```
+
 ### Injeção de dependência via construtor
 
 Toda dependência deve ser declarada como propriedade `private val` e injetada exclusivamente via construtor primário. Nunca use `@Autowired` em campo ou setter.
@@ -140,132 +167,16 @@ class CreateTaskUseCaseImpl(
 }
 ```
 
-### Separação de fases lógicas
+### Ordenação de membros de uma classe
 
-Separe cada fase lógica de um método com **uma linha em branco**. Não insira linhas em branco dentro de uma mesma fase. Preserve o estilo do código ao redor.
+Siga sempre esta ordem dentro de qualquer classe:
 
-Fases típicas de um use case:
-
-```kotlin
-override fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
-    // 1. Preparação de entrada / validação
-    val taskIdValueOrError = IdValueObject.of(input.taskId)
-    if (taskIdValueOrError.isFail()) {
-        throw taskIdValueOrError.getError()
-    }
-
-    // 2. Lógica de negócio / busca e autorização
-    val taskIdValue = taskIdValueOrError.getValue()
-    val task = taskRepository.findById(taskIdValue)
-        ?: throw TaskNotFoundException()
-    val userIsOwner = task.userId.asString() == input.userId
-    if (!userIsOwner) {
-        throw TaskAccessDeniedException()
-    }
-
-    // 3. Mutação no domínio
-    task.updateTaskName(input.taskName)
-
-    // 4. Persistência
-    val saved = taskRepository.save(task)
-
-    // 5. Mapeamento de resposta
-    return toOutput(saved)
-}
-```
-
-Fases típicas de um controller:
-
-```kotlin
-@PostMapping
-override fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> {
-    logger.info("Create task request received: ${request.taskName}")
-
-    val userId = AuthenticatedUserResolver.getUserId()
-
-    val input = CreateTaskInputDTO(userId = userId, taskName = request.taskName)
-
-    val output = createTaskUseCase.execute(input)
-
-    val response = TaskResponse.of(output)
-
-    logger.info("Task created with id: ${response.id}")
-    return ResponseEntity.status(HttpStatus.CREATED).body(response)
-}
-```
-
-### Validação de value objects nas implementações de use case
-
-Sempre que o input do use case contiver um campo que será usado **isoladamente** (sem instanciar uma entidade completa) — como um ID para busca ou um campo que será atualizado individualmente —, valide com `isFail()` antes de prosseguir e lance a exceção de domínio retornada pelo próprio `Result`. Nunca use o value object sem antes verificar o resultado.
-
-```kotlin
-val taskIdValueOrError = IdValueObject.of(input.taskId)
-if (taskIdValueOrError.isFail()) {
-    throw taskIdValueOrError.getError()
-}
-val taskIdValue = taskIdValueOrError.getValue()
-```
-
-**Exceção — instanciação de entidade completa**: quando todos os campos necessários estão disponíveis e a entidade será criada via construtor, **não** valide os value objects manualmente. O construtor já chama `validateOrThrow` internamente e lança `DomainException` automaticamente.
-
-```kotlin
-// CORRETO — entidade valida internamente, não repita a validação
-val task = TaskEntity(
-    id = UUID.randomUUID().toString(),
-    userId = input.userId,
-    taskName = input.taskName,
-    finished = false
-)
-
-// INCORRETO — validação duplicada, desnecessária antes da instanciação completa
-val taskNameValueOrError = TaskNameValueObject.of(input.taskName)
-if (taskNameValueOrError.isFail()) {
-    throw taskNameValueOrError.getError()
-}
-val task = TaskEntity(id = UUID.randomUUID().toString(), userId = input.userId, taskName = input.taskName, finished = false)
-```
-
-A conversão da entidade de domínio para `OutputDTO` deve sempre ser feita por um método privado `toOutput(entity: XxxEntity)` dentro da implementação. Nunca repita o mapeamento inline nem exponha entidades de domínio fora da implementação.
-
-```kotlin
-private fun toOutput(task: TaskEntity): TaskOutputDTO =
-    TaskOutputDTO(
-        id = task.id.asString(),
-        userId = task.userId.asString(),
-        taskName = task.taskName.asString(),
-        finished = task.finished,
-        createdAt = task.createdAt
-    )
-```
-
-### DTOs e conversão de dados
-
-O fluxo de dados entre camadas segue uma direção única, com tipos distintos em cada fronteira:
-
-```
-Request (payload) → InputDTO (usecase) → Entity (domain) → OutputDTO (usecase) → Response (payload)
-```
-
-- **Controller → Use Case**: o controller monta o `InputDTO` manualmente a partir dos campos do `Request`, nunca passa o `Request` diretamente ao use case.
-- **Use Case → Controller**: o use case retorna um `OutputDTO`; o controller converte para `Response` via factory estática `Response.of(outputDto)` no companion object.
-- **Use Case → Domain**: o use case instancia a entidade diretamente via construtor público. O `InputDTO` carrega apenas strings/primitivos.
-- **Use Case → Repository → Domain**: mappers `object` fazem a conversão entre entidade de domínio e modelo JPA dentro dos adapters.
-
-### `toString()` customizado para dados sensíveis
-
-Todo `data class` de request ou response que contenha campos sensíveis (senha, token) **deve** sobrescrever `toString()` substituindo o valor por `'[PROTECTED]'`. Essa proteção garante que logs de entrada e saída dos controllers nunca exponham dados confidenciais.
-
-```kotlin
-// Exemplo: UserLoginRequest.kt
-override fun toString(): String =
-    "UserLoginRequest{username='$username', password='[PROTECTED]'}"
-
-// Exemplo: UserLoginResponse.kt
-override fun toString(): String =
-    "UserLoginResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
-```
-
-Campos considerados sensíveis: senhas (`password`, `currentPassword`, `newPassword`), tokens (`accessToken`, `refreshToken`) e qualquer credencial ou segredo.
+1. Constantes (`companion object` com `const val` / `val`)
+2. Campos de instância / propriedades
+3. Construtores
+4. Métodos públicos
+5. Métodos protegidos
+6. Métodos privados
 
 ### Agrupamento de ConfigurationProperties
 
@@ -280,7 +191,6 @@ Cada prefixo do `application.yaml` mapeado para uma classe Kotlin deve usar `@Co
 data class SecurityConfigProperties(
     val jwt: Jwt
 ) {
-    // Subgrupo aninhado: security.jwt.*
     data class Jwt(
         val secret: String,
         val accessTokenExpirationMs: Long,
@@ -303,37 +213,575 @@ security:
     refresh-token-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
 ```
 
-## Convenções de documentação
+### DTOs e conversão de dados
 
-A documentação Swagger é isolada em interfaces dedicadas, mantendo os controllers e payloads livres de anotações OpenAPI.
+O fluxo de dados entre camadas segue uma direção única, com tipos distintos em cada fronteira:
 
-### Interfaces `*ControllerDoc`
+```
+Request (payload) → InputDTO (usecase) → Entity (domain) → OutputDTO (usecase) → Response (payload)
+```
 
-Cada controller possui uma interface `*ControllerDoc` em `presentation/controller/documentation/`. Ela concentra **todas** as anotações Swagger do controller: `@Tag`, `@RequestMapping`, `@Operation`, `@ApiResponses` e `@SecurityRequirement`. O controller implementa essa interface e não contém nenhuma anotação OpenAPI.
+- **Controller → Use Case**: o controller monta o `InputDTO` manualmente a partir dos campos do `Request`, nunca passa o `Request` diretamente ao use case.
+- **Use Case → Controller**: o use case retorna um `OutputDTO`; o controller converte para `Response` via factory estática `Response.of(outputDto)` no companion object.
+- **Use Case → Domain**: o use case instancia a entidade diretamente via construtor público. O `InputDTO` carrega apenas strings/primitivos.
+- **Use Case → Repository → Domain**: mappers fazem a conversão entre entidade de domínio e modelo JPA dentro dos adapters.
 
-- `@Tag` e `@RequestMapping` ficam na interface, nunca no controller.
-- `@SecurityRequirement(name = "bearerAuth")` é declarado na interface quando todos os endpoints do controller exigem autenticação. Para endpoints individuais que divergem da regra do controller, adicione `security` diretamente no `@Operation` do método correspondente.
-- Cada método documenta `summary`, `description` (HTML inline com `<p>`, `<ul>`, `<li>`, `<code>`, `<strong>`), `requestBody` (quando há corpo) e `@ApiResponses` com todos os códigos de status possíveis.
-- Todo `@ApiResponse` com corpo inclui `content` com `mediaType = "application/json"` e ao menos um `ExampleObject` com JSON representativo.
-- Respostas sem corpo (ex: 204) declaram apenas `responseCode` e `description`, sem `content`.
+## Convenções da camada domain
+
+Campos considerados sensíveis: senhas (`password`, `currentPassword`, `newPassword`), tokens (`accessToken`, `refreshToken`) e qualquer credencial ou segredo.
+
+### Entidade base (`Entity`)
+
+Toda entidade de domínio estende `Entity`. O construtor da classe base recebe `id` (String) e `createdAt` (Instant), valida o ID via `IdValueObject.of(id)` e atribui `Instant.now()` quando `createdAt` for `null`. O campo `id` é `private val IdValueObject`; `createdAt` é `private val Instant`.
+
+As subclasses nunca acessam `id` diretamente — usam sempre `getId()` ou a propriedade exposta pela classe base.
+
+O método `validateOrThrow(results: List<Result<*>>)` é `protected` e coleta todos os `Result` com falha, extrai as `DomainException`s e lança uma `DomainException` agregada. Subclasses o chamam no construtor após criar todos os value objects.
+
+### Estrutura de entidade de domínio
+
+Entidades seguem este esquema:
+
+1. **Campos mutáveis**: declarados com `var` (podem ser atualizados por métodos de domínio).
+2. **Campos imutáveis (exceto `id` e `createdAt`)**: declarados com `val`.
+3. **Construtor completo**: recebe todos os campos como primitivos/strings, cria os value objects, chama `validateOrThrow`, atribui os campos.
+4. **Construtor de conveniência**: delega ao construtor completo passando `null` para `createdAt` e `updatedAt` quando não disponíveis (ex: criação nova).
+5. **Métodos de negócio** (`update*`, `markAs*`): recebem primitivos/strings, recriam o value object via `of(...).getValueOrThrow()` e atualizam o campo.
 
 ```kotlin
-@Tag(name = "Tasks", description = "Gerenciamento de tarefas — criação, listagem, atualização e exclusão")
+class TaskEntity(
+    id: String,
+    userId: String,
+    taskName: String,
+    finished: Boolean,
+    createdAt: Instant? = null,
+    val updatedAt: Instant? = null
+) : Entity(id, createdAt) {
+
+    var taskName: TaskNameValueObject
+        private set
+    var finished: Boolean = finished
+        private set
+    val userId: IdValueObject
+
+    init {
+        val userIdResult = IdValueObject.of(userId)
+        val taskNameResult = TaskNameValueObject.of(taskName)
+
+        val results = listOf(userIdResult, taskNameResult)
+        validateOrThrow(results)
+
+        this.userId = userIdResult.getValueResult()
+        this.taskName = taskNameResult.getValueResult()
+    }
+
+    fun updateTaskName(taskName: String) {
+        this.taskName = TaskNameValueObject.of(taskName).getValueResultOrThrow()
+    }
+}
+```
+
+### Value objects
+
+Cada value object segue este contrato:
+
+- Construtor `private` — instanciação exclusiva via `of(...)`.
+- Factory no companion object `of(value: String)` retorna `Result<VO>`: `Result.fail(InvalidXxxException())` quando inválido, `Result.success(XxxValueObject(value))` quando válido.
+- Método `asString()` expõe o valor primitivo. Nunca use `getValue()`.
+- Sobrescrevem `equals` e `hashCode` com base em `asString()`.
+- Regras de validação ficam dentro do `of(...)` — `null`, formato, tamanho, padrão de regex, etc.
+
+```kotlin
+class UsernameValueObject private constructor(private val username: String) {
+
+    fun asString(): String = username
+
+    companion object {
+        private val USERNAME_PATTERN = Regex("^[a-zA-Z0-9_]{3,50}$")
+
+        fun of(username: String?): Result<UsernameValueObject> {
+            if (username == null || !USERNAME_PATTERN.matches(username)) {
+                return Result.fail(InvalidUsernameException())
+            }
+
+            return Result.success(UsernameValueObject(username))
+        }
+    }
+}
+```
+
+Value objects de domínio existentes:
+
+- `IdValueObject` — UUID no formato padrão (`common/valueobject/`)
+- `TaskNameValueObject` — não nulo, não vazio, máximo 255 caracteres
+- `UsernameValueObject` — alfanumérico + underscore, 3–50 caracteres
+- `UserEmailValueObject` — formato de e-mail válido
+- `UserPasswordValueObject` — não nulo (a senha já chega codificada do adapter)
+
+### `DomainException`
+
+Classe base de todas as exceções de domínio. Subclasses de value object e entidade estendem diretamente `DomainException` com mensagem fixa no construtor:
+
+```kotlin
+class InvalidTaskNameException : DomainException(
+    "Task name must not be blank and must have at most 255 characters"
+)
+```
+
+Nunca lance `RuntimeException` ou `IllegalArgumentException` no domínio — sempre uma subclasse de `DomainException`.
+
+## Convenções da camada application
+
+### Interfaces de porta (`port/`)
+
+As interfaces de porta definem o contrato entre a camada de aplicação e a infraestrutura. Ficam em `application/port/` e são organizadas por categoria:
+
+- `port/persistence/repository/` — interfaces de repositório (`TaskRepository`, `UserRepository`). Assinaturas trabalham exclusivamente com tipos do domínio: `IdValueObject`, `UsernameValueObject`, `TaskEntity`, `UserEntity`. Nunca expõem tipos JPA.
+- `port/security/` — interfaces de serviços de segurança (`Token`, `PasswordEncoder`). Trabalham com `String`s e com o DTO de porta `DecodeTokenDto`.
+- `port/security/dto/` — DTOs usados nas assinaturas das interfaces de porta de segurança (ex: `DecodeTokenDto`). São `data class` simples sem anotações de framework.
+- `port/security/exception/` — exceções lançadas pelas interfaces de porta de segurança (ex: `InvalidTokenException`). Subclasses de `RuntimeException`; não estendem `DomainException`.
+
+```kotlin
+interface TaskRepository {
+    fun save(task: TaskEntity): TaskEntity
+    fun findById(id: IdValueObject): TaskEntity?
+    fun findAllByUserId(userId: IdValueObject): List<TaskEntity>
+    fun deleteById(id: IdValueObject)
+}
+
+interface Token {
+    fun generateAccessToken(sub: String): String
+    fun generateRefreshToken(sub: String): String
+    fun tokenValidation(token: String): DecodeTokenDto
+}
+```
+
+### Implementações de caso de uso (`usecase/.../implementation/`)
+
+- Anotadas com `@Service`, implementam a interface correspondente.
+- Uma classe por caso de uso, sufixo `Impl` (ex: `CreateTaskUseCaseImpl`).
+- Dependências injetadas via construtor como propriedades `private val`.
+- O método `execute` é sempre anotado com `override` e segue as fases descritas em [Separação de fases lógicas](#separação-de-fases-lógicas).
+- Use cases sem retorno declaram `Unit` na interface.
+- Use cases que retornam lista convertem cada entidade com `.map { toOutput(it) }`.
+
+Estrutura completa de um use case de criação (sem busca por ID):
+
+```kotlin
+@Service
+class CreateTaskUseCaseImpl(
+    private val taskRepository: TaskRepository
+) : CreateTaskUseCase {
+
+    override fun execute(input: CreateTaskInputDTO): TaskOutputDTO {
+        val task = TaskEntity(
+            id = UUID.randomUUID().toString(),
+            userId = input.userId,
+            taskName = input.taskName,
+            finished = false
+        )
+
+        val saved = taskRepository.save(task)
+
+        return toOutput(saved)
+    }
+
+    private fun toOutput(task: TaskEntity): TaskOutputDTO =
+        TaskOutputDTO(
+            id = task.getId().asString(),
+            userId = task.userId.asString(),
+            taskName = task.taskName.asString(),
+            finished = task.finished,
+            createdAt = task.createdAt
+        )
+}
+```
+
+Estrutura completa de um use case de atualização (com busca por ID, verificação de ownership e mutação):
+
+```kotlin
+@Service
+class UpdateTaskUseCaseImpl(
+    private val taskRepository: TaskRepository
+) : UpdateTaskUseCase {
+
+    override fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
+        val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+
+        val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
+
+        val userIsOwner = task.userId.asString() == input.userId
+        if (!userIsOwner) {
+            throw TaskAccessDeniedException()
+        }
+
+        task.updateTaskName(input.taskName)
+
+        val saved = taskRepository.save(task)
+
+        return toOutput(saved)
+    }
+
+    private fun toOutput(task: TaskEntity): TaskOutputDTO = ...
+}
+```
+
+Estrutura completa de um use case de exclusão (sem retorno, com ownership):
+
+```kotlin
+@Service
+class DeleteTaskUseCaseImpl(
+    private val taskRepository: TaskRepository
+) : DeleteTaskUseCase {
+
+    override fun execute(input: DeleteTaskInputDTO) {
+        val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+
+        val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
+
+        val userIsOwner = task.userId.asString() == input.userId
+        if (!userIsOwner) {
+            throw TaskAccessDeniedException()
+        }
+
+        taskRepository.deleteById(taskIdValue)
+    }
+}
+```
+
+### Exceções de caso de uso (`usecase/.../exception/`)
+
+Exceções específicas de cada domínio de caso de uso ficam em `exception/` ao lado de `interfaces/` e `implementation/`. Estendem `RuntimeException` diretamente (não `DomainException`) e carregam uma mensagem fixa:
+
+```kotlin
+class TaskNotFoundException : RuntimeException("Task not found")
+```
+
+Exceções de porta (`port/security/exception/`) seguem o mesmo padrão.
+
+### Validação de value objects nas implementações de use case
+
+Sempre que o input do use case contiver um campo que será usado **isoladamente** — como um ID para busca ou um campo que será atualizado individualmente —, use `getValueOrThrow()` diretamente. A validação manual com `isFail()` é necessária apenas quando o value object precisa ser inspecionado antes de ser usado.
+
+```kotlin
+val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+```
+
+**Exceção — instanciação de entidade completa**: quando todos os campos necessários estão disponíveis e a entidade será criada via construtor, **não** valide os value objects manualmente. O construtor já chama `validateOrThrow` internamente e lança `DomainException` automaticamente.
+
+```kotlin
+// CORRETO — entidade valida internamente, não repita a validação
+val task = TaskEntity(
+    id = UUID.randomUUID().toString(),
+    userId = input.userId,
+    taskName = input.taskName,
+    finished = false
+)
+
+// INCORRETO — validação duplicada, desnecessária antes da instanciação completa
+val taskNameResult = TaskNameValueObject.of(input.taskName).getValueOrThrow()
+val task = TaskEntity(id = UUID.randomUUID().toString(), userId = input.userId, taskName = input.taskName, finished = false)
+```
+
+A validação manual é necessária em dois casos:
+- Para usar um value object **antes** de instanciar a entidade (ex: verificar unicidade de username sem criar o objeto ainda).
+- Para converter campos de IDs recebidos no `InputDTO` que serão usados como parâmetros de busca no repositório.
+
+A conversão da entidade de domínio para `OutputDTO` deve sempre ser feita por um método privado `toOutput(entity: XxxEntity)` dentro da implementação. Nunca repita o mapeamento inline nem exponha entidades de domínio fora da implementação.
+
+## Convenções da camada external
+
+A camada `external` é o único lugar onde infraestrutura pode existir. Toda integração com tecnologia externa — banco de dados, biblioteca de JWT, encoder de senha, cliente HTTP, fila de mensagens, etc. — deve ser implementada aqui como um adaptador.
+
+**Exceção — camada de apresentação (HTTP, scheduler)**: mecanismos de entrada da aplicação não são infraestrutura de suporte e por isso **não** pertencem a `external`. Tudo que representa uma forma de acesso à aplicação pertence à camada `presentation`.
+
+Cada adaptador **obrigatoriamente** implementa uma interface de porta definida em `application/port/`. Nunca crie uma classe de infraestrutura sem uma interface correspondente em `port/`. As camadas de domínio e aplicação nunca importam nada de `external/` — a dependência flui sempre de fora para dentro.
+
+```
+application/port/security/Token.kt                        ← interface
+external/security/TokenAdapter.kt                         ← implementação (só external conhece JJWT)
+application/port/persistence/repository/TaskRepository.kt ← interface
+external/persistence/repository/TaskRepositoryAdapter.kt  ← implementação (só external conhece JPA)
+```
+
+### Adaptadores de persistência
+
+#### Modelos JPA (`*JpaModel`)
+
+- Anotados com `@Entity` e `@Table(name = "...")`.
+- Campos `UUID` para IDs (não `String`) — a conversão é feita nos mappers com `UUID.fromString(...)` / `.toString()`.
+- `@Id` sem geração automática (`@GeneratedValue`) — o ID vem do domínio.
+- `@CreationTimestamp` e `@UpdateTimestamp` do Hibernate para `createdAt` e `updatedAt`.
+- Colunas imutáveis após criação recebem `updatable = false`.
+- Possuem construtor sem argumentos (exigido pelo JPA) e construtor com todos os campos.
+- Campos mutáveis (ex: `taskName`, `finished`) expõem setters; campos imutáveis expõem apenas getters.
+
+```kotlin
+@Entity
+@Table(name = "tasks")
+class TaskJpaModel() {
+
+    @Id
+    @Column(nullable = false, updatable = false)
+    lateinit var id: UUID
+
+    @Column(name = "user_id", nullable = false, updatable = false)
+    lateinit var userId: UUID
+
+    @Column(name = "task_name", nullable = false)
+    lateinit var taskName: String
+
+    @Column(nullable = false)
+    var finished: Boolean = false
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: Instant? = null
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    var updatedAt: Instant? = null
+
+    constructor(
+        id: UUID,
+        userId: UUID,
+        taskName: String,
+        finished: Boolean,
+        createdAt: Instant?,
+        updatedAt: Instant?
+    ) : this() {
+        this.id = id
+        this.userId = userId
+        this.taskName = taskName
+        this.finished = finished
+        this.createdAt = createdAt
+        this.updatedAt = updatedAt
+    }
+}
+```
+
+#### DAOs Spring Data JPA (`*JpaDao`)
+
+- Estendem `JpaRepository<Model, UUID>`.
+- Declaram apenas os métodos de query adicionais necessários (ex: `findAllByUserId`). Métodos padrão do `JpaRepository` são usados diretamente.
+- Sem anotações `@Query` a não ser que a query derivada não seja possível.
+
+```kotlin
+interface TaskJpaDao : JpaRepository<TaskJpaModel, UUID> {
+    fun findAllByUserId(userId: UUID): List<TaskJpaModel>
+}
+```
+
+#### Adaptadores do Repository (`*RepositoryAdapter`)
+
+- Anotados com `@Repository`, implementam a interface de porta correspondente.
+- Recebem o DAO Spring Data JPA via construtor.
+- Toda operação converte domínio → modelo com `Mapper.toModel(entity)` antes de persistir, e modelo → domínio com `Mapper.toDomain(model)` ao retornar.
+- **Nunca** propagam exceções do JPA para fora — se necessário, capturam e relançam como exceção de aplicação.
+
+```kotlin
+@Repository
+class TaskRepositoryAdapter(
+    private val jpaRepository: TaskJpaDao
+) : TaskRepository {
+
+    override fun save(task: TaskEntity): TaskEntity {
+        val model = TaskMapper.toModel(task)
+        val saved = jpaRepository.save(model)
+        return TaskMapper.toDomain(saved)
+    }
+
+    override fun findById(id: IdValueObject): TaskEntity? {
+        val parsedId = UUID.fromString(id.asString())
+        return jpaRepository.findById(parsedId).map { TaskMapper.toDomain(it) }.orElse(null)
+    }
+}
+```
+
+#### Mappers (`*Mapper`)
+
+- Classes com construtor `private` e todos os métodos no `companion object` (equivalente às classes estáticas do Java).
+- `toModel(entity: XxxEntity)` — converte domínio para JPA.
+- `toDomain(model: XxxJpaModel)` — converte JPA para domínio.
+- Nunca adicionam lógica de negócio ou validação.
+
+```kotlin
+class TaskMapper private constructor() {
+
+    companion object {
+        fun toModel(entity: TaskEntity): TaskJpaModel =
+            TaskJpaModel(
+                id = UUID.fromString(entity.getId().asString()),
+                userId = UUID.fromString(entity.userId.asString()),
+                taskName = entity.taskName.asString(),
+                finished = entity.finished,
+                createdAt = entity.createdAt,
+                updatedAt = entity.updatedAt
+            )
+
+        fun toDomain(model: TaskJpaModel): TaskEntity =
+            TaskEntity(
+                id = model.id.toString(),
+                userId = model.userId.toString(),
+                taskName = model.taskName,
+                finished = model.finished,
+                createdAt = model.createdAt,
+                updatedAt = model.updatedAt
+            )
+    }
+}
+```
+
+### Adaptadores de segurança
+
+**`TokenAdapter`** (`@Component`, implementa `Token`):
+- Recebe `SecurityConfigProperties` via construtor e extrai `jwt.secret`, `jwt.accessTokenExpirationMs`, `jwt.refreshTokenExpirationMs`.
+- Toda exceção da biblioteca JJWT é capturada e relançada como `InvalidTokenException`. Nunca deixa exceções de JJWT escapar para fora do adaptador.
+- `generateAccessToken` e `generateRefreshToken` delegam para um método privado `buildToken(sub, expirationMs, tokenType)`.
+- Loga em nível `ERROR` quando o token é inválido.
+
+**`PasswordEncoderAdapter`** (`@Component`, implementa `PasswordEncoder`):
+- Recebe `BCryptPasswordEncoder` (bean registrado em `SecurityConfig`) via construtor.
+- Delega `encode` e `matches` diretamente ao `BCryptPasswordEncoder` sem lógica adicional.
+
+**`JwtAuthenticationFilter`** (`@Component`, estende `OncePerRequestFilter`):
+- Extrai o token do header `Authorization: Bearer <token>`.
+- Se o header estiver ausente ou sem prefixo `Bearer `, segue a cadeia sem autenticar.
+- Chama `token.tokenValidation(jwt)` — se lançar exceção, segue a cadeia sem autenticar (o endpoint protegido devolverá 401).
+- Se o `sub` for válido e o `SecurityContext` estiver vazio, chama `getUserByIdUseCase.execute(input)` e popula o `SecurityContext` com `UsernamePasswordAuthenticationToken` tendo o `userId` como principal e lista de authorities vazia.
+
+## Convenções da camada presentation
+
+A camada `presentation` concentra tudo que representa uma forma de acesso à aplicação. Independentemente do protocolo ou mecanismo, qualquer ponto de entrada deve estar aqui:
+
+- **HTTP** — controllers REST (`@RestController`), filtros Servlet, handlers de exceção
+- **Scheduler** — tarefas agendadas (`@Scheduled`)
+
+Nunca coloque pontos de entrada em `external/` — essa camada é exclusiva para adaptadores de infraestrutura de suporte (banco, JWT, etc.).
+
+### Estrutura dos controllers
+
+- Anotados com `@RestController`.
+- Implementam a interface `*ControllerDoc` correspondente — nenhuma anotação do SpringDoc no corpo do controller.
+- Logger declarado como `private val logger = LoggerFactory.getLogger(XxxController::class.java)` no `companion object`.
+- Todas as dependências (interfaces de caso de uso) injetadas via construtor.
+- `AuthenticatedUserResolver.getUserId()` é o único ponto de extração do ID do usuário autenticado. Nunca acesse o `SecurityContext` diretamente nos controllers.
+
+```kotlin
+@RestController
+class TaskController(
+    private val createTaskUseCase: CreateTaskUseCase
+) : TaskControllerDoc {
+
+    override fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> {
+        logger.info("Creating task - request: {}", request)
+
+        val userId = AuthenticatedUserResolver.getUserId()
+
+        val input = CreateTaskInputDTO(userId = userId, taskName = request.taskName)
+
+        val output = createTaskUseCase.execute(input)
+
+        val response = TaskResponse.of(output)
+
+        logger.info("Creating task - response: {}", response)
+        return ResponseEntity.status(HttpStatus.CREATED).body(response)
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(TaskController::class.java)
+    }
+}
+```
+
+### `GlobalExceptionHandler`
+
+- Anotado com `@RestControllerAdvice`.
+- Único ponto de mapeamento de exceções para respostas HTTP. Nenhum controller captura exceções.
+- Retorna `ProblemDetail` (Problem Details RFC 7807) via `ProblemDetail.forStatusAndDetail(status, message)`.
+- Mapeamentos obrigatórios:
+  - `MethodArgumentNotValidException` → `400` (agrega mensagens dos field errors)
+  - `HttpMessageNotReadableException` → `400`
+  - `DomainException` → `422`
+  - `*NotFoundException` → `404`
+  - `UsernameAlreadyExistsException` → `409`
+  - `InvalidCredentialsException`, `InvalidTokenException` → `401`
+  - `*AccessDeniedException` → `403`
+  - `Exception` (genérico) → `500` com mensagem `"Internal server error"` (nunca exponha detalhes de exceções genéricas)
+- Todo handler loga em nível `ERROR` com `logger.error("...: {}", ex.message, ex)`.
+
+### `AuthenticatedUserResolver`
+
+Classe utilitária sem instância que lê o `principal` do `SecurityContext`:
+
+- `getUserId()` — lança `IllegalArgumentException` se não autenticado. Use em todos os endpoints protegidos.
+- `getUserIdOrNull()` — retorna `null` se não autenticado. Use apenas em endpoints opcionalmente autenticados.
+
+O principal no `SecurityContext` é sempre uma `String` com o UUID do usuário, populada pelo `JwtAuthenticationFilter`.
+
+### `toString()` customizado para dados sensíveis
+
+Todo `data class` de request ou response que contenha campos sensíveis (senha, token) **deve** sobrescrever `toString()` substituindo o valor por `'[PROTECTED]'`. Essa proteção garante que logs de entrada e saída dos controllers nunca exponham dados confidenciais.
+
+```kotlin
+// Exemplo: UserLoginRequest.kt
+override fun toString(): String =
+    "UserLoginRequest{username='$username', password='[PROTECTED]'}"
+
+// Exemplo: UserLoginResponse.kt
+override fun toString(): String =
+    "UserLoginResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
+```
+
+Campos considerados sensíveis: senhas (`password`, `currentPassword`, `newPassword`), tokens (`accessToken`, `refreshToken`) e qualquer credencial ou segredo.
+
+## Convenções de documentação (Swagger / OpenAPI)
+
+Toda a documentação da API é declarada fora dos controllers, em interfaces e classes dedicadas dentro de `presentation/controller/documentation/`. Os controllers permanecem limpos — sem nenhuma anotação do SpringDoc.
+
+### `*ControllerDoc` — documentação de endpoints
+
+- Cada controller possui uma interface `*ControllerDoc` correspondente em `documentation/`.
+- A interface é anotada com `@Tag(name = "...", description = "...")` e `@RequestMapping` com o path base do controller.
+- Endpoints que exigem autenticação recebem `@SecurityRequirement(name = "bearerAuth")` na interface (ou no método, quando apenas alguns endpoints do controller são protegidos).
+- Cada método da interface declara exatamente uma anotação `@Operation` e uma `@ApiResponses`.
+
+`@Operation` deve conter:
+- `summary`: título curto do endpoint.
+- `description`: descrição em HTML construída por concatenação de strings (`"<p>...</p>" + "<ul>..."`) com tags `<p>`, `<ul>`, `<li>`, `<code>` e `<blockquote>` quando necessário. Nunca use text blocks (triple-quote `"""`), pois não são suportados neste contexto.
+- `requestBody` (quando aplicável): com `mediaType = "application/json"`, `schema` apontando para a classe de request e ao menos dois `ExampleObject` — um válido e um inválido.
+- `parameters` (quando aplicável): para path variables, com `name`, `description`, `required = true` e `example`.
+
+`@ApiResponses` deve cobrir todos os status HTTP possíveis para o endpoint:
+- Sucesso (`2xx`): com `schema` e ao menos um `ExampleObject` com corpo representativo.
+- Erros de validação (`400`): quando o endpoint aceita `@RequestBody`.
+- Não autenticado (`401`): em todo endpoint protegido.
+- Acesso negado (`403`): quando há verificação de ownership.
+- Não encontrado (`404`): quando o use case pode lançar `*NotFoundException`.
+- Conflito (`409`): quando há verificação de unicidade.
+- Erro interno (`500`): sempre presente, com exemplo padrão.
+
+Para respostas sem corpo (`204 No Content`), omita o `content` na `@ApiResponse`.
+
+```kotlin
+@Tag(name = "Tasks", description = "Gerenciamento de tarefas — criação, listagem, atualização, exclusão e conclusão")
 @RequestMapping("/api/v1/tasks")
 @SecurityRequirement(name = "bearerAuth")
 interface TaskControllerDoc {
 
     @Operation(
         summary = "Criar nova tarefa",
-        description = "<p>Cria uma nova tarefa vinculada ao usuário autenticado.</p>",
+        description = "<p>Cria uma nova tarefa associada ao usuário autenticado.</p>" +
+            "<p>A tarefa é criada com o status <code>finished: false</code> por padrão.</p>" +
+            "<p>Requer autenticação via <code>Authorization: Bearer &lt;accessToken&gt;</code>.</p>",
         requestBody = RequestBody(
             required = true,
             content = [Content(
                 mediaType = "application/json",
                 schema = Schema(implementation = CreateTaskRequest::class),
                 examples = [
-                    ExampleObject(name = "Dados válidos", value = """{"taskName": "Estudar Kotlin"}"""),
-                    ExampleObject(name = "Nome vazio (inválido)", value = """{"taskName": ""}""")
+                    ExampleObject(name = "Tarefa válida", value = """{"taskName": "Estudar Spring Boot"}"""),
+                    ExampleObject(name = "Nome em branco (inválido)", value = """{"taskName": ""}""")
                 ]
             )]
         )
@@ -345,7 +793,7 @@ interface TaskControllerDoc {
             content = [Content(
                 mediaType = "application/json",
                 schema = Schema(implementation = TaskResponse::class),
-                examples = [ExampleObject(name = "Tarefa criada", value = """{"id": "...", "taskName": "Estudar Kotlin", "finished": false}""")]
+                examples = [ExampleObject(name = "Tarefa criada", value = """{"id": "b2c3d4e5-f6a7-8901-bcde-f12345678901", "taskName": "Estudar Spring Boot", "finished": false}""")]
             )]
         ),
         ApiResponse(
@@ -355,34 +803,42 @@ interface TaskControllerDoc {
                 mediaType = "application/json",
                 examples = [ExampleObject(name = "Não autenticado", value = """{"status": 401, "detail": "Invalid or expired token"}""")]
             )]
+        ),
+        ApiResponse(
+            responseCode = "500",
+            description = "Erro interno inesperado",
+            content = [Content(
+                mediaType = "application/json",
+                examples = [ExampleObject(name = "Erro interno", value = """{"status": 500, "detail": "Internal server error"}""")]
+            )]
         )
     )
     fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse>
 }
 ```
 
-### Interfaces `*RequestDoc` e `*ResponseDoc`
+### `*RequestDoc` / `*ResponseDoc` — documentação de payloads
 
-Cada classe de request e response possui uma interface `*Doc` em `presentation/controller/documentation/payload/`. Ela concentra as anotações `@Schema` dos campos. As classes de payload implementam a interface e não repetem anotações OpenAPI nos campos.
-
-- A interface de payload é anotada com `@Schema(description = "...")` descrevendo o payload como um todo.
-- Cada campo é documentado com `@get:Schema(description, example, minLength?, maxLength?)` na interface.
-- As classes de request e response implementam a interface `*Doc` correspondente. Nenhuma anotação `@Schema` fica nas classes de payload — apenas na interface.
+- Cada `data class` de request ou response implementa uma interface `*Doc` correspondente em `documentation/payload/{domínio}/request/` ou `.../response/`.
+- A interface é anotada com `@Schema(name = "NomeDaClasse", description = "...")`.
+- Cada propriedade da interface declara `@get:Schema` com `description`, `example` e, quando aplicável, `minLength` / `maxLength`.
+- O `data class` de request/response implementa a interface — as anotações `@Schema` são herdadas automaticamente pelo SpringDoc.
+- Campos sensíveis (senha, token) devem ter `example` com valor fictício (nunca omitir o exemplo).
 
 ```kotlin
-// Interface doc — documentation/payload/task/request/CreateTaskRequestDoc.kt
-@Schema(description = "Payload para criação de uma nova tarefa")
+// Interface de documentação
+@Schema(name = "CreateTaskRequest", description = "Dados para criação de uma nova tarefa")
 interface CreateTaskRequestDoc {
 
     @get:Schema(
-        description = "Nome da tarefa",
-        example = "Estudar Kotlin",
+        description = "Nome da tarefa. Não pode ser vazio e deve ter no máximo 255 caracteres.",
+        example = "Estudar Spring Boot",
         maxLength = 255
     )
     val taskName: String
 }
 
-// Payload — payload/task/request/CreateTaskRequest.kt
+// Data class que implementa a interface
 data class CreateTaskRequest(
     @field:NotBlank
     @field:Size(max = 255)
@@ -390,36 +846,11 @@ data class CreateTaskRequest(
 ) : CreateTaskRequestDoc
 ```
 
-```kotlin
-// Interface doc — documentation/payload/task/response/TaskResponseDoc.kt
-@Schema(description = "Representação de uma tarefa")
-interface TaskResponseDoc {
+### Regras gerais de documentação
 
-    @get:Schema(description = "Identificador único da tarefa", example = "a1b2c3d4-e5f6-7890-abcd-ef1234567890")
-    val id: String
-
-    @get:Schema(description = "Nome da tarefa", example = "Estudar Kotlin")
-    val taskName: String
-
-    @get:Schema(description = "Indica se a tarefa foi concluída", example = "false")
-    val finished: Boolean
-}
-
-// Payload — payload/task/response/TaskResponse.kt
-data class TaskResponse(
-    override val id: String,
-    override val taskName: String,
-    override val finished: Boolean
-) : TaskResponseDoc {
-    companion object {
-        fun of(output: TaskOutputDTO): TaskResponse = TaskResponse(
-            id = output.id,
-            taskName = output.taskName,
-            finished = output.finished
-        )
-    }
-}
-```
+- Nunca adicione anotações do SpringDoc (`@Operation`, `@ApiResponse`, `@Schema`, etc.) diretamente nos controllers ou nas `data class` de request/response. Toda documentação pertence às interfaces `*Doc`.
+- Exemplos de corpo de resposta de erro devem seguir o formato Problem Details (RFC 7807): campos `type`, `title`, `status`, `detail`.
+- Os nomes dos `@ExampleObject` devem ser descritivos e em português, indicando o cenário representado (ex: `"Credenciais válidas"`, `"Username muito curto (inválido)"`).
 
 ## Layout de testes
 
@@ -429,6 +860,10 @@ src/test/kotlin/com/jpmns/task/
 │   ├── application/usecase/       # Testes unitários de casos de uso (MockK, sem contexto Spring)
 │   │   ├── task/                  # CreateTaskUseCaseTest, UpdateTaskUseCaseTest, etc.
 │   │   └── user/                  # CreateUserUseCaseTest, UserLoginUseCaseTest, etc.
+│   ├── controller/                # Testes unitários de controllers (slice @WebMvcTest)
+│   │   ├── AuthControllerTest.kt
+│   │   ├── TaskControllerTest.kt
+│   │   └── UserControllerTest.kt
 │   ├── domain/                    # Testes unitários de entidades e value objects
 │   │   ├── task/                  # TaskEntityTest, TaskNameValueObjectTest
 │   │   └── user/                  # UserEntityTest, UsernameValueObjectTest, etc.
@@ -438,11 +873,8 @@ src/test/kotlin/com/jpmns/task/
 │   │   │   ├── mapper/            # TaskMapperTest, UserMapperTest
 │   │   │   └── repository/        # TaskRepositoryAdapterTest, UserRepositoryAdapterTest
 │   │   └── security/              # PasswordEncoderAdapterTest, TokenAdapterTest
-│   └── presentation/controller/   # Testes unitários de controllers (slice @WebMvcTest)
-│       ├── AuthControllerTest.kt
-│       ├── TaskControllerTest.kt
-│       └── UserControllerTest.kt
-├── integration/                   # Testes de integração completos (Testcontainers PostgreSQL)
+│   └── fixture/                   # TaskFixture, UserFixture — construtores de dados de teste compartilhados
+├── integration/                   # Testes E2E completos (Testcontainers PostgreSQL)
 │   ├── common/
 │   │   ├── abstracts/IntegrationTestBase.kt    # Classe base: @SpringBootTest + MockMvc
 │   │   ├── container/PostgresContainerConfig.kt
@@ -451,7 +883,6 @@ src/test/kotlin/com/jpmns/task/
 │   ├── TaskIntegrationTest.kt
 │   └── UserIntegrationTest.kt
 └── shared/
-    ├── fixture/                   # TaskFixture, UserFixture — construtores de dados de teste compartilhados
     └── security/
         ├── WithJwtTokenMock.kt    # Anotação para injetar um principal JWT mockado nos testes
         └── factory/WithMockJwtTokenSecurityContextFactory.kt
@@ -474,8 +905,7 @@ fun `should return 201 with task data when input is valid`() { }
 fun shouldReturn201WithTaskDataWhenInputIsValid() { }
 ```
 
-- Exemplos: `` `should return 200 with tokens when credentials are valid` ``, `` `should throw when task is not found` ``, `` `should return 403 when user does not own the task` ``.
-- Use `assertThat` do AssertJ para asserções.
+- Use `assertThat` do AssertJ para asserções e `assertThatThrownBy` para verificar exceções.
 - Verifique interações com `verify { mock.method(...) }` e `verify { mock wasNot Called }`.
 - Testes devem ser ordenados: sucesso (happy path) primeiro, corner cases depois, exceções/erros por último.
 - Siga o padrão **AAA (Arrange → Act → Assert)**, separando cada etapa com uma linha em branco, nunca utilize comentários para separação das etapas.
@@ -512,6 +942,56 @@ assertThat(output.taskName).isEqualTo(task.taskName.asString())
 
 - Cubra o máximo de cenários possível. Sempre siga a estrutura de layout definida para cada tipo de teste.
 
+### Testes unitários de value objects
+
+Uma classe de teste por value object — sem contexto Spring, sem MockK.
+
+Cenários obrigatórios:
+- Happy path: criação com valor válido, verificar `isFail()` é `false` e `getValue().asString()` retorna o valor esperado.
+- Boundary cases: valores nos limites (mínimo, máximo, exato).
+- Falhas: `null`, vazio, em branco, fora do limite, formato inválido.
+
+```kotlin
+@Test
+fun `should create a valid TaskNameValueObject`() {
+    val name = "Buy groceries"
+
+    val result = TaskNameValueObject.of(name)
+
+    assertThat(result.isFail()).isFalse()
+    assertThat(result.getValue().asString()).isEqualTo(name)
+}
+
+@Test
+fun `should fail when task name is blank`() {
+    val result = TaskNameValueObject.of("")
+
+    assertThat(result.isFail()).isTrue()
+}
+```
+
+### Testes unitários de entidades
+
+Uma classe de teste por entidade — sem contexto Spring, sem MockK.
+
+Cenários obrigatórios:
+- Happy path: construção com dados válidos, verificar todos os campos via getters.
+- Métodos de negócio: cada `update*` e `markAs*` tem ao menos um cenário de sucesso e um de falha.
+- Falhas de construção: IDs inválidos, campos obrigatórios nulos/vazios/fora do limite — assert em `DomainException`.
+
+```kotlin
+@Test
+fun `should throw when task name is blank`() {
+    val id = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    val userId = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+    val finished = false
+    val emptyTaskName = ""
+
+    assertThatThrownBy { TaskEntity(id = id, userId = userId, taskName = emptyTaskName, finished = finished) }
+        .isInstanceOf(DomainException::class.java)
+}
+```
+
 ### Testes unitários de use cases
 
 - Use `@ExtendWith(MockKExtension::class)` — sem contexto Spring.
@@ -524,28 +1004,49 @@ assertThat(output.taskName).isEqualTo(task.taskName.asString())
 
 ```kotlin
 @ExtendWith(MockKExtension::class)
-class CreateTaskUseCaseTest {
+class CreateUserUseCaseTest {
+
     @MockK
-    lateinit var taskRepository: TaskRepository
+    lateinit var userRepository: UserRepository
+
+    @MockK
+    lateinit var passwordEncoder: PasswordEncoder
 
     @InjectMockKs
-    lateinit var useCase: CreateTaskUseCaseImpl
+    lateinit var useCase: CreateUserUseCaseImpl
 
     @Test
-    fun `should create a task successfully`() {
-        val task = TaskFixture.aTask()
+    fun `should create a user successfully`() {
         val user = UserFixture.aUser()
-        val userId = user.id
-        val taskName = task.taskName
-        val input = CreateTaskInputDTO(userId = userId.asString(), taskName = taskName.asString())
+        val username = user.username
+        val password = user.password
+        val input = CreateUserInputDTO(username = username.asString(), password = password.asString())
+        val savedUser = UserFixture.aUser()
 
-        every { taskRepository.save(any()) } returns task
+        every { userRepository.existsByUsername(username) } returns false
+        every { passwordEncoder.encode(password.asString()) } returns password.asString()
+        every { userRepository.save(any()) } returns savedUser
 
         val output = useCase.execute(input)
 
-        assertThat(output.taskName).isEqualTo(taskName.asString())
+        assertThat(output.username).isEqualTo(username.asString())
         assertThat(output.id).isNotNull()
-        verify { taskRepository.save(any()) }
+        verify { userRepository.save(any()) }
+    }
+
+    @Test
+    fun `should throw when username already exists`() {
+        val user = UserFixture.aUser()
+        val username = user.username
+        val password = user.password
+        val input = CreateUserInputDTO(username = username.asString(), password = password.asString())
+
+        every { userRepository.existsByUsername(username) } returns true
+        every { passwordEncoder.encode(password.asString()) } returns password.asString()
+
+        assertThatThrownBy { useCase.execute(input) }
+            .isInstanceOf(UsernameAlreadyExistsException::class.java)
+        verify { userRepository wasNot Called }
     }
 }
 ```
@@ -559,44 +1060,55 @@ class CreateTaskUseCaseTest {
 - Cada classe nested tem seu próprio método privado `perform(...)` que encapsula a chamada MockMvc para aquele endpoint.
 
 ```kotlin
-@WebMvcTest(TaskController::class)
+@WebMvcTest(AuthController::class)
 @Import(SecurityConfig::class, GlobalExceptionHandler::class)
-class TaskControllerTest {
+class AuthControllerTest {
+
     @Autowired
     private lateinit var mockMvc: MockMvc
 
     @MockkBean
-    private lateinit var createTaskUseCase: CreateTaskUseCase
+    private lateinit var userLoginUseCase: UserLoginUseCase
 
     @MockkBean
     private lateinit var token: Token
 
     @Nested
-    inner class CreateTask {
+    @DisplayName("POST /api/v1/auth/login")
+    inner class Login {
+
         @Test
-        @WithJwtTokenMock
-        fun `should return 201 with task data when creation succeeds`() {
-            val task = TaskFixture.aTask()
-            val taskName = task.taskName
-            val output = buildTaskOutput()
+        fun `should return 200 with tokens when credentials are valid`() {
+            val user = UserFixture.aUser()
+            val username = user.username
+            val password = user.password
+            val accessToken = "access-token"
+            val refreshToken = "refresh-token"
+            val output = UserLoginOutputDTO(accessToken = accessToken, refreshToken = refreshToken)
 
-            every { createTaskUseCase.execute(any()) } returns output
+            every { userLoginUseCase.execute(any()) } returns output
 
-            perform(taskName.asString())
-                .andExpect(status().isCreated)
-                .andExpect(jsonPath("$.taskName").value(taskName.asString()))
+            perform(username = username.asString(), password = password.asString())
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.accessToken").value(accessToken))
+                .andExpect(jsonPath("$.refreshToken").value(refreshToken))
         }
 
         @Test
-        fun `should return 401 when request has no token`() {
-            perform("My task")
+        fun `should return 401 when credentials are invalid`() {
+            val user = UserFixture.aUser()
+            val username = user.username
+
+            every { userLoginUseCase.execute(any()) } throws InvalidCredentialsException()
+
+            perform(username = username.asString(), password = "wrong-password")
                 .andExpect(status().isUnauthorized)
         }
 
-        private fun perform(taskName: String): ResultActions {
-            val requestBody = """{"taskName": "$taskName"}"""
+        private fun perform(username: String, password: String): ResultActions {
+            val requestBody = """{"username": "$username", "password": "$password"}"""
             return mockMvc.perform(
-                post("/api/v1/tasks")
+                post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody)
             )
@@ -605,25 +1117,163 @@ class TaskControllerTest {
 }
 ```
 
-### Testes de DAO (`@DataJpaTest`)
+### Testes de persistência
 
-- Testes das interfaces Spring Data JPA (`*JpaDao`) usam `@DataJpaTest`, que sobe apenas o slice JPA sem o contexto completo do Spring.
-- **Exceção permitida**: testes de DAO podem usar H2 em memória (dependência `testImplementation("com.h2database:h2")`), pois seu objetivo é verificar queries e mapeamentos JPA de forma rápida e isolada, sem necessidade de Testcontainers.
-- Não use `@DataJpaTest` para testar lógica de negócio ou adaptadores de repositório — esses pertencem aos testes unitários com MockK e aos testes de integração com Testcontainers, respectivamente.
+Cobrem os três componentes da camada `external/persistence/`: DAOs, mappers e repository adapters. Cada um tem sua própria estratégia de teste.
+
+#### Testes de DAO (`@DataJpaTest`)
+
+- Usam `@DataJpaTest` — sobe apenas o slice JPA, sem contexto Spring completo.
+- **Exceção permitida**: podem usar H2 em memória (`testImplementation("com.h2database:h2")`), pois o objetivo é verificar queries e mapeamentos JPA de forma rápida e isolada.
+- Dependências (`*JpaDao`) são injetadas com `@Autowired`.
+- Constantes para IDs desconhecidos ficam como `private val` no `companion object` da classe de teste.
+- Use `@BeforeEach` para popular dados de pré-requisito.
+- Construa os modelos JPA via métodos auxiliares privados (`buildTask(...)`, `buildUser(...)`) para evitar repetição.
+- Cenários obrigatórios: `save`, `findById` (encontrado e não encontrado), `findAll*` (com resultado e lista vazia), `deleteById`.
+
+```kotlin
+@DataJpaTest
+class TaskJpaDaoTest {
+
+    @Autowired
+    private lateinit var taskJpaDao: TaskJpaDao
+
+    @Autowired
+    private lateinit var userJpaDao: UserJpaDao
+
+    @BeforeEach
+    fun setUp() {
+        val user = UserFixture.aUser()
+        userJpaDao.save(buildUser(user))
+    }
+
+    @Test
+    fun `should return empty when task id does not exist`() {
+        val found = taskJpaDao.findById(UNKNOWN_TASK_ID)
+
+        assertThat(found).isEmpty()
+    }
+
+    companion object {
+        private val UNKNOWN_TASK_ID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000002")
+    }
+}
+```
+
+#### Testes de mapper
+
+- Sem anotações de extensão — são classes Kotlin puras.
+- Um teste por direção de mapeamento: `toModel` e `toDomain`.
+- Verificar que todos os campos são mapeados corretamente, incluindo conversão de `UUID` ↔ `String`.
+
+```kotlin
+@Test
+fun `should map a TaskEntity to a TaskJpaModel correctly`() {
+    val task = TaskFixture.aTask()
+    val taskId = task.getId()
+
+    val model = TaskMapper.toModel(task)
+
+    assertThat(model.id.toString()).isEqualTo(taskId.asString())
+    assertThat(model.taskName).isEqualTo(task.taskName.asString())
+}
+```
+
+#### Testes de repository adapter
+
+- Use `@ExtendWith(MockKExtension::class)` — o DAO é mockado com `@MockK`; o adapter com `@InjectMockKs`.
+- O objetivo é verificar que o adapter converte corretamente domínio ↔ modelo e delega ao DAO.
+- Cenários obrigatórios espelham as operações da interface de porta: `save`, `findById` (presente e vazio), `findAll*`, `deleteById`.
+
+```kotlin
+@ExtendWith(MockKExtension::class)
+class TaskRepositoryAdapterTest {
+
+    @MockK
+    lateinit var jpaRepository: TaskJpaDao
+
+    @InjectMockKs
+    lateinit var adapter: TaskRepositoryAdapter
+
+    @Test
+    fun `should save a task and return the persisted domain entity`() {
+        val task = TaskFixture.aTask()
+        val taskId = task.getId()
+        val model = buildTaskModel()
+
+        every { jpaRepository.save(any()) } returns model
+
+        val result = adapter.save(task)
+
+        assertThat(result.getId().asString()).isEqualTo(taskId.asString())
+        verify { jpaRepository.save(any()) }
+    }
+}
+```
 
 ### Testes de integração
 
+Cobrem adaptadores de infraestrutura que **não** são persistência — como `TokenAdapter`, `PasswordEncoderAdapter` e qualquer outro adaptador de `external/` que integre com biblioteca de terceiros. Esses testes instanciam o adaptador diretamente (sem contexto Spring) e verificam o comportamento real da integração.
+
+- Sem `@ExtendWith` — o adaptador é instanciado manualmente no `@BeforeEach`.
+- Dependências externas reais são usadas (ex: `BCryptPasswordEncoder`, `SecurityConfigProperties` construído manualmente).
+- Constantes de configuração (segredos, expirations) são declaradas como `private const val` no `companion object` da classe de teste.
+- Cenários obrigatórios para `Token`: geração de access token, geração de refresh token, validação com subject correto, token expirado, token malformado, token assinado com segredo diferente.
+- Cenários obrigatórios para `PasswordEncoder`: encode retorna hash diferente do raw, hashes distintos para a mesma senha, `matches` retorna `true` para senha correta e `false` para senha errada.
+
+```kotlin
+class TokenAdapterTest {
+
+    private lateinit var tokenAdapter: TokenAdapter
+
+    @BeforeEach
+    fun setUp() {
+        tokenAdapter = TokenAdapter(buildProperties(SECRET, ACCESS_EXPIRATION_MS, REFRESH_EXPIRATION_MS))
+    }
+
+    @Test
+    fun `should throw InvalidTokenException when token is expired`() {
+        val expiredAdapter = TokenAdapter(buildProperties(SECRET, -1L, -1L))
+        val user = UserFixture.aUser()
+        val sub = user.id.asString()
+        val expiredToken = expiredAdapter.generateAccessToken(sub)
+
+        assertThatThrownBy { tokenAdapter.tokenValidation(expiredToken) }
+            .isInstanceOf(InvalidTokenException::class.java)
+    }
+
+    private fun buildProperties(secret: String, accessMs: Long, refreshMs: Long): SecurityConfigProperties =
+        SecurityConfigProperties(jwt = SecurityConfigProperties.Jwt(
+            secret = secret,
+            accessTokenExpirationMs = accessMs,
+            refreshTokenExpirationMs = refreshMs
+        ))
+
+    companion object {
+        private const val SECRET = "test-secret-key-must-be-at-least-32-chars!!"
+        private const val ACCESS_EXPIRATION_MS = 900_000L
+        private const val REFRESH_EXPIRATION_MS = 604_800_000L
+    }
+}
+```
+
+### Testes E2E
+
 - Uma classe por controller com o sufixo `IntegrationTest` (ex: `TaskIntegrationTest`), estendendo `IntegrationTestBase`.
 - `IntegrationTestBase` fornece `MockMvc`, `@SpringBootTest`, `@AutoConfigureMockMvc`, perfil `integration-test` e Testcontainers PostgreSQL via `PostgresContainerConfig`. Sempre estenda-a — nunca configure essas infraestruturas manualmente.
-- Sempre usar Testcontainers — nunca banco em memória ou mocks de persistência (exceto testes de DAO com `@DataJpaTest`, conforme seção acima).
+- Sempre usar Testcontainers — nunca banco em memória ou mocks de persistência (exceto testes de DAO com `@DataJpaTest`).
 - Uma `inner class` por endpoint, anotada com `@Nested`, com `@DisplayName` indicando o método HTTP e o path.
 - Cada classe nested tem seu próprio método privado `perform(...)` que encapsula a chamada MockMvc.
 - Cada método de teste declara explicitamente se precisa de `@SqlCreateSeed` (para popular o banco) e/ou `@WithJwtTokenMock` (para autenticação). Não assuma nenhum estado prévio.
 
 ```kotlin
+@DisplayName("Task Integration Tests")
 class TaskIntegrationTest : IntegrationTestBase() {
+
     @Nested
+    @DisplayName("POST /api/v1/tasks")
     inner class CreateTask {
+
         @Test
         @SqlCreateSeed
         @WithJwtTokenMock
@@ -641,6 +1291,14 @@ class TaskIntegrationTest : IntegrationTestBase() {
         fun `should return 401 when no token is provided`() {
             perform("My first task")
                 .andExpect(status().isUnauthorized)
+        }
+
+        @Test
+        @SqlCreateSeed
+        @WithJwtTokenMock
+        fun `should return 400 when task name is blank`() {
+            perform("")
+                .andExpect(status().isBadRequest)
         }
 
         private fun perform(taskName: String): ResultActions {
