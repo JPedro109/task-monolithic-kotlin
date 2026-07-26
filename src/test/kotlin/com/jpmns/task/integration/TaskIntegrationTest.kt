@@ -251,7 +251,7 @@ class TaskIntegrationTest : IntegrationTestBase() {
             mockMvc.perform(patch("/api/v1/tasks/$taskId/finish"))
     }
 
-    companion object {
+    private companion object {
         private const val EXISTING_TASK_ID = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
         private const val NON_EXISTENT_TASK_ID = "00000000-0000-0000-0000-000000000001"
         private const val USER_ID_WITHOUT_TASK = "41a385a3-de9f-44bb-ac0f-7a9fd6ac11e1"

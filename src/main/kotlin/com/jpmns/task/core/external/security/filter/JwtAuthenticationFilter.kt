@@ -32,6 +32,7 @@ class JwtAuthenticationFilter(
             val decoded = runCatching { token.tokenValidation(jwt) }.getOrNull()
 
             if (decoded == null) {
+                filterChain.doFilter(request, response)
                 return
             }
 

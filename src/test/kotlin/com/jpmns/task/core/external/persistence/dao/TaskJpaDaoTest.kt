@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.dao.DataIntegrityViolationException
 
+import com.jpmns.task.core.domain.user.UserEntity
 import com.jpmns.task.core.external.persistence.model.TaskJpaModel
 import com.jpmns.task.core.external.persistence.model.UserJpaModel
 import com.jpmns.task.shared.fixture.TaskFixture
@@ -163,7 +164,7 @@ class TaskJpaDaoTest {
         assertThat(all).hasSizeGreaterThanOrEqualTo(1)
     }
 
-    private fun buildUser(user: com.jpmns.task.core.domain.user.UserEntity): UserJpaModel {
+    private fun buildUser(user: UserEntity): UserJpaModel {
         val id = UUID.fromString(user.id.asString())
         val username = user.username.asString()
         val password = user.password.asString()

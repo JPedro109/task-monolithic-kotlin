@@ -19,7 +19,7 @@ import com.jpmns.task.core.application.port.security.exception.InvalidTokenExcep
 import com.jpmns.task.core.application.usecase.user.dto.output.RefreshUserTokenOutputDTO
 import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDTO
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
-import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
+import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.RefreshUserTokenUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.UserLoginUseCase
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
@@ -44,7 +44,7 @@ class AuthControllerTest {
     private lateinit var token: Token
 
     @MockkBean
-    private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
+    private lateinit var getUserByIdUseCase: GetUserByIdUseCase
 
     @Nested
     @DisplayName("POST /api/v1/auth/login")

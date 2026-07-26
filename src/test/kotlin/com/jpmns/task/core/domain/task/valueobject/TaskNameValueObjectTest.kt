@@ -2,6 +2,9 @@ package com.jpmns.task.core.domain.task.valueobject
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EmptySource
+import org.junit.jupiter.params.provider.ValueSource
 
 import com.jpmns.task.shared.fixture.TaskFixture
 
@@ -30,6 +33,15 @@ class TaskNameValueObjectTest {
     fun `should fail for a task name with more than 255 characters`() {
         val taskName = "a".repeat(256)
 
+        val result = TaskNameValueObject.of(taskName)
+
+        assertThat(result.isFailure).isTrue()
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    @ValueSource(strings = ["   ", "\t", "\n"])
+    fun `should fail for empty or blank task names`(taskName: String) {
         val result = TaskNameValueObject.of(taskName)
 
         assertThat(result.isFailure).isTrue()

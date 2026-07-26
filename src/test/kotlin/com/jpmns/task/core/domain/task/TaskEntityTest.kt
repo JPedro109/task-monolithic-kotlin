@@ -110,6 +110,25 @@ class TaskEntityTest {
     }
 
     @Test
+    fun `should throw when task name is blank`() {
+        val task = TaskFixture.aTask()
+        val id = task.id
+        val user = UserFixture.aUser()
+        val userId = user.id
+        val finished = task.finished
+        val blankTaskName = "   "
+
+        assertThatThrownBy {
+            TaskEntity(
+                id = id.asString(),
+                userId = userId.asString(),
+                taskName = blankTaskName,
+                finished = finished
+            )
+        }.isInstanceOf(DomainException::class.java)
+    }
+
+    @Test
     fun `should throw with two errors when both userId and taskName are invalid`() {
         val task = TaskFixture.aTask()
         val id = task.id

@@ -26,7 +26,7 @@ class TaskNameValueObject private constructor(private val value: String) {
         private const val MAX_TASK_NAME_LENGTH = 255
 
         fun of(taskName: String): Result<TaskNameValueObject> {
-            if (taskName.length > MAX_TASK_NAME_LENGTH) {
+            if (taskName.isBlank() || taskName.length > MAX_TASK_NAME_LENGTH) {
                 return Result.fail(
                     InvalidTaskNameException()
                 )

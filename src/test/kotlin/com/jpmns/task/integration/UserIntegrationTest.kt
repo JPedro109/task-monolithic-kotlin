@@ -16,11 +16,6 @@ import com.jpmns.task.integration.common.sql.SqlCreateSeed
 import com.jpmns.task.shared.security.WithJwtTokenMock
 
 class UserIntegrationTest : IntegrationTestBase() {
-    companion object {
-        private const val EXISTING_USERNAME = "john"
-        private const val PASSWORD = "password"
-    }
-
     @Nested
     @DisplayName("POST /api/v1/users")
     inner class CreateUser {
@@ -209,5 +204,10 @@ class UserIntegrationTest : IntegrationTestBase() {
                     .content(requestBody)
             )
         }
+    }
+
+    private companion object {
+        private const val EXISTING_USERNAME = "john"
+        private const val PASSWORD = "password"
     }
 }

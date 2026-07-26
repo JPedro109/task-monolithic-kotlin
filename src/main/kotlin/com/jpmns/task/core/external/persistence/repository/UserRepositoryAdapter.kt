@@ -16,7 +16,7 @@ class UserRepositoryAdapter(
     private val dao: UserJpaDao
 ) : UserRepository {
     override fun save(user: UserEntity): UserEntity {
-        var model = dao.save(UserMapper.toModel(user))
+        val model = dao.save(UserMapper.toModel(user))
 
         return UserMapper.toDomain(model)
     }

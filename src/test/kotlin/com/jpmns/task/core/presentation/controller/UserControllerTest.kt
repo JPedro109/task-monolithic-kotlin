@@ -22,9 +22,9 @@ import com.jpmns.task.core.application.usecase.user.dto.output.UpdateUsernameOut
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
-import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
 import com.jpmns.task.core.application.usecase.user.interfaces.CreateUserUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.DeleteUserUseCase
+import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUserPasswordUseCase
 import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUsernameUseCase
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
@@ -56,7 +56,7 @@ class UserControllerTest {
     private lateinit var token: Token
 
     @MockkBean
-    private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
+    private lateinit var getUserByIdUseCase: GetUserByIdUseCase
 
     @Nested
     @DisplayName("POST /api/v1/users")

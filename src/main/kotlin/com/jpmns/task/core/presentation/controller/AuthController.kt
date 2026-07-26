@@ -28,7 +28,7 @@ class AuthController(
 ) : AuthControllerDoc {
     @PostMapping("/login")
     override fun login(@Valid @RequestBody request: UserLoginRequest): ResponseEntity<UserLoginResponse> {
-        logger.info("Login request received for user: ${request.username}")
+        logger.info("Login request received for user: $request")
 
         val input = UserLoginInputDTO(username = request.username, password = request.password)
 
@@ -36,7 +36,7 @@ class AuthController(
 
         val response = UserLoginResponse.of(output)
 
-        logger.info("Login successful for user: ${request.username}")
+        logger.info("Login successful for user: $request")
         return ResponseEntity.ok(response)
     }
 

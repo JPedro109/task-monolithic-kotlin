@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 
 @Tag(name = "Users", description = "Gerenciamento de usuários — criação, atualização e exclusão de conta")
-@RequestMapping("/api/v1/users")
 interface UserControllerDoc {
 
     @Operation(

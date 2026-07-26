@@ -21,7 +21,7 @@ import com.jpmns.task.core.domain.common.exception.DomainException
 class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidation(ex: MethodArgumentNotValidException): ProblemDetail {
-        logger.error("Validation error", ex)
+        logger.error("Validation error", ex.message, ex)
 
         val errors = ex.bindingResult.fieldErrors.joinToString(", ") {
             "${it.field}: ${it.defaultMessage}"
@@ -36,7 +36,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handleNotReadable(ex: HttpMessageNotReadableException): ProblemDetail {
-        logger.error("Message not readable", ex)
+        logger.error("Message not readable", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.BAD_REQUEST,
@@ -50,7 +50,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(DomainException::class)
     fun handleDomain(ex: DomainException): ProblemDetail {
-        logger.error("Domain error", ex)
+        logger.error("Domain error", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.UNPROCESSABLE_ENTITY,
@@ -64,7 +64,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException::class)
     fun handleUserNotFound(ex: UserNotFoundException): ProblemDetail {
-        logger.error("User not found", ex)
+        logger.error("User not found", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.NOT_FOUND,
@@ -78,7 +78,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(TaskNotFoundException::class)
     fun handleTaskNotFound(ex: TaskNotFoundException): ProblemDetail {
-        logger.error("Task not found", ex)
+        logger.error("Task not found", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.NOT_FOUND,
@@ -92,7 +92,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameAlreadyExistsException::class)
     fun handleUsernameConflict(ex: UsernameAlreadyExistsException): ProblemDetail {
-        logger.error("Username conflict", ex)
+        logger.error("Username conflict", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.CONFLICT,
@@ -106,7 +106,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidCredentialsException::class)
     fun handleInvalidCredentials(ex: InvalidCredentialsException): ProblemDetail {
-        logger.error("Invalid credentials", ex)
+        logger.error("Invalid credentials", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.UNAUTHORIZED,
@@ -120,7 +120,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException::class)
     fun handleInvalidToken(ex: InvalidTokenException): ProblemDetail {
-        logger.error("Invalid token", ex)
+        logger.error("Invalid token", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.UNAUTHORIZED,
@@ -134,7 +134,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(TaskAccessDeniedException::class)
     fun handleTaskAccessDenied(ex: TaskAccessDeniedException): ProblemDetail {
-        logger.error("Task access denied", ex)
+        logger.error("Task access denied", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.FORBIDDEN,
@@ -148,7 +148,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGeneric(ex: Exception): ProblemDetail {
-        logger.error("Internal server error", ex)
+        logger.error("Internal server error", ex.message, ex)
 
         val problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.INTERNAL_SERVER_ERROR,

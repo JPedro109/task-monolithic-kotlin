@@ -70,6 +70,7 @@ class CreateUserUseCaseTest {
             .isInstanceOf(UsernameAlreadyExistsException::class.java)
         verify { userRepository.existsByUsername(username) }
         verify(exactly = 0) { userRepository.save(any()) }
+        verify(exactly = 1) { passwordEncoder.encode(any()) }
     }
 
     @Test
@@ -88,5 +89,6 @@ class CreateUserUseCaseTest {
             .isInstanceOf(DomainException::class.java)
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
+        verify(exactly = 1) { passwordEncoder.encode(any()) }
     }
 }

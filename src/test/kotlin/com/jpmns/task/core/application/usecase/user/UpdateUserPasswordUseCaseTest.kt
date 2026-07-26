@@ -121,8 +121,8 @@ class UpdateUserPasswordUseCaseTest {
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(DomainException::class.java)
         verify(exactly = 0) { userRepository.findById(any()) }
+        verify(exactly = 0) { userRepository.save(any()) }
         verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
         verify(exactly = 0) { passwordEncoder.encode(any()) }
-        verify(exactly = 0) { userRepository.save(any()) }
     }
 }

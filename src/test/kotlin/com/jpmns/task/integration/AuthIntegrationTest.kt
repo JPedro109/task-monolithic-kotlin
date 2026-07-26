@@ -124,7 +124,7 @@ class AuthIntegrationTest : IntegrationTestBase() {
         }
     }
 
-    companion object {
+    private companion object {
         private const val EXISTING_USERNAME = "john"
         private const val EXISTING_PASSWORD = "password"
     }

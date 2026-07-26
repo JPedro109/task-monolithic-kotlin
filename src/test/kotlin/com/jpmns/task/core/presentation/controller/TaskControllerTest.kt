@@ -27,7 +27,7 @@ import com.jpmns.task.core.application.usecase.task.interfaces.DeleteTaskUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.ListTasksUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.MarkTaskAsFinishedUseCase
 import com.jpmns.task.core.application.usecase.task.interfaces.UpdateTaskUseCase
-import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
+import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
 import com.jpmns.task.core.domain.task.TaskEntity
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.TaskFixture
@@ -61,7 +61,7 @@ class TaskControllerTest {
     private lateinit var token: Token
 
     @MockkBean
-    private lateinit var getUserByIdUseCaseImpl: GetUserByIdUseCaseImpl
+    private lateinit var getUserByIdUseCase: GetUserByIdUseCase
 
     @Nested
     @DisplayName("POST /api/v1/tasks")

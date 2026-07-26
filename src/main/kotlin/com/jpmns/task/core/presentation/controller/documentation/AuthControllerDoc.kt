@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 
 @Tag(name = "Auth", description = "Autenticação — login e renovação de tokens de acesso")
-@RequestMapping("/api/v1/auth")
 interface AuthControllerDoc {
 
     @Operation(
