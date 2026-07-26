@@ -71,8 +71,7 @@ src/main/kotlin/com/jpmns/task/
 ## Regras de arquitetura (Clean Architecture)
 
 - O **Domínio** não possui nenhuma dependência de Spring/JPA. Entidades e value objects são Kotlin puro.
-- **Value objects** são criados via companion object com factory `of(...)` que retorna `Result<VO, DomainException>`. O construtor é sempre `private`; nunca instancie diretamente fora da própria classe.
-- **Value objects** expõem o valor primitivo via método `asString()`. Não há getter genérico `getValue()` no value object em si.
+- **Value objects** são criados via companion object com factory `of(...)` que retorna `Result<VO>`. O construtor é sempre `private`; nunca instancie diretamente fora da própria classe.
 - **Casos de uso** são definidos como interfaces em `usecase/.../interfaces/` e implementados em `usecase/.../implementation/`. Controllers dependem apenas da interface.
 - **Port interfaces** (`TaskRepository`, `Token`, `PasswordEncoder`) ficam em `application/port/` e são implementadas por adaptadores em `external/`. As camadas de domínio e aplicação nunca importam de `external/`.
 - **Mappers** são `object` Kotlin (equivalente a classes estáticas sem estado). Possuem métodos `toModel()` (domínio → JPA) e `toDomain()` (JPA → domínio). Nunca adicionam lógica de negócio.
@@ -97,8 +96,6 @@ src/main/kotlin/com/jpmns/task/
 - **ktlint + detekt**: aplicados em todo build. Política de zero warnings.
 
 ## Convenções de código
-
-Funções de extensão e factory methods no `companion object` ficam junto aos métodos públicos. Helpers internos no `companion object` ficam no final.
 
 ### Imutabilidade e uso de `val`
 
@@ -171,12 +168,12 @@ class CreateTaskUseCaseImpl(
 
 Siga sempre esta ordem dentro de qualquer classe:
 
-1. Constantes (`companion object` com `const val` / `val`)
-2. Campos de instância / propriedades
-3. Construtores
-4. Métodos públicos
-5. Métodos protegidos
-6. Métodos privados
+1. Campos de instância / propriedades
+2. Construtores
+3. Métodos públicos
+4. Métodos protegidos
+5. Métodos privados
+6. Constantes (`companion object` com `const val` / `val`)
 
 ### Agrupamento de ConfigurationProperties
 
@@ -227,8 +224,6 @@ Request (payload) → InputDTO (usecase) → Entity (domain) → OutputDTO (usec
 - **Use Case → Repository → Domain**: mappers fazem a conversão entre entidade de domínio e modelo JPA dentro dos adapters.
 
 ## Convenções da camada domain
-
-Campos considerados sensíveis: senhas (`password`, `currentPassword`, `newPassword`), tokens (`accessToken`, `refreshToken`) e qualquer credencial ou segredo.
 
 ### Entidade base (`Entity`)
 
@@ -286,8 +281,8 @@ Cada value object segue este contrato:
 
 - Construtor `private` — instanciação exclusiva via `of(...)`.
 - Factory no companion object `of(value: String)` retorna `Result<VO>`: `Result.fail(InvalidXxxException())` quando inválido, `Result.success(XxxValueObject(value))` quando válido.
-- Método `asString()` expõe o valor primitivo. Nunca use `getValue()`.
-- Sobrescrevem `equals` e `hashCode` com base em `asString()`.
+- O valor primitivo é exposto por um método de conversão correspondente ao seu tipo, como `asString()`, `asInt()`, `asLong()`, etc. Nunca use getValue().
+- Sobrescrevem `equals` e `hashCode` com base no valor retornado pelo método de conversão correspondente (`asString()`, `asInt()`, `asLong()`, etc.).
 - Regras de validação ficam dentro do `of(...)` — `null`, formato, tamanho, padrão de regex, etc.
 
 ```kotlin
@@ -308,14 +303,6 @@ class UsernameValueObject private constructor(private val username: String) {
     }
 }
 ```
-
-Value objects de domínio existentes:
-
-- `IdValueObject` — UUID no formato padrão (`common/valueobject/`)
-- `TaskNameValueObject` — não nulo, não vazio, máximo 255 caracteres
-- `UsernameValueObject` — alfanumérico + underscore, 3–50 caracteres
-- `UserEmailValueObject` — formato de e-mail válido
-- `UserPasswordValueObject` — não nulo (a senha já chega codificada do adapter)
 
 ### `DomainException`
 
@@ -522,7 +509,7 @@ A conversão da entidade de domínio para `OutputDTO` deve sempre ser feita por 
 
 ## Convenções da camada external
 
-A camada `external` é o único lugar onde infraestrutura pode existir. Toda integração com tecnologia externa — banco de dados, biblioteca de JWT, encoder de senha, cliente HTTP, fila de mensagens, etc. — deve ser implementada aqui como um adaptador.
+A camada `external` é o único lugar onde infraestrutura pode existir. Toda integração com tecnologia externa — banco de dados, biblioteca de JWT, encoder de senha, fila de mensagens, etc. — deve ser implementada aqui como um adaptador.
 
 **Exceção — camada de apresentação (HTTP, scheduler)**: mecanismos de entrada da aplicação não são infraestrutura de suporte e por isso **não** pertencem a `external`. Tudo que representa uma forma de acesso à aplicação pertence à camada `presentation`.
 
@@ -586,7 +573,6 @@ interface TaskJpaDao : JpaRepository<TaskJpaModel, UUID> {
 - Anotados com `@Repository`, implementam a interface de porta correspondente.
 - Recebem o DAO Spring Data JPA via construtor.
 - Toda operação converte domínio → modelo com `Mapper.toModel(entity)` antes de persistir, e modelo → domínio com `Mapper.toDomain(model)` ao retornar.
-- **Nunca** propagam exceções do JPA para fora — se necessário, capturam e relançam como exceção de aplicação.
 
 ```kotlin
 @Repository
@@ -703,31 +689,6 @@ class TaskController(
 }
 ```
 
-### `GlobalExceptionHandler`
-
-- Anotado com `@RestControllerAdvice`.
-- Único ponto de mapeamento de exceções para respostas HTTP. Nenhum controller captura exceções.
-- Retorna `ProblemDetail` (Problem Details RFC 7807) via `ProblemDetail.forStatusAndDetail(status, message)`.
-- Mapeamentos obrigatórios:
-  - `MethodArgumentNotValidException` → `400` (agrega mensagens dos field errors)
-  - `HttpMessageNotReadableException` → `400`
-  - `DomainException` → `422`
-  - `*NotFoundException` → `404`
-  - `UsernameAlreadyExistsException` → `409`
-  - `InvalidCredentialsException`, `InvalidTokenException` → `401`
-  - `*AccessDeniedException` → `403`
-  - `Exception` (genérico) → `500` com mensagem `"Internal server error"` (nunca exponha detalhes de exceções genéricas)
-- Todo handler loga em nível `ERROR` com `logger.error("...: {}", ex.message, ex)`.
-
-### `AuthenticatedUserResolver`
-
-Classe utilitária sem instância que lê o `principal` do `SecurityContext`:
-
-- `getUserId()` — lança `IllegalArgumentException` se não autenticado. Use em todos os endpoints protegidos.
-- `getUserIdOrNull()` — retorna `null` se não autenticado. Use apenas em endpoints opcionalmente autenticados.
-
-O principal no `SecurityContext` é sempre uma `String` com o UUID do usuário, populada pelo `JwtAuthenticationFilter`.
-
 ### `toString()` customizado para dados sensíveis
 
 Todo `data class` de request ou response que contenha campos sensíveis (senha, token) **deve** sobrescrever `toString()` substituindo o valor por `'[PROTECTED]'`. Essa proteção garante que logs de entrada e saída dos controllers nunca exponham dados confidenciais.
@@ -743,6 +704,22 @@ override fun toString(): String =
 ```
 
 Campos considerados sensíveis: senhas (`password`, `currentPassword`, `newPassword`), tokens (`accessToken`, `refreshToken`) e qualquer credencial ou segredo.
+
+### `GlobalExceptionHandler`
+
+- Anotado com `@RestControllerAdvice`.
+- Único ponto de mapeamento de exceções para respostas HTTP. Nenhum controller captura exceções.
+- Retorna `ProblemDetail` (Problem Details RFC 7807) via `ProblemDetail.forStatusAndDetail(status, message)`.
+- Todo handler loga em nível `ERROR` com `logger.error("...: {}", ex.message, ex)`.
+
+### `AuthenticatedUserResolver`
+
+Classe utilitária sem instância que lê o `principal` do `SecurityContext`:
+
+- `getUserId()` — lança `IllegalArgumentException` se não autenticado. Use em todos os endpoints protegidos.
+- `getUserIdOrNull()` — retorna `null` se não autenticado. Use apenas em endpoints opcionalmente autenticados.
+
+O principal no `SecurityContext` é sempre uma `String` com o UUID do usuário, populada pelo `JwtAuthenticationFilter`.
 
 ## Convenções de documentação (Swagger / OpenAPI)
 
