@@ -75,7 +75,7 @@ src/main/kotlin/com/jpmns/task/
 - **Value objects** expõem o valor primitivo via método `asString()`. Não há getter genérico `getValue()` no value object em si.
 - **Casos de uso** são definidos como interfaces em `usecase/.../interfaces/` e implementados em `usecase/.../implementation/`. Controllers dependem apenas da interface.
 - **Port interfaces** (`TaskRepository`, `Token`, `PasswordEncoder`) ficam em `application/port/` e são implementadas por adaptadores em `external/`. As camadas de domínio e aplicação nunca importam de `external/`.
-- **Mappers** são classes utilitárias estáticas sem estado: construtor `private`, todos os métodos no companion object. Possuem métodos `toModel()` (domínio → JPA) e `toDomain()` (JPA → domínio). Nunca adicionam lógica de negócio.
+- **Mappers** são `object` Kotlin (equivalente a classes estáticas sem estado). Possuem métodos `toModel()` (domínio → JPA) e `toDomain()` (JPA → domínio). Nunca adicionam lógica de negócio.
 - **Implementações de use case** nunca retornam entidades de domínio diretamente.
 - **Input DTOs** da camada de aplicação (`usecase/.../dto/input/`) são `data class` simples, sem anotações de framework. Recebem apenas tipos primitivos ou strings — nunca value objects.
 - **Output DTOs** da camada de aplicação (`usecase/.../dto/output/`) são `data class` simples, sem anotações de framework. Contêm apenas tipos primitivos, strings e `Instant`.
@@ -138,7 +138,7 @@ Fases típicas de um use case:
 
 ```kotlin
 override fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
-    val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+    val taskIdValue = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
     val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
     val userIsOwner = task.userId.asString() == input.userId
@@ -232,9 +232,9 @@ Campos considerados sensíveis: senhas (`password`, `currentPassword`, `newPassw
 
 ### Entidade base (`Entity`)
 
-Toda entidade de domínio estende `Entity`. O construtor da classe base recebe `id` (String) e `createdAt` (Instant), valida o ID via `IdValueObject.of(id)` e atribui `Instant.now()` quando `createdAt` for `null`. O campo `id` é `private val IdValueObject`; `createdAt` é `private val Instant`.
+Toda entidade de domínio estende `Entity`. O construtor da classe base recebe `id` (String) e `createdAt` (Instant), valida o ID via `IdValueObject.of(id)` e atribui `Instant.now()` quando `createdAt` for `null`. O campo `id` é `val IdValueObject` (somente leitura — em Kotlin, `val` implica apenas getter, sem setter); `createdAt` é `val Instant`.
 
-As subclasses nunca acessam `id` diretamente — usam sempre `getId()` ou a propriedade exposta pela classe base.
+As subclasses acessam `id` via a propriedade `id` exposta pela classe base (ex: `task.id.asString()`). Não existe nem é necessário um método `getId()` — Kotlin expõe propriedades diretamente.
 
 O método `validateOrThrow(results: List<Result<*>>)` é `protected` e coleta todos os `Result` com falha, extrai as `DomainException`s e lança uma `DomainException` agregada. Subclasses o chamam no construtor após criar todos os value objects.
 
@@ -242,11 +242,10 @@ O método `validateOrThrow(results: List<Result<*>>)` é `protected` e coleta to
 
 Entidades seguem este esquema:
 
-1. **Campos mutáveis**: declarados com `var` (podem ser atualizados por métodos de domínio).
-2. **Campos imutáveis (exceto `id` e `createdAt`)**: declarados com `val`.
-3. **Construtor completo**: recebe todos os campos como primitivos/strings, cria os value objects, chama `validateOrThrow`, atribui os campos.
-4. **Construtor de conveniência**: delega ao construtor completo passando `null` para `createdAt` e `updatedAt` quando não disponíveis (ex: criação nova).
-5. **Métodos de negócio** (`update*`, `markAs*`): recebem primitivos/strings, recriam o value object via `of(...).getValueOrThrow()` e atualizam o campo.
+1. **Campos declarados no corpo** (`val` para imutáveis, `var private set` para mutáveis): campos que precisam de inicialização tardia no `init` são declarados no corpo da classe; campos com valor padrão ou recebidos diretamente como parâmetro do construtor podem ser declarados no próprio construtor primário.
+2. **Construtor primário**: recebe todos os campos como primitivos/strings. Campos opcionais (`createdAt`, `updatedAt`) têm valor padrão `null`.
+3. **Bloco `init`**: cria os value objects a partir dos parâmetros primitivos, chama `validateOrThrow` e atribui os campos do corpo.
+4. **Métodos de negócio** (`update*`, `markAs*`): recebem primitivos/strings, recriam o value object via `of(...).getValueResultOrThrow()` e atualizam o campo.
 
 ```kotlin
 class TaskEntity(
@@ -299,8 +298,8 @@ class UsernameValueObject private constructor(private val username: String) {
     companion object {
         private val USERNAME_PATTERN = Regex("^[a-zA-Z0-9_]{3,50}$")
 
-        fun of(username: String?): Result<UsernameValueObject> {
-            if (username == null || !USERNAME_PATTERN.matches(username)) {
+        fun of(username: String): Result<UsernameValueObject> {
+            if (!USERNAME_PATTERN.matches(username)) {
                 return Result.fail(InvalidUsernameException())
             }
 
@@ -388,12 +387,44 @@ class CreateTaskUseCaseImpl(
 
     private fun toOutput(task: TaskEntity): TaskOutputDTO =
         TaskOutputDTO(
-            id = task.getId().asString(),
+            id = task.id.asString(),
             userId = task.userId.asString(),
             taskName = task.taskName.asString(),
             finished = task.finished,
             createdAt = task.createdAt
         )
+}
+```
+
+Estrutura completa de um use case de criação **com verificação de unicidade antes de instanciar a entidade**:
+
+Quando o use case precisa verificar uma regra de negócio (ex: unicidade de username) antes de criar a entidade, valide o value object manualmente para poder usá-lo como parâmetro da query, depois instancie a entidade normalmente — sem duplicar a validação:
+
+```kotlin
+@Service
+class CreateUserUseCaseImpl(
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder
+) : CreateUserUseCase {
+
+    override fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
+        val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
+
+        if (userRepository.existsByUsername(usernameResult)) {
+            throw UsernameAlreadyExistsException()
+        }
+
+        val encodedPassword = passwordEncoder.encode(input.password)
+        val user = UserEntity(
+            id = UUID.randomUUID().toString(),
+            username = input.username,
+            password = encodedPassword
+        )
+
+        val saved = userRepository.save(user)
+
+        return toOutput(saved)
+    }
 }
 ```
 
@@ -406,7 +437,7 @@ class UpdateTaskUseCaseImpl(
 ) : UpdateTaskUseCase {
 
     override fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
-        val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+        val taskIdValue = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
         val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
 
@@ -435,7 +466,7 @@ class DeleteTaskUseCaseImpl(
 ) : DeleteTaskUseCase {
 
     override fun execute(input: DeleteTaskInputDTO) {
-        val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+        val taskIdValue = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
         val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
 
@@ -461,13 +492,13 @@ Exceções de porta (`port/security/exception/`) seguem o mesmo padrão.
 
 ### Validação de value objects nas implementações de use case
 
-Sempre que o input do use case contiver um campo que será usado **isoladamente** — como um ID para busca ou um campo que será atualizado individualmente —, use `getValueOrThrow()` diretamente. A validação manual com `isFail()` é necessária apenas quando o value object precisa ser inspecionado antes de ser usado.
+Sempre que o input do use case contiver um campo que será usado **isoladamente** — como um ID para busca ou um campo que será atualizado individualmente —, use `getValueResultOrThrow()` diretamente. A validação manual com `isFailure` é necessária apenas quando o value object precisa ser inspecionado antes de ser usado.
 
 ```kotlin
-val taskIdValue = IdValueObject.of(input.taskId).getValueOrThrow()
+val taskIdValue = IdValueObject.of(input.taskId).getValueResultOrThrow()
 ```
 
-**Exceção — instanciação de entidade completa**: quando todos os campos necessários estão disponíveis e a entidade será criada via construtor, **não** valide os value objects manualmente. O construtor já chama `validateOrThrow` internamente e lança `DomainException` automaticamente.
+**Exceção — instanciação de entidade completa sem verificação prévia**: quando todos os campos necessários estão disponíveis, a entidade será criada via construtor e **não há verificação de negócio que precise ocorrer antes**, não valide os value objects manualmente. O construtor já chama `validateOrThrow` internamente e lança `DomainException` automaticamente.
 
 ```kotlin
 // CORRETO — entidade valida internamente, não repita a validação
@@ -479,12 +510,12 @@ val task = TaskEntity(
 )
 
 // INCORRETO — validação duplicada, desnecessária antes da instanciação completa
-val taskNameResult = TaskNameValueObject.of(input.taskName).getValueOrThrow()
+val taskNameResult = TaskNameValueObject.of(input.taskName).getValueResultOrThrow()
 val task = TaskEntity(id = UUID.randomUUID().toString(), userId = input.userId, taskName = input.taskName, finished = false)
 ```
 
 A validação manual é necessária em dois casos:
-- Para usar um value object **antes** de instanciar a entidade (ex: verificar unicidade de username sem criar o objeto ainda).
+- Para usar um value object **antes** de instanciar a entidade (ex: verificar unicidade de username sem criar o objeto ainda — nesse caso valide o VO, use-o na query e só depois instancie a entidade com os dados primitivos).
 - Para converter campos de IDs recebidos no `InputDTO` que serão usados como parâmetros de busca no repositório.
 
 A conversão da entidade de domínio para `OutputDTO` deve sempre ser feita por um método privado `toOutput(entity: XxxEntity)` dentro da implementação. Nunca repita o mapeamento inline nem exponha entidades de domínio fora da implementação.
@@ -513,51 +544,29 @@ external/persistence/repository/TaskRepositoryAdapter.kt  ← implementação (s
 - `@Id` sem geração automática (`@GeneratedValue`) — o ID vem do domínio.
 - `@CreationTimestamp` e `@UpdateTimestamp` do Hibernate para `createdAt` e `updatedAt`.
 - Colunas imutáveis após criação recebem `updatable = false`.
-- Possuem construtor sem argumentos (exigido pelo JPA) e construtor com todos os campos.
-- Campos mutáveis (ex: `taskName`, `finished`) expõem setters; campos imutáveis expõem apenas getters.
+- O plugin `kotlin-jpa` do Gradle gera automaticamente o construtor sem argumentos exigido pelo JPA para classes anotadas com `@Entity` — não é necessário declará-lo manualmente.
+- Use um único construtor primário com todos os campos. Campos com `updatable = false` no banco (como `id` e `userId`) ainda são declarados como `var` para compatibilidade com o JPA; o `updatable = false` na coluna garante que não sejam atualizados no banco.
 
 ```kotlin
 @Entity
 @Table(name = "tasks")
-class TaskJpaModel() {
-
+class TaskJpaModel(
     @Id
     @Column(nullable = false, updatable = false)
-    lateinit var id: UUID
-
+    var id: UUID,
     @Column(name = "user_id", nullable = false, updatable = false)
-    lateinit var userId: UUID
-
+    var userId: UUID,
     @Column(name = "task_name", nullable = false)
-    lateinit var taskName: String
-
+    var taskName: String,
     @Column(nullable = false)
-    var finished: Boolean = false
-
+    var finished: Boolean,
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    var createdAt: Instant? = null
-
+    var createdAt: Instant? = null,
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     var updatedAt: Instant? = null
-
-    constructor(
-        id: UUID,
-        userId: UUID,
-        taskName: String,
-        finished: Boolean,
-        createdAt: Instant?,
-        updatedAt: Instant?
-    ) : this() {
-        this.id = id
-        this.userId = userId
-        this.taskName = taskName
-        this.finished = finished
-        this.createdAt = createdAt
-        this.updatedAt = updatedAt
-    }
-}
+)
 ```
 
 #### DAOs Spring Data JPA (`*JpaDao`)
@@ -600,35 +609,32 @@ class TaskRepositoryAdapter(
 
 #### Mappers (`*Mapper`)
 
-- Classes com construtor `private` e todos os métodos no `companion object` (equivalente às classes estáticas do Java).
+- Implementados como `object` Kotlin — equivalente a uma classe estática sem estado.
 - `toModel(entity: XxxEntity)` — converte domínio para JPA.
 - `toDomain(model: XxxJpaModel)` — converte JPA para domínio.
 - Nunca adicionam lógica de negócio ou validação.
 
 ```kotlin
-class TaskMapper private constructor() {
+object TaskMapper {
+    fun toModel(entity: TaskEntity): TaskJpaModel =
+        TaskJpaModel(
+            id = UUID.fromString(entity.id.asString()),
+            userId = UUID.fromString(entity.userId.asString()),
+            taskName = entity.taskName.asString(),
+            finished = entity.finished,
+            createdAt = entity.createdAt,
+            updatedAt = entity.updatedAt
+        )
 
-    companion object {
-        fun toModel(entity: TaskEntity): TaskJpaModel =
-            TaskJpaModel(
-                id = UUID.fromString(entity.getId().asString()),
-                userId = UUID.fromString(entity.userId.asString()),
-                taskName = entity.taskName.asString(),
-                finished = entity.finished,
-                createdAt = entity.createdAt,
-                updatedAt = entity.updatedAt
-            )
-
-        fun toDomain(model: TaskJpaModel): TaskEntity =
-            TaskEntity(
-                id = model.id.toString(),
-                userId = model.userId.toString(),
-                taskName = model.taskName,
-                finished = model.finished,
-                createdAt = model.createdAt,
-                updatedAt = model.updatedAt
-            )
-    }
+    fun toDomain(model: TaskJpaModel): TaskEntity =
+        TaskEntity(
+            id = model.id.toString(),
+            userId = model.userId.toString(),
+            taskName = model.taskName,
+            finished = model.finished,
+            createdAt = model.createdAt,
+            updatedAt = model.updatedAt
+        )
 }
 ```
 
@@ -661,20 +667,23 @@ Nunca coloque pontos de entrada em `external/` — essa camada é exclusiva para
 
 ### Estrutura dos controllers
 
-- Anotados com `@RestController`.
+- Anotados com `@RestController` e `@RequestMapping` com o path base do endpoint.
 - Implementam a interface `*ControllerDoc` correspondente — nenhuma anotação do SpringDoc no corpo do controller.
+- A interface `*ControllerDoc` **não** declara `@RequestMapping` — o path fica exclusivamente no controller.
 - Logger declarado como `private val logger = LoggerFactory.getLogger(XxxController::class.java)` no `companion object`.
 - Todas as dependências (interfaces de caso de uso) injetadas via construtor.
 - `AuthenticatedUserResolver.getUserId()` é o único ponto de extração do ID do usuário autenticado. Nunca acesse o `SecurityContext` diretamente nos controllers.
+- Use string interpolation do Kotlin (`"$variavel"`) nos logs — não use placeholders `{}` do SLF4J.
 
 ```kotlin
 @RestController
+@RequestMapping("/api/v1/tasks")
 class TaskController(
     private val createTaskUseCase: CreateTaskUseCase
 ) : TaskControllerDoc {
 
     override fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> {
-        logger.info("Creating task - request: {}", request)
+        logger.info("Creating task - request: $request")
 
         val userId = AuthenticatedUserResolver.getUserId()
 
@@ -684,7 +693,7 @@ class TaskController(
 
         val response = TaskResponse.of(output)
 
-        logger.info("Creating task - response: {}", response)
+        logger.info("Creating task - response: $response")
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
@@ -742,7 +751,7 @@ Toda a documentação da API é declarada fora dos controllers, em interfaces e 
 ### `*ControllerDoc` — documentação de endpoints
 
 - Cada controller possui uma interface `*ControllerDoc` correspondente em `documentation/`.
-- A interface é anotada com `@Tag(name = "...", description = "...")` e `@RequestMapping` com o path base do controller.
+- A interface é anotada com `@Tag(name = "...", description = "...")` e `@SecurityRequirement` quando aplicável. **Não** declara `@RequestMapping` — o path fica no controller.
 - Endpoints que exigem autenticação recebem `@SecurityRequirement(name = "bearerAuth")` na interface (ou no método, quando apenas alguns endpoints do controller são protegidos).
 - Cada método da interface declara exatamente uma anotação `@Operation` e uma `@ApiResponses`.
 
@@ -906,7 +915,7 @@ fun shouldReturn201WithTaskDataWhenInputIsValid() { }
 ```
 
 - Use `assertThat` do AssertJ para asserções e `assertThatThrownBy` para verificar exceções.
-- Verifique interações com `verify { mock.method(...) }` e `verify { mock wasNot Called }`.
+- Verifique interações com `verify { mock.method(...) }` e `verify(exactly = 0) { mock.method(...) }`.
 - Testes devem ser ordenados: sucesso (happy path) primeiro, corner cases depois, exceções/erros por último.
 - Siga o padrão **AAA (Arrange → Act → Assert)**, separando cada etapa com uma linha em branco, nunca utilize comentários para separação das etapas.
 - Dentro do `Arrange`, separe a criação de variáveis dos stubs `every { ... }` com uma linha em branco:
@@ -947,9 +956,9 @@ assertThat(output.taskName).isEqualTo(task.taskName.asString())
 Uma classe de teste por value object — sem contexto Spring, sem MockK.
 
 Cenários obrigatórios:
-- Happy path: criação com valor válido, verificar `isFail()` é `false` e `getValue().asString()` retorna o valor esperado.
+- Happy path: criação com valor válido, verificar `isFailure` é `false` e `getValueResult().asString()` retorna o valor esperado.
 - Boundary cases: valores nos limites (mínimo, máximo, exato).
-- Falhas: `null`, vazio, em branco, fora do limite, formato inválido.
+- Falhas: vazio, em branco, fora do limite, formato inválido.
 
 ```kotlin
 @Test
@@ -958,15 +967,15 @@ fun `should create a valid TaskNameValueObject`() {
 
     val result = TaskNameValueObject.of(name)
 
-    assertThat(result.isFail()).isFalse()
-    assertThat(result.getValue().asString()).isEqualTo(name)
+    assertThat(result.isFailure).isFalse()
+    assertThat(result.getValueResult().asString()).isEqualTo(name)
 }
 
 @Test
 fun `should fail when task name is blank`() {
     val result = TaskNameValueObject.of("")
 
-    assertThat(result.isFail()).isTrue()
+    assertThat(result.isFailure).isTrue()
 }
 ```
 
@@ -1170,7 +1179,7 @@ class TaskJpaDaoTest {
 @Test
 fun `should map a TaskEntity to a TaskJpaModel correctly`() {
     val task = TaskFixture.aTask()
-    val taskId = task.getId()
+    val taskId = task.id
 
     val model = TaskMapper.toModel(task)
 
@@ -1198,14 +1207,14 @@ class TaskRepositoryAdapterTest {
     @Test
     fun `should save a task and return the persisted domain entity`() {
         val task = TaskFixture.aTask()
-        val taskId = task.getId()
+        val taskId = task.id
         val model = buildTaskModel()
 
         every { jpaRepository.save(any()) } returns model
 
         val result = adapter.save(task)
 
-        assertThat(result.getId().asString()).isEqualTo(taskId.asString())
+        assertThat(result.id.asString()).isEqualTo(taskId.asString())
         verify { jpaRepository.save(any()) }
     }
 }
@@ -1241,7 +1250,6 @@ class TokenAdapterTest {
         assertThatThrownBy { tokenAdapter.tokenValidation(expiredToken) }
             .isInstanceOf(InvalidTokenException::class.java)
     }
-
     private fun buildProperties(secret: String, accessMs: Long, refreshMs: Long): SecurityConfigProperties =
         SecurityConfigProperties(jwt = SecurityConfigProperties.Jwt(
             secret = secret,
