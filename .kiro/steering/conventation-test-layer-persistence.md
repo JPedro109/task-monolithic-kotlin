@@ -1,5 +1,6 @@
 ---
-inclusion: always
+inclusion: fileMatch
+fileMatchPattern: "**/src/test/**/persistence/**"
 ---
 
 # Testes de Persistência

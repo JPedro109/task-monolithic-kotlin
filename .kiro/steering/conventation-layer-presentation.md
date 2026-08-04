@@ -1,5 +1,6 @@
 ---
-inclusion: always
+inclusion: fileMatch
+fileMatchPattern: "**/src/main/**/presentation/**"
 ---
 
 # Convenções da Camada Presentation

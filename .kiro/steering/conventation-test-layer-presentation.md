@@ -1,5 +1,6 @@
 ---
-inclusion: always
+inclusion: fileMatch
+fileMatchPattern: "**/src/test/**/presentation/**,**/src/test/**/integration/**"
 ---
 
 # Testes Unitários de Controllers

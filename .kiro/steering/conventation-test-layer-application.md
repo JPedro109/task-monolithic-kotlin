@@ -1,5 +1,6 @@
 ---
-inclusion: always
+inclusion: fileMatch
+fileMatchPattern: "**/src/test/**/application/**"
 ---
 
 # Testes Unitários de Casos de Uso

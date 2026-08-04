@@ -1,5 +1,6 @@
 ---
-inclusion: always
+inclusion: fileMatch
+fileMatchPattern: "**/src/main/**/domain/**"
 ---
 
 # Convenções da Camada Domain
