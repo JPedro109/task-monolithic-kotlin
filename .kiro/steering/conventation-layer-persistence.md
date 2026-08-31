@@ -254,7 +254,7 @@ interface SampleJpaDao : JpaRepository<SampleJpaModel, UUID> {
 
 ```kotlin
 @Service
-class CreateSampleUseCaseImpl(
+class CreateSampleUseCase(
     @PersistenceContext
     private val entityManager: EntityManager
 )

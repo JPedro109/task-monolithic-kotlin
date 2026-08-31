@@ -60,7 +60,7 @@ As seguintes regras devem ser respeitadas:
 - Controllers não devem implementar regras de negócio.
 - Controllers não devem acessar repositórios.
 - Controllers não devem acessar adaptadores de infraestrutura.
-- Controllers devem depender exclusivamente de interfaces de casos de uso.
+- Controllers devem depender exclusivamente de casos de uso (classes concretas da camada Application).
 - Controllers devem permanecer pequenos e objetivos.
 - Controllers devem implementar a interface `*ControllerDoc` correspondente (nenhuma anotação do SpringDoc no corpo do controller).
 - A interface `*ControllerDoc` **não** declara `@RequestMapping` — o path fica exclusivamente no controller.
@@ -597,7 +597,7 @@ Toda comunicação deve ocorrer exclusivamente através dos casos de uso.
 Toda implementação da camada Presentation deve respeitar os seguintes princípios:
 
 - Controllers representam apenas endpoints HTTP.
-- Controllers dependem exclusivamente de interfaces de casos de uso.
+- Controllers dependem exclusivamente de casos de uso (classes concretas da camada Application).
 - Controllers implementam `*ControllerDoc` para documentação.
 - Payloads representam apenas contratos HTTP.
 - Requests e Responses devem utilizar `data class`.

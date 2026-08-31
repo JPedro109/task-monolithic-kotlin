@@ -17,24 +17,22 @@ As seguintes convenções devem ser adotadas:
 - Pacotes devem utilizar apenas letras minúsculas.
 - Interfaces devem representar comportamentos ou contratos.
 - Interfaces **não devem** utilizar o prefixo `I`.
-- Implementações concretas de interfaces devem utilizar o sufixo `Impl`.
+- Casos de uso são classes concretas, sem interface e sem sufixo `Impl`.
+- Adaptadores de infraestrutura (implementações de portas) utilizam o sufixo `Adapter` (ou um nome que descreva a tecnologia, ex: `JpaTaskRepository`).
 - Classes concretas devem possuir nomes que representem claramente sua responsabilidade.
-- Adaptadores devem utilizar o sufixo `AdapterImpl`.
 
 Evite abreviações desnecessárias e nomes genéricos que não expressem claramente a responsabilidade do componente.
 
 ### ✔ Correto
 
 ```kotlin
-interface CreateUserUseCase
-
-class CreateUserUseCaseImpl : CreateUserUseCase
-
-class UserRepositoryAdapterImpl : UserRepository
+class CreateUserUseCase
 
 interface PasswordEncoder
 
-class TokenAdapterImpl : Token
+class TokenAdapter : Token
+
+class UserRepositoryAdapter : UserRepository
 ```
 
 ### ❌ Incorreto
@@ -145,7 +143,7 @@ Cada bloco deve representar uma fase claramente identificável da execução, co
 ### ✔ Correto
 
 ```kotlin
-override fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
+fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
     val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
 
     if (userRepository.existsByUsername(usernameResult)) {
@@ -168,7 +166,7 @@ override fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
 ### ❌ Incorreto
 
 ```kotlin
-override fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
+fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
     val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
 
     if (userRepository.existsByUsername(usernameResult)) {
@@ -206,11 +204,11 @@ Métodos auxiliares devem permanecer próximos dos métodos que os utilizam, mas
 
 ```kotlin
 @Service
-class CreateTaskUseCaseImpl(
+class CreateTaskUseCase(
     private val taskRepository: TaskRepository
-) : CreateTaskUseCase {
+) {
 
-    override fun execute(input: CreateTaskInputDTO): TaskOutputDTO {
+    fun execute(input: CreateTaskInputDTO): TaskOutputDTO {
         val task = TaskEntity(
             id = UUID.randomUUID().toString(),
             userId = input.userId,
@@ -265,10 +263,10 @@ As seguintes regras devem ser respeitadas:
 
 ```kotlin
 @Service
-class CreateUserUseCaseImpl(
+class CreateUserUseCase(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
-) : CreateUserUseCase {
+) {
     ...
 }
 ```
@@ -277,7 +275,7 @@ class CreateUserUseCaseImpl(
 
 ```kotlin
 @Service
-class CreateUserUseCaseImpl {
+class CreateUserUseCase {
     @Autowired
     private lateinit var userRepository: UserRepository
 

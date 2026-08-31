@@ -37,14 +37,14 @@ As seguintes regras devem ser respeitadas:
 - Cada caso de uso deve possuir sua própria classe de teste.
 - Dependências devem ser simuladas utilizando MockK.
 - O contexto do Spring não deve ser iniciado.
-- Apenas a implementação do caso de uso deve ser instanciada.
+- Apenas a classe concreta do caso de uso deve ser instanciada.
 - Todos os fluxos de sucesso e falha devem ser testados.
 - O comportamento das portas deve ser validado através de verificações (`verify`).
 - Fixtures devem ser utilizadas sempre que possível.
 - Cada teste deve validar apenas um cenário.
 - Usar `@ExtendWith(MockKExtension::class)`.
 - Dependências são declaradas com `@MockK`.
-- A implementação sob teste com `@InjectMockKs`.
+- O caso de uso sob teste com `@InjectMockKs`.
 
 ---
 
@@ -92,7 +92,7 @@ class CreateSampleUseCaseTest {
     lateinit var sampleRepository: SampleRepository
 
     @InjectMockKs
-    lateinit var useCase: CreateSampleUseCaseImpl
+    lateinit var useCase: CreateSampleUseCase
 
     @Test
     fun `should create a sample successfully`() {

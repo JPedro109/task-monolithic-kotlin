@@ -29,19 +29,18 @@ application/
 │       └── exception/
 └── usecase/
     └── sample/
-        ├── interfaces/
-        ├── implementation/
         ├── dto/
         │   ├── input/
         │   └── output/
-        └── exception/
+        ├── exception/
+        └── CreateSampleUseCase.kt
 ```
 
 As seguintes regras devem ser respeitadas:
 
 - Cada contexto deve possuir seu próprio pacote.
-- Cada caso de uso deve possuir sua própria interface.
-- Implementações devem permanecer em `implementation`.
+- Cada caso de uso é uma **classe concreta**, sem interface e sem sufixo `Impl`, diretamente no pacote do contexto (`usecase/<contexto>`).
+- Não devem existir subpastas `interfaces/` ou `implementation/`.
 - DTOs devem permanecer separados entre entrada e saída.
 - Portas devem permanecer organizadas por responsabilidade.
 
@@ -53,11 +52,13 @@ Casos de uso representam operações executadas pela aplicação.
 
 Cada caso de uso deve representar apenas uma responsabilidade.
 
+Um caso de uso tem exatamente uma implementação e nenhum ponto de variação real. A interface single-impl é cerimônia que não compra desacoplamento, portanto o caso de uso é modelado como uma **classe concreta**. Interfaces (contratos) são reservadas às **portas** — repositórios, segurança e gateways —, onde existe inversão de dependência real com a infraestrutura.
+
 As seguintes regras devem ser respeitadas:
 
-- Todo caso de uso deve possuir uma interface.
-- Toda implementação deve implementar sua respectiva interface.
-- Implementações devem utilizar o sufixo `Impl`.
+- Todo caso de uso é uma classe concreta, sem interface e sem sufixo `Impl`.
+- O método público não usa `override` — não há contrato para sobrescrever.
+- Injeção pelo construtor primário, com dependências imutáveis (`private val`).
 - Cada caso de uso deve executar apenas um fluxo da aplicação.
 - Casos de uso não devem conter regras de infraestrutura.
 - Casos de uso não devem depender da camada Presentation.
@@ -65,12 +66,23 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-interface CreateSampleUseCase {
-    fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO
+@Service
+class CreateSampleUseCase(
+    private val sampleRepository: SampleRepository
+) {
+    fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+        ...
+    }
 }
 ```
 
+## ❌ Incorreto — interface single-impl e sufixo Impl
+
 ```kotlin
+interface CreateSampleUseCase {
+    fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO
+}
+
 @Service
 class CreateSampleUseCaseImpl(
     private val sampleRepository: SampleRepository
@@ -79,7 +91,7 @@ class CreateSampleUseCaseImpl(
 }
 ```
 
-## ❌ Incorreto
+## ❌ Incorreto — serviço com múltiplas responsabilidades
 
 ```kotlin
 @Service
@@ -216,7 +228,7 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-override fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
     val sample = SampleEntity(
         id = UUID.randomUUID().toString(),
         name = input.name,
@@ -277,8 +289,8 @@ As seguintes regras devem ser respeitadas:
 
 - DTOs nunca devem atravessar para a camada Domain.
 - Entidades nunca devem ser utilizadas diretamente pela camada Presentation.
-- A conversão de entidade para Output DTO deve ser centralizada em um método privado `toOutput` dentro da implementação.
-- Nunca repita o mapeamento inline nem exponha entidades de domínio fora da implementação.
+- A conversão de entidade para Output DTO deve ser centralizada em um método privado `toOutput` dentro do caso de uso.
+- Nunca repita o mapeamento inline nem exponha entidades de domínio fora do caso de uso.
 
 ## ✔ Correto
 
@@ -303,7 +315,7 @@ return task
 
 # Exceções de Caso de Uso
 
-Exceções específicas de cada domínio de caso de uso ficam em `exception/` ao lado de `interfaces/` e `implementation/`.
+Exceções específicas de cada domínio de caso de uso ficam em `exception/`, ao lado das classes de caso de uso e da pasta `dto/`.
 
 As seguintes regras devem ser respeitadas:
 
@@ -342,8 +354,8 @@ Não é permitido depender de:
 Toda implementação da camada Application deve respeitar os seguintes princípios:
 
 - Cada caso de uso representa uma única operação da aplicação.
-- Todo caso de uso deve possuir interface e implementação.
-- Implementações devem utilizar o sufixo `Impl`.
+- Todo caso de uso é uma classe concreta, sem interface e sem sufixo `Impl`.
+- Interface existe para inverter dependência de infraestrutura (portas), não para envelopar componente de implementação única.
 - DTOs devem utilizar `data class`.
 - DTOs não possuem regras de negócio.
 - Toda comunicação externa deve ocorrer através de portas.
