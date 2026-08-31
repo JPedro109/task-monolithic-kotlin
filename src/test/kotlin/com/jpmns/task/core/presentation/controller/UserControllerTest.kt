@@ -17,16 +17,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 import com.jpmns.task.configuration.security.SecurityConfig
 import com.jpmns.task.core.application.port.security.Token
+import com.jpmns.task.core.application.usecase.user.CreateUserUseCase
+import com.jpmns.task.core.application.usecase.user.DeleteUserUseCase
+import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
+import com.jpmns.task.core.application.usecase.user.UpdateUserPasswordUseCase
+import com.jpmns.task.core.application.usecase.user.UpdateUsernameUseCase
 import com.jpmns.task.core.application.usecase.user.dto.output.CreateUserOutputDTO
 import com.jpmns.task.core.application.usecase.user.dto.output.UpdateUsernameOutputDTO
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
-import com.jpmns.task.core.application.usecase.user.interfaces.CreateUserUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.DeleteUserUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUserPasswordUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUsernameUseCase
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.UserFixture
 import com.jpmns.task.shared.security.WithJwtTokenMock

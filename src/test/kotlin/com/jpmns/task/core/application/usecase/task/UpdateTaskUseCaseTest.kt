@@ -9,7 +9,6 @@ import com.jpmns.task.core.application.port.persistence.repository.TaskRepositor
 import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDTO
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
-import com.jpmns.task.core.application.usecase.task.implementation.UpdateTaskUseCaseImpl
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.TaskFixture
 import com.jpmns.task.shared.fixture.UserFixture
@@ -26,7 +25,7 @@ class UpdateTaskUseCaseTest {
     lateinit var taskRepository: TaskRepository
 
     @InjectMockKs
-    lateinit var useCase: UpdateTaskUseCaseImpl
+    lateinit var useCase: UpdateTaskUseCase
 
     @Test
     fun `should update a task successfully`() {

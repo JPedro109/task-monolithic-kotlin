@@ -1,19 +1,18 @@
-package com.jpmns.task.core.application.usecase.task.implementation
+package com.jpmns.task.core.application.usecase.task
 
 import org.springframework.stereotype.Service
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
 import com.jpmns.task.core.application.usecase.task.dto.input.ListTasksInputDTO
 import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDTO
-import com.jpmns.task.core.application.usecase.task.interfaces.ListTasksUseCase
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 import com.jpmns.task.core.domain.task.TaskEntity
 
 @Service
-class ListTasksUseCaseImpl(
+class ListTasksUseCase(
     private val taskRepository: TaskRepository
-) : ListTasksUseCase {
-    override fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
+) {
+    fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
         val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
 
         return taskRepository.findAllByUserId(userIdResult).map(::toOutput)

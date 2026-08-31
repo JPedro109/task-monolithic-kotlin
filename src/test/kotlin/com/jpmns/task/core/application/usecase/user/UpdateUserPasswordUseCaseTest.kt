@@ -9,7 +9,6 @@ import com.jpmns.task.core.application.port.security.PasswordEncoder
 import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUserPasswordInputDTO
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
-import com.jpmns.task.core.application.usecase.user.implementation.UpdateUserPasswordUseCaseImpl
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
@@ -28,7 +27,7 @@ class UpdateUserPasswordUseCaseTest {
     lateinit var passwordEncoder: PasswordEncoder
 
     @InjectMockKs
-    lateinit var useCase: UpdateUserPasswordUseCaseImpl
+    lateinit var useCase: UpdateUserPasswordUseCase
 
     @Test
     fun `should update password successfully`() {

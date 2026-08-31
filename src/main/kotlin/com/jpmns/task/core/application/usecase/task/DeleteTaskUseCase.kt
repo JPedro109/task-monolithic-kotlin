@@ -1,19 +1,18 @@
-package com.jpmns.task.core.application.usecase.task.implementation
+package com.jpmns.task.core.application.usecase.task
 
 import org.springframework.stereotype.Service
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.DeleteTaskInputDTO
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
-import com.jpmns.task.core.application.usecase.task.interfaces.MarkTaskAsFinishedUseCase
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 
 @Service
-class MarkTaskAsFinishedUseCaseImpl(
+class DeleteTaskUseCase(
     private val taskRepository: TaskRepository
-) : MarkTaskAsFinishedUseCase {
-    override fun execute(input: MarkTaskAsFinishedInputDTO) {
+) {
+    fun execute(input: DeleteTaskInputDTO) {
         val taskIdResult = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
         val task = taskRepository.findById(taskIdResult)
@@ -24,8 +23,6 @@ class MarkTaskAsFinishedUseCaseImpl(
             throw TaskAccessDeniedException()
         }
 
-        task.markAsFinished()
-
-        taskRepository.save(task)
+        taskRepository.deleteById(taskIdResult)
     }
 }

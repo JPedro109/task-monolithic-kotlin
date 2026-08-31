@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+import com.jpmns.task.core.application.usecase.user.CreateUserUseCase
+import com.jpmns.task.core.application.usecase.user.DeleteUserUseCase
+import com.jpmns.task.core.application.usecase.user.UpdateUserPasswordUseCase
+import com.jpmns.task.core.application.usecase.user.UpdateUsernameUseCase
 import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDTO
 import com.jpmns.task.core.application.usecase.user.dto.input.DeleteUserInputDTO
 import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUserPasswordInputDTO
 import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDTO
-import com.jpmns.task.core.application.usecase.user.interfaces.CreateUserUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.DeleteUserUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUserPasswordUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.UpdateUsernameUseCase
 import com.jpmns.task.core.presentation.controller.common.resolver.AuthenticatedUserResolver
 import com.jpmns.task.core.presentation.controller.documentation.UserControllerDoc
 import com.jpmns.task.core.presentation.controller.payload.user.request.CreateUserRequest

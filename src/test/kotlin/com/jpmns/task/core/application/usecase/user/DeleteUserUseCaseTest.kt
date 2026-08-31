@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.usecase.user.dto.input.DeleteUserInputDTO
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
-import com.jpmns.task.core.application.usecase.user.implementation.DeleteUserUseCaseImpl
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
@@ -25,7 +24,7 @@ class DeleteUserUseCaseTest {
     lateinit var userRepository: UserRepository
 
     @InjectMockKs
-    lateinit var useCase: DeleteUserUseCaseImpl
+    lateinit var useCase: DeleteUserUseCase
 
     @Test
     fun `should delete a user successfully`() {

@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+import com.jpmns.task.core.application.usecase.user.RefreshUserTokenUseCase
+import com.jpmns.task.core.application.usecase.user.UserLoginUseCase
 import com.jpmns.task.core.application.usecase.user.dto.input.RefreshUserTokenInputDTO
 import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDTO
-import com.jpmns.task.core.application.usecase.user.interfaces.RefreshUserTokenUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.UserLoginUseCase
 import com.jpmns.task.core.presentation.controller.documentation.AuthControllerDoc
 import com.jpmns.task.core.presentation.controller.payload.user.request.RefreshTokenRequest
 import com.jpmns.task.core.presentation.controller.payload.user.request.UserLoginRequest

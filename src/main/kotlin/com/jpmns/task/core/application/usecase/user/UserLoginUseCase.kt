@@ -1,4 +1,4 @@
-package com.jpmns.task.core.application.usecase.user.implementation
+package com.jpmns.task.core.application.usecase.user
 
 import org.springframework.stereotype.Service
 
@@ -8,16 +8,15 @@ import com.jpmns.task.core.application.port.security.Token
 import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDTO
 import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDTO
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
-import com.jpmns.task.core.application.usecase.user.interfaces.UserLoginUseCase
 import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 
 @Service
-class UserLoginUseCaseImpl(
+class UserLoginUseCase(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val token: Token
-) : UserLoginUseCase {
-    override fun execute(input: UserLoginInputDTO): UserLoginOutputDTO {
+) {
+    fun execute(input: UserLoginInputDTO): UserLoginOutputDTO {
         val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
 
         val user = userRepository.findByUsername(usernameResult) ?: throw InvalidCredentialsException()

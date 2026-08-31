@@ -9,7 +9,6 @@ import com.jpmns.task.core.application.port.persistence.repository.UserRepositor
 import com.jpmns.task.core.application.port.security.PasswordEncoder
 import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDTO
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
-import com.jpmns.task.core.application.usecase.user.implementation.CreateUserUseCaseImpl
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
@@ -28,7 +27,7 @@ class CreateUserUseCaseTest {
     lateinit var passwordEncoder: PasswordEncoder
 
     @InjectMockKs
-    lateinit var useCase: CreateUserUseCaseImpl
+    lateinit var useCase: CreateUserUseCase
 
     @Test
     fun `should create a user successfully`() {

@@ -19,15 +19,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 import com.jpmns.task.configuration.security.SecurityConfig
 import com.jpmns.task.core.application.port.security.Token
+import com.jpmns.task.core.application.usecase.task.CreateTaskUseCase
+import com.jpmns.task.core.application.usecase.task.DeleteTaskUseCase
+import com.jpmns.task.core.application.usecase.task.ListTasksUseCase
+import com.jpmns.task.core.application.usecase.task.MarkTaskAsFinishedUseCase
+import com.jpmns.task.core.application.usecase.task.UpdateTaskUseCase
 import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDTO
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
-import com.jpmns.task.core.application.usecase.task.interfaces.CreateTaskUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.DeleteTaskUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.ListTasksUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.MarkTaskAsFinishedUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.UpdateTaskUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
+import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
 import com.jpmns.task.core.domain.task.TaskEntity
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.TaskFixture

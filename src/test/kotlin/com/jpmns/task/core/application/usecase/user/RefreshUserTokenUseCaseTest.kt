@@ -11,7 +11,6 @@ import com.jpmns.task.core.application.port.security.dto.DecodeTokenDto
 import com.jpmns.task.core.application.port.security.exception.InvalidTokenException
 import com.jpmns.task.core.application.usecase.user.dto.input.RefreshUserTokenInputDTO
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
-import com.jpmns.task.core.application.usecase.user.implementation.RefreshUserTokenUseCaseImpl
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
@@ -30,7 +29,7 @@ class RefreshUserTokenUseCaseTest {
     lateinit var token: Token
 
     @InjectMockKs
-    lateinit var useCase: RefreshUserTokenUseCaseImpl
+    lateinit var useCase: RefreshUserTokenUseCase
 
     @Test
     fun `should refresh token successfully`() {

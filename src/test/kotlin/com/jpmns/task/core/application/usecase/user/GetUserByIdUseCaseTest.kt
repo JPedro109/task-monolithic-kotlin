@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.usecase.user.dto.input.GetUserByIdInputDTO
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
-import com.jpmns.task.core.application.usecase.user.implementation.GetUserByIdUseCaseImpl
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
@@ -24,7 +23,7 @@ class GetUserByIdUseCaseTest {
     lateinit var userRepository: UserRepository
 
     @InjectMockKs
-    lateinit var useCase: GetUserByIdUseCaseImpl
+    lateinit var useCase: GetUserByIdUseCase
 
     @Test
     fun `should get user by id successfully`() {

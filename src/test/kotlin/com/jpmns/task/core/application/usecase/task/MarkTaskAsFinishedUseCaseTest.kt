@@ -8,7 +8,6 @@ import com.jpmns.task.core.application.port.persistence.repository.TaskRepositor
 import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDTO
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
-import com.jpmns.task.core.application.usecase.task.implementation.MarkTaskAsFinishedUseCaseImpl
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.TaskFixture
 import com.jpmns.task.shared.fixture.UserFixture
@@ -25,7 +24,7 @@ class MarkTaskAsFinishedUseCaseTest {
     lateinit var taskRepository: TaskRepository
 
     @InjectMockKs
-    lateinit var useCase: MarkTaskAsFinishedUseCaseImpl
+    lateinit var useCase: MarkTaskAsFinishedUseCase
 
     @Test
     fun `should mark task as finished successfully`() {

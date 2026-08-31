@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 import com.jpmns.task.core.application.port.security.Token
+import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
 import com.jpmns.task.core.application.usecase.user.dto.input.GetUserByIdInputDTO
-import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
 
 @Component
 class JwtAuthenticationFilter(

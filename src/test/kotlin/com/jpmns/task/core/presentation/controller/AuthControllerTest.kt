@@ -16,12 +16,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import com.jpmns.task.configuration.security.SecurityConfig
 import com.jpmns.task.core.application.port.security.Token
 import com.jpmns.task.core.application.port.security.exception.InvalidTokenException
+import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
+import com.jpmns.task.core.application.usecase.user.RefreshUserTokenUseCase
+import com.jpmns.task.core.application.usecase.user.UserLoginUseCase
 import com.jpmns.task.core.application.usecase.user.dto.output.RefreshUserTokenOutputDTO
 import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDTO
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
-import com.jpmns.task.core.application.usecase.user.interfaces.GetUserByIdUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.RefreshUserTokenUseCase
-import com.jpmns.task.core.application.usecase.user.interfaces.UserLoginUseCase
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.UserFixture
 import com.ninjasquad.springmockk.MockkBean

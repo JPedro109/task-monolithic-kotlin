@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+import com.jpmns.task.core.application.usecase.task.CreateTaskUseCase
+import com.jpmns.task.core.application.usecase.task.DeleteTaskUseCase
+import com.jpmns.task.core.application.usecase.task.ListTasksUseCase
+import com.jpmns.task.core.application.usecase.task.MarkTaskAsFinishedUseCase
+import com.jpmns.task.core.application.usecase.task.UpdateTaskUseCase
 import com.jpmns.task.core.application.usecase.task.dto.input.CreateTaskInputDTO
 import com.jpmns.task.core.application.usecase.task.dto.input.DeleteTaskInputDTO
 import com.jpmns.task.core.application.usecase.task.dto.input.ListTasksInputDTO
 import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDTO
 import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDTO
-import com.jpmns.task.core.application.usecase.task.interfaces.CreateTaskUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.DeleteTaskUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.ListTasksUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.MarkTaskAsFinishedUseCase
-import com.jpmns.task.core.application.usecase.task.interfaces.UpdateTaskUseCase
 import com.jpmns.task.core.presentation.controller.common.resolver.AuthenticatedUserResolver
 import com.jpmns.task.core.presentation.controller.documentation.TaskControllerDoc
 import com.jpmns.task.core.presentation.controller.payload.task.request.CreateTaskRequest
