@@ -60,7 +60,6 @@ fun shouldReturn201WithSampleDataWhenInputIsValid() { }
 
 ```kotlin
 val sample = SampleFixture.aSample()
-val userId = user.id
 val sampleName = sample.sampleName
 val input = CreateSampleInputDTO(sampleName = sampleName.asString())
 
@@ -112,16 +111,16 @@ As seguintes regras devem ser respeitadas:
 
 ```kotlin
 object SampleFixture {
-    private const val DEFAULT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-    private const val DEFAULT_USER_ID = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
-    private const val DEFAULT_TASK_NAME = "Sample Sample"
-    private const val DEFAULT_FINISHED = false
+    const val DEFAULT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    const val DEFAULT_USER_ID = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+    const val DEFAULT_SAMPLE_NAME = "Sample Name"
+    const val DEFAULT_FINISHED = false
 
     fun aSample(): SampleEntity =
         SampleEntity(
             id = DEFAULT_ID,
             userId = DEFAULT_USER_ID,
-            sampleName = DEFAULT_TASK_NAME,
+            sampleName = DEFAULT_SAMPLE_NAME,
             finished = DEFAULT_FINISHED
         )
 }
@@ -145,7 +144,7 @@ fun `should create sample successfully`() {
     val sample = SampleEntity(
         id = "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
         userId = "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-        sampleName = "Sample Sample",
+        sampleName = "Sample Name",
         finished = false
     )
     ...

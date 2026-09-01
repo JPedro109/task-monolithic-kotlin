@@ -90,8 +90,8 @@ class TokenAdapterTest {
 
     @Test
     fun `should generate a valid access token`() {
-        val user = UserFixture.aUser()
-        val sub = user.id.asString()
+        val sample = SampleFixture.aSample()
+        val sub = sample.id.asString()
 
         val token = tokenAdapter.generateAccessToken(sub)
 
@@ -101,8 +101,8 @@ class TokenAdapterTest {
     @Test
     fun `should throw InvalidTokenException when token is expired`() {
         val expiredAdapter = TokenAdapter(buildProperties(SECRET, -1L, -1L))
-        val user = UserFixture.aUser()
-        val sub = user.id.asString()
+        val sample = SampleFixture.aSample()
+        val sub = sample.id.asString()
         val expiredToken = expiredAdapter.generateAccessToken(sub)
 
         assertThatThrownBy { tokenAdapter.tokenValidation(expiredToken) }

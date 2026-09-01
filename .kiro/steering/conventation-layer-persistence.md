@@ -77,7 +77,7 @@ As seguintes regras devem ser respeitadas:
 - Devem trabalhar com Entidades do domínio.
 - Não devem implementar regras de negócio.
 - Não devem expor Models para outras camadas.
-- Devem utilizar o sufixo `Adapter` (ex: `TaskRepositoryAdapter`).
+- Devem utilizar o sufixo `Adapter` (ex: `SampleRepositoryAdapter`).
 - Anotados com `@Repository`.
 
 ## ✔ Correto

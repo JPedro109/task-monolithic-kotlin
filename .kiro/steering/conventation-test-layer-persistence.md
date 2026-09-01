@@ -91,9 +91,6 @@ class SampleJpaDaoTest {
     @Autowired
     private lateinit var sampleJpaDao: SampleJpaDao
 
-    @Autowired
-    private lateinit var sampleJpaDao: SampleJpaDao
-
     @BeforeEach
     fun setUp() {
         val sample = SampleFixture.aSample()
@@ -124,7 +121,7 @@ class SampleJpaDaoTest {
     private fun buildSample(sample: SampleEntity): SampleJpaModel =
         SampleJpaModel(
             id = UUID.fromString(sample.id.asString()),
-            samplename = sample.samplename.asString()
+            sampleName = sample.sampleName.asString()
         )
 
     companion object {

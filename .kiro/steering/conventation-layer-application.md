@@ -258,25 +258,25 @@ Quando todos os campos necessários estão disponíveis e a entidade será criad
 ## ✔ Correto — busca por ID
 
 ```kotlin
-val taskIdValue = IdValueObject.of(input.taskId).getValueResultOrThrow()
-val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
+val sampleIdValue = IdValueObject.of(input.sampleId).getValueResultOrThrow()
+val sample = sampleRepository.findById(sampleIdValue) ?: throw SampleNotFoundException()
 ```
 
 ## ✔ Correto — verificação de unicidade antes da criação
 
 ```kotlin
-val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
-if (userRepository.existsByUsername(usernameResult)) {
-    throw UsernameAlreadyExistsException()
+val sampleNameResult = SampleNameValueObject.of(input.sampleName).getValueResultOrThrow()
+if (sampleRepository.existsBySampleName(sampleNameResult)) {
+    throw SampleNameAlreadyExistsException()
 }
-val user = UserEntity(id = UUID.randomUUID().toString(), username = input.username, password = encodedPassword)
+val sample = SampleEntity(id = UUID.randomUUID().toString(), sampleName = input.sampleName)
 ```
 
 ## ❌ Incorreto — validação duplicada desnecessária
 
 ```kotlin
-val taskNameResult = TaskNameValueObject.of(input.taskName).getValueResultOrThrow()
-val task = TaskEntity(id = UUID.randomUUID().toString(), userId = input.userId, taskName = input.taskName, finished = false)
+val sampleNameResult = SampleNameValueObject.of(input.sampleName).getValueResultOrThrow()
+val sample = SampleEntity(id = UUID.randomUUID().toString(), userId = input.userId, sampleName = input.sampleName, finished = false)
 ```
 
 ---
@@ -295,20 +295,20 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-private fun toOutput(task: TaskEntity): TaskOutputDTO =
-    TaskOutputDTO(
-        id = task.id.asString(),
-        userId = task.userId.asString(),
-        taskName = task.taskName.asString(),
-        finished = task.finished,
-        createdAt = task.createdAt
+private fun toOutput(sample: SampleEntity): SampleOutputDTO =
+    SampleOutputDTO(
+        id = sample.id.asString(),
+        userId = sample.userId.asString(),
+        sampleName = sample.sampleName.asString(),
+        finished = sample.finished,
+        createdAt = sample.createdAt
     )
 ```
 
 ## ❌ Incorreto
 
 ```kotlin
-return task
+return sample
 ```
 
 ---
@@ -326,9 +326,9 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-class TaskNotFoundException : RuntimeException("Task not found")
-class TaskAccessDeniedException : RuntimeException("Access denied to this task")
-class UsernameAlreadyExistsException : RuntimeException("Username already exists")
+class SampleNotFoundException : RuntimeException("Sample not found")
+class SampleAccessDeniedException : RuntimeException("Access denied to this sample")
+class SampleNameAlreadyExistsException : RuntimeException("Sample name already exists")
 ```
 
 ---

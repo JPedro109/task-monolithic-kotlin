@@ -95,29 +95,29 @@ class SampleControllerTest {
     private lateinit var mockMvc: MockMvc
 
     @MockkBean
-    private lateinit var createSampleName: CreateSampleNameUseCase
+    private lateinit var createSampleUseCase: CreateSampleUseCase
 
     @MockkBean
     private lateinit var token: Token
 
     @Nested
     @DisplayName("POST /api/v1/samples")
-    inner class Login {
+    inner class CreateSample {
 
         @Test
-        fun `should return 200 with tokens when credentials are valid`() {
+        fun `should return 201 with sample data when input is valid`() {
             val sample = SampleFixture.aSample()
             val sampleName = sample.sampleName
-            val output = CreateSampleNameOutputDTO(sampleName = sampleName.asString())
+            val output = SampleOutputDTO(id = sample.id.asString(), sampleName = sampleName.asString(), finished = false)
 
-            every { createSampleName.execute(any()) } returns output
+            every { createSampleUseCase.execute(any()) } returns output
 
             perform(sampleName = sampleName.asString())
-                .andExpect(status().isOk)
-                .andExpect(jsonPath("$.sampleName").value(accessToken))
+                .andExpect(status().isCreated)
+                .andExpect(jsonPath("$.sampleName").value(sampleName.asString()))
         }
 
-        private fun perform(sampleName: String, password: String): ResultActions {
+        private fun perform(sampleName: String): ResultActions {
             val requestBody = """{"sampleName": "$sampleName"}"""
             return mockMvc.perform(
                 post("/api/v1/samples")
@@ -144,7 +144,7 @@ class SampleControllerTest { }
 
 ```kotlin
 @Test
-fun `should create task`() {
+fun `should create sample`() {
     val controller = SampleController(...)
 }
 ```
@@ -217,7 +217,7 @@ class PostgresContainerConfig {
     fun postgresContainer(): PostgreSQLContainer<*> =
         PostgreSQLContainer(DockerImageName.parse("postgres:15-alpine"))
             .withDatabaseName("sample_test")
-            .withSamplename("test")
+            .withUsername("test")
             .withPassword("test")
 }
 ```
@@ -338,7 +338,7 @@ class SampleIntegrationTest : IntegrationTestBase() {
         @Test
         @SqlCreateSeed
         @WithJwtTokenMock
-        fun `should return 400 when task name is blank`() {
+        fun `should return 400 when sample name is blank`() {
             perform("")
                 .andExpect(status().isBadRequest)
         }
@@ -370,7 +370,7 @@ class SampleIntegrationTest { }
 
 ```kotlin
 @MockkBean
-private lateinit var taskRepository: SampleRepository
+private lateinit var sampleRepository: SampleRepository
 ```
 
 ---

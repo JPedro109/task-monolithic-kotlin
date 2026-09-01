@@ -91,12 +91,11 @@ class SampleEntity(
 
     var sampleName: SampleNameValueObject
         private set
-    val userId: IdValueObject
 
     init {
         val sampleNameResult = SampleNameValueObject.of(sampleName)
 
-        val results = listOf(userIdResult, sampleNameResult)
+        val results = listOf(sampleNameResult)
         validateOrThrow(results)
 
         this.sampleName = sampleNameResult.getValueResult()
@@ -211,10 +210,10 @@ class SampleNameValueObject private constructor(private val value: String) {
 
     fun asString(): String = value
 
-    override fun equals(other: Any): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
 
-        if (other !is SamplevalueValueObject) return false
+        if (other !is SampleNameValueObject) return false
 
         return asString() == other.asString()
     }
@@ -224,12 +223,12 @@ class SampleNameValueObject private constructor(private val value: String) {
     companion object {
         private const val MAX_LENGTH = 255
 
-        fun of(value: String): Result<SamplevalueValueObject> {
+        fun of(value: String): Result<SampleNameValueObject> {
             if (value.isBlank() || value.length > MAX_LENGTH) {
                 return Result.fail(InvalidSampleNameException())
             }
 
-            return Result.success(SampleNameValueObject(name))
+            return Result.success(SampleNameValueObject(value))
         }
     }
 }
@@ -238,9 +237,9 @@ class SampleNameValueObject private constructor(private val value: String) {
 ## ❌ Incorreto
 
 ```kotlin
-class SampleNameValueObject(var name: String) {
-    fun setValue(name: String) {
-        this.name = name
+class SampleNameValueObject(var value: String) {
+    fun setValue(value: String) {
+        this.value = value
     }
 }
 ```
@@ -264,19 +263,19 @@ if (result.isFailure) {
     throw result.getError()
 }
 
-val sample = result.getValueResult()
+val sampleName = result.getValueResult()
 ```
 
 ## ✔ Correto
 
 ```kotlin
-val sample = SampleNameValueObject.of(value).getValueResultOrThrow()
+val sampleName = SampleNameValueObject.of(value).getValueResultOrThrow()
 ```
 
 ## ❌ Incorreto
 
 ```kotlin
-val sample = SampleNameValueObject(value)  // construtor direto
+val sampleName = SampleNameValueObject(value)  // construtor direto
 ```
 
 ---
@@ -312,7 +311,7 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-class SampleNameException : DomainException(
+class InvalidSampleNameException : DomainException(
     "Sample name must not be blank and must have at most 255 characters"
 )
 ```

@@ -98,7 +98,6 @@ class CreateSampleUseCaseTest {
     fun `should create a sample successfully`() {
         val sample = SampleFixture.aSample()
         val sampleName = sample.sampleName
-        val password = sample.password
         val input = CreateSampleInputDTO(sampleName = sampleName.asString())
         val savedSample = SampleFixture.aSample()
 
@@ -123,7 +122,6 @@ class CreateSampleUseCaseTest {
 fun `should throw when sampleName already exists`() {
     val sample = SampleFixture.aSample()
     val sampleName = sample.sampleName
-    val password = sample.password
     val input = CreateSampleInputDTO(sampleName = sampleName.asString())
 
     every { sampleRepository.existsBySampleName(sampleName) } returns true

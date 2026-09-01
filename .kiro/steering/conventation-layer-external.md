@@ -152,7 +152,7 @@ runCatching {
 
 - Toda integração externa pertence à camada External.
 - Todo adaptador deve implementar uma porta da camada Application.
-- Adaptadores usam sufixo `Adapter` (ex: `TokenAdapter`, `TaskRepositoryAdapter`).
+- Adaptadores usam sufixo `Adapter` (ex: `TokenAdapter`, `SampleRepositoryAdapter`).
 - A camada External nunca implementa regras de negócio.
 - Toda exceção de infraestrutura deve ser traduzida.
 - Configurações devem utilizar `@ConfigurationProperties`.

@@ -159,17 +159,17 @@ data class CreateSampleRequest(
 ### ✔ Correto — com dados sensíveis
 
 ```kotlin
-data class UserLoginRequest(
+data class SampleLoginRequest(
     @field:NotBlank
     @field:Size(min = 3, max = 50)
     override val username: String,
     @field:NotBlank
     @field:Size(min = 8, max = 128)
     override val password: String
-) : UserLoginRequestDoc {
+) : SampleLoginRequestDoc {
 
     override fun toString(): String =
-        "UserLoginRequest{username='$username', password='[PROTECTED]'}"
+        "SampleLoginRequest{username='$username', password='[PROTECTED]'}"
 }
 ```
 
@@ -318,23 +318,23 @@ Para respostas sem corpo (`204 No Content`), omita o `content` na `@ApiResponse`
 ### ✔ Correto
 
 ```kotlin
-@Tag(name = "Tasks", description = "Gerenciamento de tarefas — criação, listagem, atualização, exclusão e conclusão")
+@Tag(name = "Samples", description = "Gerenciamento de samples — criação, listagem, atualização, exclusão e conclusão")
 @SecurityRequirement(name = "bearerAuth")
-interface TaskControllerDoc {
+interface SampleControllerDoc {
 
     @Operation(
-        summary = "Criar nova tarefa",
-        description = "<p>Cria uma nova tarefa associada ao usuário autenticado.</p>" +
-            "<p>A tarefa é criada com o status <code>finished: false</code> por padrão.</p>" +
+        summary = "Criar novo sample",
+        description = "<p>Cria um novo sample associado ao usuário autenticado.</p>" +
+            "<p>O sample é criado com o status <code>finished: false</code> por padrão.</p>" +
             "<p>Requer autenticação via <code>Authorization: Bearer &lt;accessToken&gt;</code>.</p>",
         requestBody = RequestBody(
             required = true,
             content = [Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = CreateTaskRequest::class),
+                schema = Schema(implementation = CreateSampleRequest::class),
                 examples = [
-                    ExampleObject(name = "Tarefa válida", value = """{"taskName": "Estudar Spring Boot"}"""),
-                    ExampleObject(name = "Nome em branco (inválido)", value = """{"taskName": ""}""")
+                    ExampleObject(name = "Sample válido", value = """{"sampleName": "Sample Name"}"""),
+                    ExampleObject(name = "Nome em branco (inválido)", value = """{"sampleName": ""}""")
                 ]
             )]
         )
@@ -342,11 +342,11 @@ interface TaskControllerDoc {
     @ApiResponses(
         ApiResponse(
             responseCode = "201",
-            description = "Tarefa criada com sucesso",
+            description = "Sample criado com sucesso",
             content = [Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = TaskResponse::class),
-                examples = [ExampleObject(name = "Tarefa criada", value = """{"id": "b2c3d4e5-f6a7-8901-bcde-f12345678901", "taskName": "Estudar Spring Boot", "finished": false}""")]
+                schema = Schema(implementation = SampleResponse::class),
+                examples = [ExampleObject(name = "Sample criado", value = """{"id": "b2c3d4e5-f6a7-8901-bcde-f12345678901", "sampleName": "Sample Name", "finished": false}""")]
             )]
         ),
         ApiResponse(
@@ -374,7 +374,7 @@ interface TaskControllerDoc {
             )]
         )
     )
-    fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse>
+    fun createSample(@Valid @RequestBody request: CreateSampleRequest): ResponseEntity<SampleResponse>
 }
 ```
 
@@ -382,27 +382,27 @@ interface TaskControllerDoc {
 
 ```kotlin
 @RestController
-@RequestMapping("/api/v1/tasks")
-class TaskController(
-    private val createTaskUseCase: CreateTaskUseCase
-) : TaskControllerDoc {
+@RequestMapping("/api/v1/samples")
+class SampleController(
+    private val createSampleUseCase: CreateSampleUseCase
+) : SampleControllerDoc {
 
-    override fun createTask(@Valid @RequestBody request: CreateTaskRequest): ResponseEntity<TaskResponse> {
-        logger.info("Creating task - request: $request")
+    override fun createSample(@Valid @RequestBody request: CreateSampleRequest): ResponseEntity<SampleResponse> {
+        logger.info("Creating sample - request: $request")
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = CreateTaskInputDTO(userId = userId, taskName = request.taskName)
-        val output = createTaskUseCase.execute(input)
+        val input = CreateSampleInputDTO(userId = userId, sampleName = request.sampleName)
+        val output = createSampleUseCase.execute(input)
 
-        val response = TaskResponse.of(output)
+        val response = SampleResponse.of(output)
 
-        logger.info("Creating task - response: $response")
+        logger.info("Creating sample - response: $response")
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(TaskController::class.java)
+        private val logger = LoggerFactory.getLogger(SampleController::class.java)
     }
 }
 ```
@@ -420,48 +420,48 @@ class TaskController(
 ### ✔ Correto — Interface de documentação de Request
 
 ```kotlin
-@Schema(name = "CreateTaskRequest", description = "Dados para criação de uma nova tarefa")
-interface CreateTaskRequestDoc {
+@Schema(name = "CreateSampleRequest", description = "Dados para criação de um novo sample")
+interface CreateSampleRequestDoc {
 
     @get:Schema(
-        description = "Nome da tarefa. Não pode ser vazio e deve ter no máximo 255 caracteres.",
-        example = "Estudar Spring Boot",
+        description = "Nome do sample. Não pode ser vazio e deve ter no máximo 255 caracteres.",
+        example = "Sample Name",
         maxLength = 255
     )
-    val taskName: String
+    val sampleName: String
 }
 ```
 
 ### ✔ Correto — Data class implementando a interface Doc
 
 ```kotlin
-data class CreateTaskRequest(
+data class CreateSampleRequest(
     @field:NotBlank
     @field:Size(max = 255)
-    override val taskName: String
-) : CreateTaskRequestDoc
+    override val sampleName: String
+) : CreateSampleRequestDoc
 ```
 
 ### ✔ Correto — Interface de documentação de Response
 
 ```kotlin
-@Schema(name = "TaskResponse", description = "Dados de uma tarefa")
-interface TaskResponseDoc {
+@Schema(name = "SampleResponse", description = "Dados de um sample")
+interface SampleResponseDoc {
 
     @get:Schema(
-        description = "Identificador único da tarefa.",
+        description = "Identificador único do sample.",
         example = "b2c3d4e5-f6a7-8901-bcde-f12345678901"
     )
     val id: String
 
     @get:Schema(
-        description = "Nome da tarefa.",
-        example = "Estudar Spring Boot"
+        description = "Nome do sample.",
+        example = "Sample Name"
     )
-    val taskName: String
+    val sampleName: String
 
     @get:Schema(
-        description = "Indica se a tarefa foi concluída.",
+        description = "Indica se o sample foi concluído.",
         example = "false"
     )
     val finished: Boolean
@@ -471,17 +471,17 @@ interface TaskResponseDoc {
 ### ✔ Correto — Data class de Response com factory estática
 
 ```kotlin
-data class TaskResponse(
+data class SampleResponse(
     override val id: String,
-    override val taskName: String,
+    override val sampleName: String,
     override val finished: Boolean
-) : TaskResponseDoc {
+) : SampleResponseDoc {
 
     companion object {
-        fun of(output: TaskOutputDTO): TaskResponse =
-            TaskResponse(
+        fun of(output: SampleOutputDTO): SampleResponse =
+            SampleResponse(
                 id = output.id,
-                taskName = output.taskName,
+                sampleName = output.sampleName,
                 finished = output.finished
             )
     }
@@ -491,19 +491,19 @@ data class TaskResponse(
 ### ✔ Correto — Interface Doc com campo sensível
 
 ```kotlin
-@Schema(name = "UserLoginRequest", description = "Credenciais para autenticação do usuário")
-interface UserLoginRequestDoc {
+@Schema(name = "SampleLoginRequest", description = "Credenciais para autenticação")
+interface SampleLoginRequestDoc {
 
     @get:Schema(
         description = "Nome de usuário. Deve ter entre 3 e 50 caracteres alfanuméricos ou underscore.",
-        example = "john_doe",
+        example = "sample_user",
         minLength = 3,
         maxLength = 50
     )
     val username: String
 
     @get:Schema(
-        description = "Senha do usuário. Deve ter entre 8 e 128 caracteres.",
+        description = "Senha. Deve ter entre 8 e 128 caracteres.",
         example = "S3cur3P@ss",
         minLength = 8,
         maxLength = 128
@@ -515,25 +515,25 @@ interface UserLoginRequestDoc {
 ### ✔ Correto — Request com toString protegido
 
 ```kotlin
-data class UserLoginRequest(
+data class SampleLoginRequest(
     @field:NotBlank
     @field:Size(min = 3, max = 50)
     override val username: String,
     @field:NotBlank
     @field:Size(min = 8, max = 128)
     override val password: String
-) : UserLoginRequestDoc {
+) : SampleLoginRequestDoc {
 
     override fun toString(): String =
-        "UserLoginRequest{username='$username', password='[PROTECTED]'}"
+        "SampleLoginRequest{username='$username', password='[PROTECTED]'}"
 }
 ```
 
 ### ✔ Correto — Response com tokens protegidos
 
 ```kotlin
-@Schema(name = "UserLoginResponse", description = "Tokens de autenticação do usuário")
-interface UserLoginResponseDoc {
+@Schema(name = "SampleLoginResponse", description = "Tokens de autenticação")
+interface SampleLoginResponseDoc {
 
     @get:Schema(
         description = "Token de acesso JWT.",
@@ -548,17 +548,17 @@ interface UserLoginResponseDoc {
     val refreshToken: String
 }
 
-data class UserLoginResponse(
+data class SampleLoginResponse(
     override val accessToken: String,
     override val refreshToken: String
-) : UserLoginResponseDoc {
+) : SampleLoginResponseDoc {
 
     override fun toString(): String =
-        "UserLoginResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
+        "SampleLoginResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
 
     companion object {
-        fun of(output: UserLoginOutputDTO): UserLoginResponse =
-            UserLoginResponse(
+        fun of(output: SampleLoginOutputDTO): SampleLoginResponse =
+            SampleLoginResponse(
                 accessToken = output.accessToken,
                 refreshToken = output.refreshToken
             )
@@ -572,7 +572,7 @@ data class UserLoginResponse(
 
 - Nunca adicione anotações do SpringDoc (`@Operation`, `@ApiResponse`, `@Schema`, etc.) diretamente nos controllers ou nas `data class` de request/response. Toda documentação pertence às interfaces `*Doc`.
 - Exemplos de corpo de resposta de erro devem seguir o formato Problem Details (RFC 7807): campos `type`, `title`, `status`, `detail`.
-- Os nomes dos `@ExampleObject` devem ser descritivos e em português, indicando o cenário representado (ex: `"Credenciais válidas"`, `"Username muito curto (inválido)"`).
+- Os nomes dos `@ExampleObject` devem ser descritivos e em português, indicando o cenário representado (ex: `"Sample válido"`, `"Nome em branco (inválido)"`).
 
 ---
 

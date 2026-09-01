@@ -22,7 +22,7 @@ src/test/kotlin/
 └── core/
     └── domain/
         └── sample/
-            └── SamplePasswordValueObjectTest.kt
+            └── SampleNameValueObjectTest.kt
 ```
 
 ---
@@ -189,7 +189,7 @@ class SampleEntityTest {
         val sampleName = sample.sampleName
 
         assertThat(sampleId.asString()).isNotNull()
-        assertThat(sampleName.asString()).isEqualTo("Sample Sample")
+        assertThat(sampleName.asString()).isEqualTo("Sample Name")
     }
 
     @Test

@@ -18,7 +18,7 @@ As seguintes convenções devem ser adotadas:
 - Interfaces devem representar comportamentos ou contratos.
 - Interfaces **não devem** utilizar o prefixo `I`.
 - Casos de uso são classes concretas, sem interface e sem sufixo `Impl`.
-- Adaptadores de infraestrutura (implementações de portas) utilizam o sufixo `Adapter` (ou um nome que descreva a tecnologia, ex: `JpaTaskRepository`).
+- Adaptadores de infraestrutura (implementações de portas) utilizam o sufixo `Adapter` (ou um nome que descreva a tecnologia, ex: `JpaSampleRepository`).
 - Classes concretas devem possuir nomes que representem claramente sua responsabilidade.
 
 Evite abreviações desnecessárias e nomes genéricos que não expressem claramente a responsabilidade do componente.
@@ -26,19 +26,19 @@ Evite abreviações desnecessárias e nomes genéricos que não expressem claram
 ### ✔ Correto
 
 ```kotlin
-class CreateUserUseCase
+class CreateSampleUseCase
 
 interface PasswordEncoder
 
 class TokenAdapter : Token
 
-class UserRepositoryAdapter : UserRepository
+class SampleRepositoryAdapter : SampleRepository
 ```
 
 ### ❌ Incorreto
 
 ```kotlin
-class UserManager
+class SampleManager
 
 class Helper
 
@@ -61,14 +61,14 @@ Constantes devem ser declaradas no `companion object` com `const val` para primi
 
 ```kotlin
 companion object {
-    private const val MAX_USERNAME_LENGTH = 50
+    private const val MAX_SAMPLE_NAME_LENGTH = 255
 }
 ```
 
 ### ❌ Incorreto
 
 ```kotlin
-if (username.length > 50) {
+if (sampleName.length > 255) {
     ...
 }
 ```
@@ -82,15 +82,15 @@ Sempre prefira `val` para declarar variáveis. Use `var` apenas em casos extremo
 ### ✔ Correto
 
 ```kotlin
-val task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
-val output = toOutput(task)
+val sample = sampleRepository.findById(sampleIdValue) ?: throw SampleNotFoundException()
+val output = toOutput(sample)
 ```
 
 ### ❌ Incorreto
 
 ```kotlin
-var task = taskRepository.findById(taskIdValue) ?: throw TaskNotFoundException()
-var output = toOutput(task)
+var sample = sampleRepository.findById(sampleIdValue) ?: throw SampleNotFoundException()
+var output = toOutput(sample)
 ```
 
 ---
@@ -102,15 +102,15 @@ Sempre use named parameters ao instanciar classes, chamar construtores ou invoca
 ### ✔ Correto
 
 ```kotlin
-val input = CreateTaskInputDTO(userId = userId.asString(), taskName = taskName.asString())
-val task = TaskEntity(id = UUID.randomUUID().toString(), userId = input.userId, taskName = input.taskName, finished = false)
+val input = CreateSampleInputDTO(userId = userId.asString(), sampleName = sampleName.asString())
+val sample = SampleEntity(id = UUID.randomUUID().toString(), userId = input.userId, sampleName = input.sampleName, finished = false)
 ```
 
 ### ❌ Incorreto
 
 ```kotlin
-val input = CreateTaskInputDTO(userId.asString(), taskName.asString())
-val task = TaskEntity(UUID.randomUUID().toString(), input.userId, input.taskName, false)
+val input = CreateSampleInputDTO(userId.asString(), sampleName.asString())
+val sample = SampleEntity(UUID.randomUUID().toString(), input.userId, input.sampleName, false)
 ```
 
 Não há exceções a esta regra.
@@ -143,21 +143,19 @@ Cada bloco deve representar uma fase claramente identificável da execução, co
 ### ✔ Correto
 
 ```kotlin
-fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
-    val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
+fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+    val sampleNameResult = SampleNameValueObject.of(input.sampleName).getValueResultOrThrow()
 
-    if (userRepository.existsByUsername(usernameResult)) {
-        throw UsernameAlreadyExistsException()
+    if (sampleRepository.existsBySampleName(sampleNameResult)) {
+        throw SampleNameAlreadyExistsException()
     }
 
-    val encodedPassword = passwordEncoder.encode(input.password)
-    val user = UserEntity(
+    val sample = SampleEntity(
         id = UUID.randomUUID().toString(),
-        username = input.username,
-        password = encodedPassword
+        sampleName = input.sampleName
     )
 
-    val saved = userRepository.save(user)
+    val saved = sampleRepository.save(sample)
 
     return toOutput(saved)
 }
@@ -166,19 +164,13 @@ fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
 ### ❌ Incorreto
 
 ```kotlin
-fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
-    val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
-
-    if (userRepository.existsByUsername(usernameResult)) {
-        throw UsernameAlreadyExistsException()
+fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+    val sampleNameResult = SampleNameValueObject.of(input.sampleName).getValueResultOrThrow()
+    if (sampleRepository.existsBySampleName(sampleNameResult)) {
+        throw SampleNameAlreadyExistsException()
     }
-
-    val encodedPassword = passwordEncoder.encode(input.password)
-
-    val user = UserEntity(id = UUID.randomUUID().toString(), username = input.username, password = encodedPassword)
-
-    val saved = userRepository.save(user)
-
+    val sample = SampleEntity(id = UUID.randomUUID().toString(), sampleName = input.sampleName)
+    val saved = sampleRepository.save(sample)
     return toOutput(saved)
 }
 ```
@@ -204,30 +196,30 @@ Métodos auxiliares devem permanecer próximos dos métodos que os utilizam, mas
 
 ```kotlin
 @Service
-class CreateTaskUseCase(
-    private val taskRepository: TaskRepository
+class CreateSampleUseCase(
+    private val sampleRepository: SampleRepository
 ) {
 
-    fun execute(input: CreateTaskInputDTO): TaskOutputDTO {
-        val task = TaskEntity(
+    fun execute(input: CreateSampleInputDTO): SampleOutputDTO {
+        val sample = SampleEntity(
             id = UUID.randomUUID().toString(),
             userId = input.userId,
-            taskName = input.taskName,
+            sampleName = input.sampleName,
             finished = false
         )
 
-        val saved = taskRepository.save(task)
+        val saved = sampleRepository.save(sample)
 
         return toOutput(saved)
     }
 
-    private fun toOutput(task: TaskEntity): TaskOutputDTO =
-        TaskOutputDTO(
-            id = task.id.asString(),
-            userId = task.userId.asString(),
-            taskName = task.taskName.asString(),
-            finished = task.finished,
-            createdAt = task.createdAt
+    private fun toOutput(sample: SampleEntity): SampleOutputDTO =
+        SampleOutputDTO(
+            id = sample.id.asString(),
+            userId = sample.userId.asString(),
+            sampleName = sample.sampleName.asString(),
+            finished = sample.finished,
+            createdAt = sample.createdAt
         )
 }
 ```
@@ -263,8 +255,8 @@ As seguintes regras devem ser respeitadas:
 
 ```kotlin
 @Service
-class CreateUserUseCase(
-    private val userRepository: UserRepository,
+class CreateSampleUseCase(
+    private val sampleRepository: SampleRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
     ...
@@ -275,9 +267,9 @@ class CreateUserUseCase(
 
 ```kotlin
 @Service
-class CreateUserUseCase {
+class CreateSampleUseCase {
     @Autowired
-    private lateinit var userRepository: UserRepository
+    private lateinit var sampleRepository: SampleRepository
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
@@ -310,11 +302,11 @@ As seguintes práticas devem ser adotadas:
 ### ✔ Correto
 
 ```kotlin
-log.info("Creating task - request: $request")
+log.info("Creating sample - request: $request")
 ```
 
 ```kotlin
-log.info("Creating task - response: $response")
+log.info("Creating sample - response: $response")
 ```
 
 ```kotlin
@@ -328,11 +320,11 @@ log.info("User $username authenticated using password $password")
 ```
 
 ```kotlin
-log.info("User created: " + username)
+log.info("Sample created: " + sampleName)
 ```
 
 ```kotlin
-log.info("RequestId=$requestId TraceId=$traceId User authenticated.")
+log.info("RequestId=$requestId TraceId=$traceId Sample created.")
 ```
 
 - A instância do logger sempre deve ser criada no `companion object`.
@@ -341,13 +333,13 @@ log.info("RequestId=$requestId TraceId=$traceId User authenticated.")
 
 ```kotlin
 @RestController
-@RequestMapping("/api/v1/tasks")
-class TaskController(
-    private val createTaskUseCase: CreateTaskUseCase
-) : TaskControllerDoc {
+@RequestMapping("/api/v1/samples")
+class SampleController(
+    private val createSampleUseCase: CreateSampleUseCase
+) : SampleControllerDoc {
 
     companion object {
-        private val log = LoggerFactory.getLogger(TaskController::class.java)
+        private val log = LoggerFactory.getLogger(SampleController::class.java)
     }
 }
 ```
