@@ -12,8 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
-import com.jpmns.task.core.external.security.filter.JwtAuthenticationFilter
-import com.jpmns.task.core.presentation.controller.common.filter.TracingContextFilter
+import com.jpmns.task.configuration.filter.JwtAuthenticationFilter
+import com.jpmns.task.configuration.filter.TracingContextFilter
 
 @Configuration
 @EnableWebSecurity
