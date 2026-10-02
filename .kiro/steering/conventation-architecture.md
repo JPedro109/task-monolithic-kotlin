@@ -16,6 +16,7 @@ Toda implementação deve respeitar os seguintes princípios:
 * A camada de apresentação apenas recebe requisições, delega sua execução e devolve respostas.
 * Toda comunicação entre camadas ocorre através de contratos bem definidos.
 * Implementações concretas nunca devem ser utilizadas quando um contrato puder representar a dependência.
+* A camada Application não depende de frameworks de persistência, com uma **exceção arquitetural consciente**: a anotação `org.springframework.transaction.annotation.Transactional` pode ser aplicada no método `execute` do caso de uso para definir a fronteira transacional. A fronteira transacional é orquestração do próprio caso de uso, e abstraí-la por uma porta dedicada adicionaria indireção sem ganho prático. O critério e as regras de aplicação estão detalhados na seção "Gerenciamento Transacional" de `conventation-layer-application.md`.
 
 ---
 
@@ -130,6 +131,8 @@ Não é responsável por:
 * regras de infraestrutura;
 * detalhes de frameworks;
 * protocolos externos.
+
+> **Exceção consciente — fronteira transacional:** por ser orquestração do caso de uso, a demarcação transacional é definida na própria camada Application via `@Transactional` no método `execute`. Essa é a única dependência de framework de persistência admitida nesta camada. Critério e regras em `conventation-layer-application.md`, seção "Gerenciamento Transacional".
 
 ---
 

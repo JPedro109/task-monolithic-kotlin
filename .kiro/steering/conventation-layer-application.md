@@ -333,6 +333,131 @@ class SampleNameAlreadyExistsException : RuntimeException("Sample name already e
 
 ---
 
+# Gerenciamento Transacional
+
+A fronteira transacional de um caso de uso é uma responsabilidade de **orquestração** — decidir se o conjunto de operações contra as portas de persistência deve ser confirmado por inteiro ou revertido por inteiro. Por ser orquestração, essa decisão pertence ao próprio caso de uso.
+
+Por esse motivo abrimos uma **exceção arquitetural consciente**: `org.springframework.transaction.annotation.Transactional` é a **única** dependência de framework de persistência permitida na camada Application. A anotação é aplicada **diretamente no método `execute`** do caso de uso.
+
+A alternativa — abstrair a transação por uma porta dedicada (ex.: `TransactionExecutor`/`UnitOfWork`) — adicionaria indireção sem ganho prático, já que a fronteira transacional não varia por tecnologia dentro deste projeto. Essa exceção está registrada também no documento de arquitetura (`conventation-architecture.md`), para deixar explícito que é uma decisão deliberada, e não um descuido.
+
+## Critério
+
+O gatilho da regra é o **número de invocações de métodos de porta de persistência** dentro do `execute` — **não** o número de comandos SQL gerados. Uma única invocação de porta pode gerar vários SQLs e ainda assim conta como **uma só** invocação.
+
+A razão de o número de invocações ser o gatilho: com **uma** invocação não há nada a coordenar; a partir de **duas** surge o risco de o conjunto falhar no meio (a primeira confirma, a segunda falha, banco inconsistente). O `@Transactional` transforma as N operações num bloco indivisível, confirmado por inteiro no commit único ao fim do método ou revertido por inteiro no rollback.
+
+## Regras
+
+- **1 invocação de porta de persistência → SEM `@Transactional`.** A operação isolada já é atômica pela transação do próprio Spring Data. Anotar não é erro, mas não agrega.
+- **2 ou mais invocações, TODAS de leitura → `@Transactional(readOnly = true)`.** Garante um snapshot consistente entre as leituras e sinaliza a intenção de somente leitura.
+- **2 ou mais invocações, contendo AO MENOS UMA escrita → `@Transactional`.** Caso crítico: sem a transação abrangente, uma falha após a primeira escrita deixaria o banco em estado parcial e irreversível. O critério "ao menos uma escrita" cobre tanto leitura + escrita quanto escrita + escrita.
+
+## ✔ Correto — 1 invocação (sem anotação)
+
+```kotlin
+@Service
+class ListTasksUseCase(
+    private val taskRepository: TaskRepository
+) {
+    fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
+        val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
+
+        return taskRepository.findAllByUserId(userIdResult).map(::toOutput)
+    }
+
+    private fun toOutput(task: TaskEntity): TaskOutputDTO = ...
+}
+```
+
+## ✔ Correto — 2+ invocações, todas de leitura (`readOnly = true`)
+
+```kotlin
+@Service
+class GetTaskSummaryUseCase(
+    private val taskRepository: TaskRepository,
+    private val userRepository: UserRepository
+) {
+    @Transactional(readOnly = true)
+    fun execute(input: GetTaskSummaryInputDTO): TaskSummaryOutputDTO {
+        val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
+
+        val user = userRepository.findById(userIdResult) ?: throw UserNotFoundException()
+        val tasks = taskRepository.findAllByUserId(userIdResult)
+
+        return toOutput(user, tasks)
+    }
+
+    private fun toOutput(user: UserEntity, tasks: List<TaskEntity>): TaskSummaryOutputDTO = ...
+}
+```
+
+## ✔ Correto — 2+ invocações com ao menos uma escrita (`@Transactional`)
+
+```kotlin
+@Service
+class CreateUserUseCase(
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder
+) {
+    @Transactional
+    fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
+        val encodedPassword = passwordEncoder.encode(input.password)
+        val user = UserEntity(
+            id = UUID.randomUUID().toString(),
+            username = input.username,
+            password = encodedPassword
+        )
+
+        if (userRepository.existsByUsername(user.username)) {
+            throw UsernameAlreadyExistsException()
+        }
+
+        val saved = userRepository.save(user)
+
+        return toOutput(saved)
+    }
+
+    private fun toOutput(user: UserEntity): CreateUserOutputDTO = ...
+}
+```
+
+> Note que `passwordEncoder.encode(...)` é uma porta de **segurança**, não de persistência; ela não entra na contagem. As invocações de persistência aqui são `existsByUsername` (leitura) e `save` (escrita) — duas invocações com ao menos uma escrita, logo `@Transactional`.
+
+## ❌ Incorreto — 2+ escritas sem transação abrangente
+
+```kotlin
+@Service
+class UpdateTaskUseCase(
+    private val taskRepository: TaskRepository
+) {
+    // Faltando @Transactional: se o segundo save falhar,
+    // o primeiro já foi confirmado e o banco fica inconsistente.
+    fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
+        val task = taskRepository.save(...)
+        val audit = taskRepository.save(...)
+        return toOutput(task)
+    }
+}
+```
+
+## ❌ Incorreto — `@Transactional` em caso de uso com 1 única invocação
+
+```kotlin
+@Service
+class ListTasksUseCase(
+    private val taskRepository: TaskRepository
+) {
+    @Transactional(readOnly = true) // Desnecessário: há apenas uma invocação de porta.
+    fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
+        val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
+        return taskRepository.findAllByUserId(userIdResult).map(::toOutput)
+    }
+}
+```
+
+---
+
 # Dependências
 
 A camada Application pode depender apenas da camada Domain e de contratos definidos pela própria Application.
@@ -344,7 +469,7 @@ Não é permitido depender de:
 - Responses;
 - Models de persistência;
 - Repositórios concretos;
-- Frameworks de persistência;
+- Frameworks de persistência — **com uma única exceção consciente: a anotação `org.springframework.transaction.annotation.Transactional`, usada no método `execute` do caso de uso conforme a seção [Gerenciamento Transacional](#gerenciamento-transacional)**;
 - Componentes da camada External.
 
 ---
@@ -364,3 +489,4 @@ Toda implementação da camada Application deve respeitar os seguintes princípi
 - Componentes da External nunca devem ser acessados diretamente.
 - O retorno dos casos de uso deve ocorrer através de DTOs de saída.
 - A conversão para Output DTO deve ser centralizada em um método privado `toOutput`.
+- A fronteira transacional é definida no `execute` do caso de uso: `@Transactional` é a única dependência de framework de persistência permitida, aplicada conforme o número de invocações de portas de persistência — 1 invocação sem anotação; 2+ apenas de leitura com `@Transactional(readOnly = true)`; 2+ com ao menos uma escrita com `@Transactional` (ver seção Gerenciamento Transacional).
