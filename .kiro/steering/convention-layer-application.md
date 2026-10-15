@@ -339,7 +339,7 @@ A fronteira transacional de um caso de uso é uma responsabilidade de **orquestr
 
 Por esse motivo abrimos uma **exceção arquitetural consciente**: `org.springframework.transaction.annotation.Transactional` é a **única** dependência de framework de persistência permitida na camada Application. A anotação é aplicada **diretamente no método `execute`** do caso de uso.
 
-A alternativa — abstrair a transação por uma porta dedicada (ex.: `TransactionExecutor`/`UnitOfWork`) — adicionaria indireção sem ganho prático, já que a fronteira transacional não varia por tecnologia dentro deste projeto. Essa exceção está registrada também no documento de arquitetura (`conventation-architecture.md`), para deixar explícito que é uma decisão deliberada, e não um descuido.
+A alternativa — abstrair a transação por uma porta dedicada (ex.: `TransactionExecutor`/`UnitOfWork`) — adicionaria indireção sem ganho prático, já que a fronteira transacional não varia por tecnologia dentro deste projeto. Essa exceção está registrada também no documento de arquitetura (`convention-architecture.md`), para deixar explícito que é uma decisão deliberada, e não um descuido.
 
 ## Critério
 

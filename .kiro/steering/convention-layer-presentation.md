@@ -571,7 +571,7 @@ data class SampleLoginResponse(
 ## Regras gerais de documentação
 
 - Nunca adicione anotações do SpringDoc (`@Operation`, `@ApiResponse`, `@Schema`, etc.) diretamente nos controllers ou nas `data class` de request/response. Toda documentação pertence às interfaces `*Doc`.
-- Exemplos de corpo de resposta de erro devem seguir o formato Problem Details (RFC 7807): campos `type`, `title`, `status`, `detail`.
+- Exemplos de corpo de resposta de erro devem seguir o formato Problem Details (RFC 9457, que obsoletou a RFC 7807): campos `type`, `title`, `status`, `detail`.
 - Os nomes dos `@ExampleObject` devem ser descritivos e em português, indicando o cenário representado (ex: `"Sample válido"`, `"Nome em branco (inválido)"`).
 
 ---

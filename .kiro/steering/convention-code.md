@@ -17,7 +17,8 @@ As seguintes convenções devem ser adotadas:
 - Pacotes devem utilizar apenas letras minúsculas.
 - Interfaces devem representar comportamentos ou contratos.
 - Interfaces **não devem** utilizar o prefixo `I`.
-- Casos de uso são classes concretas, sem interface e sem sufixo `Impl`.
+- Uma classe concreta só recebe o sufixo `Impl` quando implementa uma interface homônima que representa um contrato real com mais de um implementador possível — o caso das portas e seus adaptadores.
+- Casos de uso não possuem interface e, portanto, não utilizam o sufixo `Impl`. São nomeados pela operação que representam, terminando em `UseCase`.
 - Adaptadores de infraestrutura (implementações de portas) utilizam o sufixo `Adapter` (ou um nome que descreva a tecnologia, ex: `JpaSampleRepository`).
 - Classes concretas devem possuir nomes que representem claramente sua responsabilidade.
 
@@ -35,7 +36,15 @@ class TokenAdapter : Token
 class SampleRepositoryAdapter : SampleRepository
 ```
 
-### ❌ Incorreto
+### ❌ Incorreto — interface single-impl e sufixo `Impl` em caso de uso
+
+```kotlin
+interface CreateSampleUseCase
+
+class CreateSampleUseCaseImpl : CreateSampleUseCase
+```
+
+### ❌ Incorreto — nomes genéricos
 
 ```kotlin
 class SampleManager

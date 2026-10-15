@@ -107,13 +107,16 @@ Novos módulos podem ser criados sempre que uma nova responsabilidade surgir.
 
 # Configurações
 
-Toda configuração relacionada às tecnologias externas deve permanecer nesta camada.
+A configuração de um adaptador específico desta camada — por exemplo, as propriedades de um cliente HTTP de integração — reside junto do adaptador, na própria External.
+
+Já a configuração técnica de bootstrap transversal da aplicação (segurança, JWT, documentação/Swagger, tracing) reside no pacote transversal `configuration/`, fora de `core/`, conforme definido no documento de arquitetura. Assim, por exemplo, `SecurityConfigProperties` (propriedades de JWT/segurança) vive em `configuration/security/`, e não na External.
 
 As seguintes regras devem ser respeitadas:
 
 - Nunca acessar propriedades diretamente com `@Value`.
 - Utilizar `@ConfigurationProperties`.
 - Centralizar configurações por responsabilidade.
+- Classes de propriedades devem possuir o sufixo `ConfigProperties`.
 - Não implementar regras de negócio.
 
 ## ✔ Correto

@@ -16,7 +16,7 @@ Toda implementação deve respeitar os seguintes princípios:
 * A camada de apresentação apenas recebe requisições, delega sua execução e devolve respostas.
 * Toda comunicação entre camadas ocorre através de contratos bem definidos.
 * Implementações concretas nunca devem ser utilizadas quando um contrato puder representar a dependência.
-* A camada Application não depende de frameworks de persistência, com uma **exceção arquitetural consciente**: a anotação `org.springframework.transaction.annotation.Transactional` pode ser aplicada no método `execute` do caso de uso para definir a fronteira transacional. A fronteira transacional é orquestração do próprio caso de uso, e abstraí-la por uma porta dedicada adicionaria indireção sem ganho prático. O critério e as regras de aplicação estão detalhados na seção "Gerenciamento Transacional" de `conventation-layer-application.md`.
+* A camada Application não depende de frameworks de persistência, com uma **exceção arquitetural consciente**: a anotação `org.springframework.transaction.annotation.Transactional` pode ser aplicada no método `execute` do caso de uso para definir a fronteira transacional. A fronteira transacional é orquestração do próprio caso de uso, e abstraí-la por uma porta dedicada adicionaria indireção sem ganho prático. O critério e as regras de aplicação estão detalhados na seção "Gerenciamento Transacional" de `convention-layer-application.md`.
 
 ---
 
@@ -24,15 +24,31 @@ Toda implementação deve respeitar os seguintes princípios:
 
 A organização física do projeto deve refletir a arquitetura definida aqui. Cada camada deve possuir um espaço próprio, evitando a mistura de responsabilidades e mantendo uma separação clara entre os componentes da aplicação.
 
-A estrutura do projeto é:
+As quatro camadas de negócio residem sob `core/`:
 
 ```text
-src/
+core/
 ├── domain/
 ├── application/
 ├── external/
 └── presentation/
 ```
+
+Além das camadas de negócio, o projeto possui dois pacotes transversais fora de `core/`:
+
+```text
+configuration/   # configuração técnica de bootstrap do framework
+├── filter/      # filtros de requisição (ex.: autenticação JWT, contexto de tracing)
+├── security/    # configuração do Spring Security e propriedades tipadas
+├── swagger/     # configuração do SpringDoc/OpenAPI
+└── tracing/     # configuração de observabilidade/baggage
+
+shared/          # utilitários transversais sem regra de negócio
+├── extension/   # funções de extensão Kotlin
+└── type/        # tipos utilitários compartilhados
+```
+
+O pacote `configuration/` é a fronteira técnica de bootstrap do framework. Componentes transversais que precisam ser registrados no contexto do Spring e que não implementam regra de negócio (filtros, beans de configuração) residem aqui, e não dentro das camadas de `core/`. O pacote `shared/` concentra utilitários genéricos reutilizados entre camadas, igualmente sem regra de negócio.
 
 ---
 
@@ -132,7 +148,7 @@ Não é responsável por:
 * detalhes de frameworks;
 * protocolos externos.
 
-> **Exceção consciente — fronteira transacional:** por ser orquestração do caso de uso, a demarcação transacional é definida na própria camada Application via `@Transactional` no método `execute`. Essa é a única dependência de framework de persistência admitida nesta camada. Critério e regras em `conventation-layer-application.md`, seção "Gerenciamento Transacional".
+> **Exceção consciente — fronteira transacional:** por ser orquestração do caso de uso, a demarcação transacional é definida na própria camada Application via `@Transactional` no método `execute`. Essa é a única dependência de framework de persistência admitida nesta camada. Critério e regras em `convention-layer-application.md`, seção "Gerenciamento Transacional".
 
 ---
 

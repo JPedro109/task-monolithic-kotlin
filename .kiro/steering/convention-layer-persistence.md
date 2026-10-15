@@ -1,6 +1,6 @@
 ---
 inclusion: fileMatch
-fileMatchPattern: "**/src/main/**/persistence/**"
+fileMatchPattern: "**/src/main/**/external/persistence/**"
 ---
 
 # Convenções de Persistência
