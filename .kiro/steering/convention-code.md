@@ -27,12 +27,16 @@ Evite abreviações desnecessárias e nomes genéricos que não expressem claram
 ### ✔ Correto
 
 ```kotlin
+// Caso de uso: classe concreta, sem interface, nomeada pela operação + sufixo UseCase.
 class CreateSampleUseCase
 
+// Porta: interface que representa o contrato.
 interface PasswordEncoder
 
-class TokenAdapter : Token
+// Adaptador com nome que descreve a tecnologia que implementa a porta.
+class BCryptPasswordEncoder : PasswordEncoder
 
+// Adaptador com sufixo Adapter quando o nome da tecnologia não agrega.
 class SampleRepositoryAdapter : SampleRepository
 ```
 

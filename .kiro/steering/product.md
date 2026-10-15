@@ -1,3 +1,7 @@
+---
+inclusion: always
+---
+
 # Visão Geral do Produto
 
 O Task Service é uma API RESTful para gerenciamento de tarefas construída com Kotlin e Spring Boot, seguindo os princípios de Clean Architecture.
@@ -19,5 +23,5 @@ O Task Service é uma API RESTful para gerenciamento de tarefas construída com 
 - Todos os endpoints de tarefas requerem autenticação via Bearer token
 - Usuários só podem gerenciar suas próprias tarefas
 - O segredo JWT deve ter no mínimo 32 caracteres
-- Swagger UI disponível em `/docs`
-- Health/métricas em `/healthcheck`, `/info`, `/metrics`
+- Swagger UI disponível em `/docs` (habilitado via `DOC_ENABLED`, desabilitado por padrão)
+- Health/métricas via Actuator em `/actuator/healthcheck`, `/actuator/info`, `/actuator/metrics`

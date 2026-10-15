@@ -1,6 +1,6 @@
 ---
 inclusion: fileMatch
-fileMatchPattern: "**/src/test/**/persistence/**"
+fileMatchPattern: "**/src/test/**/external/persistence/**"
 ---
 
 # Testes de Persistência

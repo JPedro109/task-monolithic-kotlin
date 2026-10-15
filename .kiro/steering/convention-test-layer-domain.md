@@ -35,7 +35,7 @@ As seguintes regras devem ser respeitadas:
 - Todos os métodos públicos devem ser testados.
 - Devem ser testados cenários de sucesso e de falha.
 - Testes devem validar o objeto retornado e não apenas a ausência de exceções.
-- Quando o Value Object utilizar `Result<T>`, devem ser testados tanto `isFailure = false` quanto `isFailure = true`.
+- Quando o Value Object utilizar `Result<T>`, devem ser testados tanto o caminho de sucesso (`Result.success`, verificável por `isFailure = false`) quanto o de falha (`Result.fail`, verificável por `isFailure = true`), validando o valor retornado no sucesso e o tipo de exceção no erro.
 - Fixtures devem ser utilizadas sempre que houver reutilização de dados de teste.
 - Sem contexto Spring, sem MockK.
 
@@ -209,7 +209,7 @@ class SampleEntityTest {
         val emptySampleName = ""
 
         assertThatThrownBy {
-            SampleEntity(id = sampleId, sampleName = emptySampleName)
+            SampleEntity(id = sampleId.asString(), sampleName = emptySampleName)
         }.isInstanceOf(DomainException::class.java)
     }
 }

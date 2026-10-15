@@ -8,12 +8,10 @@ fileMatchPattern: "**/src/test/**"
 # Layout
 
 ```text
-src/test/kotlin/com/jpmns/sample/
+src/test/kotlin/com/jpmns/task/
 ├── core/
 │   ├── application/usecase/       # Testes unitários dos casos de uso (MockK, sem contexto Spring)
 │   │   ├── sample/
-│   ├── controller/                # Testes unitários dos controllers (@WebMvcTest)
-│   │   ├── SampleControllerTest.kt
 │   ├── domain/                    # Testes unitários de entidades e value objects
 │   │   ├── sample/
 │   ├── external/                  # Testes unitários de adaptadores e mappers
@@ -22,8 +20,9 @@ src/test/kotlin/com/jpmns/sample/
 │   │   │   ├── mapper/
 │   │   │   └── repository/
 │   │   └── security/
-│   └── fixture/                   # Fixtures compartilhados
-│       ├── SampleFixture.kt
+│   └── presentation/
+│       └── controller/            # Testes unitários dos controllers (@WebMvcTest)
+│           └── SampleControllerTest.kt
 ├── integration/                   # Testes de integração dos controllers (Testcontainers PostgreSQL)
 │   ├── common/
 │   │   ├── abstracts/IntegrationTestBase.kt
@@ -31,6 +30,8 @@ src/test/kotlin/com/jpmns/sample/
 │   │   └── sql/SqlCreateSeed.kt
 │   ├── SampleIntegrationTest.kt
 └── shared/
+    ├── fixture/                   # Fixtures compartilhados
+    │   └── SampleFixture.kt
     └── security/
         ├── WithJwtTokenMock.kt
         └── factory/WithMockJwtTokenSecurityContextFactory.kt
@@ -95,7 +96,7 @@ Fixtures são responsáveis por centralizar a criação de objetos utilizados du
 
 Seu objetivo é evitar duplicação de código, facilitar a leitura dos testes e manter um único ponto de manutenção para dados de teste.
 
-Todos os fixtures compartilhados devem permanecer no pacote `core/fixture`.
+Todos os fixtures compartilhados devem permanecer no pacote `shared/fixture`.
 
 As seguintes regras devem ser respeitadas:
 
@@ -201,6 +202,17 @@ object SampleApiStub {
         stubFor(
             get(urlPathMatching("/samples/.*"))
                 .willReturn(serverError())
+        )
+    }
+
+    fun timeout() {
+        stubFor(
+            get(urlPathMatching("/samples/.*"))
+                .willReturn(
+                    aResponse()
+                        .withFixedDelay(5000)
+                        .withStatus(200)
+                )
         )
     }
 }

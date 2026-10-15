@@ -171,6 +171,7 @@ Sempre que possível:
 - Utilizar Fixtures para criação dos objetos.
 - Validar o retorno do caso de uso.
 - Validar as interações com as dependências.
+- Utilizar `confirmVerified(mock)` ao final para garantir que nenhuma interação não verificada ocorreu (equivalente MockK ao `verifyNoMoreInteractions`), quando aplicável.
 - Um cenário por teste.
 - Evitar múltiplos asserts para comportamentos distintos.
 - Nomear os testes de forma descritiva com backticks.

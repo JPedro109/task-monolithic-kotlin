@@ -306,7 +306,8 @@ As seguintes regras devem ser respeitadas:
 - Devem ter uma mensagem customizada interna.
 - Não devem representar detalhes técnicos.
 - Não devem depender de infraestrutura.
-- Nunca lance `RuntimeException` ou `IllegalArgumentException` no domínio.
+
+Sobre a hierarquia: `DomainException` é, ela própria, filha de `RuntimeException` (exceção não checada). Toda exceção de domínio herda de `DomainException` e, por consequência, também é uma `RuntimeException` — essa é a base esperada. O que não é permitido é **lançar `RuntimeException` ou `IllegalArgumentException` cruas** (sem tipo de domínio) a partir do domínio: a violação de regra de negócio deve ser sempre expressa por uma subclasse descritiva de `DomainException`, nunca por uma exceção genérica.
 
 ## ✔ Correto
 
@@ -316,7 +317,15 @@ class InvalidSampleNameException : DomainException(
 )
 ```
 
-## ❌ Incorreto
+## ❌ Incorreto — lançar exceção genérica em vez de uma exceção de domínio
+
+```kotlin
+if (value.isBlank()) {
+    throw IllegalArgumentException("invalid sample name")
+}
+```
+
+## ❌ Incorreto — exceção de domínio representando detalhe técnico
 
 ```kotlin
 class SQLException : RuntimeException()
@@ -376,7 +385,11 @@ Não é permitido utilizar:
 ## ✔ Correto
 
 ```kotlin
-class SampleEntity(id: String, name: String) : Entity(id, null)
+class SampleEntity(
+    id: String,
+    name: String,
+    createdAt: Instant? = null
+) : Entity(id, createdAt)
 ```
 
 ## ❌ Incorreto
