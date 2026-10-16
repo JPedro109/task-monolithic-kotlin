@@ -70,7 +70,7 @@ As seguintes regras devem ser respeitadas:
 class CreateSampleUseCase(
     private val sampleRepository: SampleRepository
 ) {
-    fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+    fun execute(input: CreateSampleInputDto): CreateSampleOutputDto {
         ...
     }
 }
@@ -80,7 +80,7 @@ class CreateSampleUseCase(
 
 ```kotlin
 interface CreateSampleUseCase {
-    fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO
+    fun execute(input: CreateSampleInputDto): CreateSampleOutputDto
 }
 
 @Service
@@ -122,14 +122,14 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-data class CreateSampleInputDTO(
+data class CreateSampleInputDto(
     val name: String,
     val value: String
 )
 ```
 
 ```kotlin
-data class CreateSampleOutputDTO(
+data class CreateSampleOutputDto(
     val id: String,
     val name: String
 )
@@ -138,7 +138,7 @@ data class CreateSampleOutputDTO(
 ## ❌ Incorreto
 
 ```kotlin
-data class CreateSampleInputDTO(
+data class CreateSampleInputDto(
     @field:NotBlank
     val name: String
 )
@@ -228,7 +228,7 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+fun execute(input: CreateSampleInputDto): CreateSampleOutputDto {
     val sample = SampleEntity(
         id = UUID.randomUUID().toString(),
         name = input.name,
@@ -240,8 +240,8 @@ fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
     return toOutput(saved)
 }
 
-private fun toOutput(sample: SampleEntity): CreateSampleOutputDTO =
-    CreateSampleOutputDTO(
+private fun toOutput(sample: SampleEntity): CreateSampleOutputDto =
+    CreateSampleOutputDto(
         id = sample.id.asString(),
         name = sample.name.asString()
     )
@@ -295,8 +295,8 @@ As seguintes regras devem ser respeitadas:
 ## ✔ Correto
 
 ```kotlin
-private fun toOutput(sample: SampleEntity): SampleOutputDTO =
-    SampleOutputDTO(
+private fun toOutput(sample: SampleEntity): SampleOutputDto =
+    SampleOutputDto(
         id = sample.id.asString(),
         userId = sample.userId.asString(),
         sampleName = sample.sampleName.asString(),
@@ -360,13 +360,13 @@ A razão de o número de invocações ser o gatilho: com **uma** invocação nã
 class ListTasksUseCase(
     private val taskRepository: TaskRepository
 ) {
-    fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
+    fun execute(input: ListTasksInputDto): List<TaskOutputDto> {
         val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
 
         return taskRepository.findAllByUserId(userIdResult).map(::toOutput)
     }
 
-    private fun toOutput(task: TaskEntity): TaskOutputDTO = ...
+    private fun toOutput(task: TaskEntity): TaskOutputDto = ...
 }
 ```
 
@@ -379,7 +379,7 @@ class GetTaskSummaryUseCase(
     private val userRepository: UserRepository
 ) {
     @Transactional(readOnly = true)
-    fun execute(input: GetTaskSummaryInputDTO): TaskSummaryOutputDTO {
+    fun execute(input: GetTaskSummaryInputDto): TaskSummaryOutputDto {
         val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
 
         val user = userRepository.findById(userIdResult) ?: throw UserNotFoundException()
@@ -388,7 +388,7 @@ class GetTaskSummaryUseCase(
         return toOutput(user, tasks)
     }
 
-    private fun toOutput(user: UserEntity, tasks: List<TaskEntity>): TaskSummaryOutputDTO = ...
+    private fun toOutput(user: UserEntity, tasks: List<TaskEntity>): TaskSummaryOutputDto = ...
 }
 ```
 
@@ -401,7 +401,7 @@ class CreateUserUseCase(
     private val passwordEncoder: PasswordEncoder
 ) {
     @Transactional
-    fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
+    fun execute(input: CreateUserInputDto): CreateUserOutputDto {
         val encodedPassword = passwordEncoder.encode(input.password)
         val user = UserEntity(
             id = UUID.randomUUID().toString(),
@@ -418,7 +418,7 @@ class CreateUserUseCase(
         return toOutput(saved)
     }
 
-    private fun toOutput(user: UserEntity): CreateUserOutputDTO = ...
+    private fun toOutput(user: UserEntity): CreateUserOutputDto = ...
 }
 ```
 
@@ -433,7 +433,7 @@ class UpdateTaskUseCase(
 ) {
     // Faltando @Transactional: se o segundo save falhar,
     // o primeiro já foi confirmado e o banco fica inconsistente.
-    fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
+    fun execute(input: UpdateTaskInputDto): TaskOutputDto {
         val task = taskRepository.save(...)
         val audit = taskRepository.save(...)
         return toOutput(task)
@@ -449,7 +449,7 @@ class ListTasksUseCase(
     private val taskRepository: TaskRepository
 ) {
     @Transactional(readOnly = true) // Desnecessário: há apenas uma invocação de porta.
-    fun execute(input: ListTasksInputDTO): List<TaskOutputDTO> {
+    fun execute(input: ListTasksInputDto): List<TaskOutputDto> {
         val userIdResult = IdValueObject.of(input.userId).getValueResultOrThrow()
         return taskRepository.findAllByUserId(userIdResult).map(::toOutput)
     }

@@ -64,7 +64,7 @@ fun shouldReturn201WithSampleDataWhenInputIsValid() { }
 ```kotlin
 val sample = SampleFixture.aSample()
 val sampleName = sample.sampleName
-val input = CreateSampleInputDTO(sampleName = sampleName.asString())
+val input = CreateSampleInputDto(sampleName = sampleName.asString())
 
 every { sampleRepository.save(any()) } returns sample
 

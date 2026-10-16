@@ -85,7 +85,7 @@ class SampleController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = CreateSampleInputDTO(userId = userId, sampleName = request.sampleName)
+        val input = CreateSampleInputDto(userId = userId, sampleName = request.sampleName)
 
         val output = createSampleUseCase.execute(input)
 
@@ -214,7 +214,7 @@ data class SampleResponse(
 ) : SampleResponseDoc {
 
     companion object {
-        fun of(output: SampleOutputDTO): SampleResponse =
+        fun of(output: SampleOutputDto): SampleResponse =
             SampleResponse(
                 id = output.id,
                 sampleName = output.sampleName
@@ -393,7 +393,7 @@ class SampleController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = CreateSampleInputDTO(userId = userId, sampleName = request.sampleName)
+        val input = CreateSampleInputDto(userId = userId, sampleName = request.sampleName)
         val output = createSampleUseCase.execute(input)
 
         val response = SampleResponse.of(output)
@@ -479,7 +479,7 @@ data class SampleResponse(
 ) : SampleResponseDoc {
 
     companion object {
-        fun of(output: SampleOutputDTO): SampleResponse =
+        fun of(output: SampleOutputDto): SampleResponse =
             SampleResponse(
                 id = output.id,
                 sampleName = output.sampleName,
@@ -558,7 +558,7 @@ data class SampleLoginResponse(
         "SampleLoginResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
 
     companion object {
-        fun of(output: SampleLoginOutputDTO): SampleLoginResponse =
+        fun of(output: SampleLoginOutputDto): SampleLoginResponse =
             SampleLoginResponse(
                 accessToken = output.accessToken,
                 refreshToken = output.refreshToken

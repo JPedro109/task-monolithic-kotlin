@@ -20,6 +20,7 @@ As seguintes convenções devem ser adotadas:
 - Uma classe concreta só recebe o sufixo `Impl` quando implementa uma interface homônima que representa um contrato real com mais de um implementador possível — o caso das portas e seus adaptadores.
 - Casos de uso não possuem interface e, portanto, não utilizam o sufixo `Impl`. São nomeados pela operação que representam, terminando em `UseCase`.
 - Adaptadores de infraestrutura (implementações de portas) utilizam o sufixo `Adapter` (ou um nome que descreva a tecnologia, ex: `JpaSampleRepository`).
+- Siglas e acrônimos em identificadores seguem o estilo idiomático do Kotlin: apenas a primeira letra em maiúscula, tratando a sigla como uma palavra comum. Use `Dto`, `Id`, `Http`, `Json`, `Url` — nunca `DTO`, `ID`, `HTTP`. Ex.: `CreateSampleInputDto`, `SampleOutputDto`, `DecodeTokenDto`.
 - Classes concretas devem possuir nomes que representem claramente sua responsabilidade.
 
 Evite abreviações desnecessárias e nomes genéricos que não expressem claramente a responsabilidade do componente.
@@ -115,14 +116,14 @@ Sempre use named parameters ao instanciar classes, chamar construtores ou invoca
 ### ✔ Correto
 
 ```kotlin
-val input = CreateSampleInputDTO(userId = userId.asString(), sampleName = sampleName.asString())
+val input = CreateSampleInputDto(userId = userId.asString(), sampleName = sampleName.asString())
 val sample = SampleEntity(id = UUID.randomUUID().toString(), userId = input.userId, sampleName = input.sampleName, finished = false)
 ```
 
 ### ❌ Incorreto
 
 ```kotlin
-val input = CreateSampleInputDTO(userId.asString(), sampleName.asString())
+val input = CreateSampleInputDto(userId.asString(), sampleName.asString())
 val sample = SampleEntity(UUID.randomUUID().toString(), input.userId, input.sampleName, false)
 ```
 
@@ -156,7 +157,7 @@ Cada bloco deve representar uma fase claramente identificável da execução, co
 ### ✔ Correto
 
 ```kotlin
-fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+fun execute(input: CreateSampleInputDto): CreateSampleOutputDto {
     val sampleNameResult = SampleNameValueObject.of(input.sampleName).getValueResultOrThrow()
 
     if (sampleRepository.existsBySampleName(sampleNameResult)) {
@@ -177,7 +178,7 @@ fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
 ### ❌ Incorreto
 
 ```kotlin
-fun execute(input: CreateSampleInputDTO): CreateSampleOutputDTO {
+fun execute(input: CreateSampleInputDto): CreateSampleOutputDto {
     val sampleNameResult = SampleNameValueObject.of(input.sampleName).getValueResultOrThrow()
     if (sampleRepository.existsBySampleName(sampleNameResult)) {
         throw SampleNameAlreadyExistsException()
@@ -213,7 +214,7 @@ class CreateSampleUseCase(
     private val sampleRepository: SampleRepository
 ) {
 
-    fun execute(input: CreateSampleInputDTO): SampleOutputDTO {
+    fun execute(input: CreateSampleInputDto): SampleOutputDto {
         val sample = SampleEntity(
             id = UUID.randomUUID().toString(),
             userId = input.userId,
@@ -226,8 +227,8 @@ class CreateSampleUseCase(
         return toOutput(saved)
     }
 
-    private fun toOutput(sample: SampleEntity): SampleOutputDTO =
-        SampleOutputDTO(
+    private fun toOutput(sample: SampleEntity): SampleOutputDto =
+        SampleOutputDto(
             id = sample.id.asString(),
             userId = sample.userId.asString(),
             sampleName = sample.sampleName.asString(),

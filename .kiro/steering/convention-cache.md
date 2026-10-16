@@ -125,7 +125,7 @@ interface SampleJpaDao : JpaRepository<SampleJpaModel, UUID> {
 class ListSamplesUseCase {
 
     @Cacheable(cacheNames = ["samplesByUser"], key = "#input.userId")
-    fun execute(input: ListSamplesInputDTO): List<SampleOutputDTO> {
+    fun execute(input: ListSamplesInputDto): List<SampleOutputDto> {
         ...
     }
 }

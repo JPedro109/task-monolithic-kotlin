@@ -98,7 +98,7 @@ class CreateSampleUseCaseTest {
     fun `should create a sample successfully`() {
         val sample = SampleFixture.aSample()
         val sampleName = sample.sampleName
-        val input = CreateSampleInputDTO(sampleName = sampleName.asString())
+        val input = CreateSampleInputDto(sampleName = sampleName.asString())
         val savedSample = SampleFixture.aSample()
 
         every { sampleRepository.existsBySampleName(sampleName) } returns false
@@ -122,7 +122,7 @@ class CreateSampleUseCaseTest {
 fun `should throw when sampleName already exists`() {
     val sample = SampleFixture.aSample()
     val sampleName = sample.sampleName
-    val input = CreateSampleInputDTO(sampleName = sampleName.asString())
+    val input = CreateSampleInputDto(sampleName = sampleName.asString())
 
     every { sampleRepository.existsBySampleName(sampleName) } returns true
 

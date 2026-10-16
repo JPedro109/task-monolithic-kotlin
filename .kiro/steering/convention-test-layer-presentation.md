@@ -109,7 +109,7 @@ class SampleControllerTest {
         fun `should return 201 with sample data when input is valid`() {
             val sample = SampleFixture.aSample()
             val sampleName = sample.sampleName
-            val output = SampleOutputDTO(id = sample.id.asString(), sampleName = sampleName.asString(), finished = false)
+            val output = SampleOutputDto(id = sample.id.asString(), sampleName = sampleName.asString(), finished = false)
 
             every { createSampleUseCase.execute(any()) } returns output
 
