@@ -19,7 +19,6 @@ import com.jpmns.task.configuration.security.SecurityConfig
 import com.jpmns.task.core.application.port.security.Token
 import com.jpmns.task.core.application.usecase.user.CreateUserUseCase
 import com.jpmns.task.core.application.usecase.user.DeleteUserUseCase
-import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
 import com.jpmns.task.core.application.usecase.user.UpdateUserPasswordUseCase
 import com.jpmns.task.core.application.usecase.user.UpdateUsernameUseCase
 import com.jpmns.task.core.application.usecase.user.dto.output.CreateUserOutputDto
@@ -54,9 +53,6 @@ class UserControllerTest {
 
     @MockkBean
     private lateinit var token: Token
-
-    @MockkBean
-    private lateinit var getUserByIdUseCase: GetUserByIdUseCase
 
     @Nested
     @DisplayName("POST /api/v1/users")

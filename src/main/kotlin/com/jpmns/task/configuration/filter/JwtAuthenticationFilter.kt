@@ -11,13 +11,10 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 
 import com.jpmns.task.core.application.port.security.Token
-import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
-import com.jpmns.task.core.application.usecase.user.dto.input.GetUserByIdInputDto
 
 @Component
 class JwtAuthenticationFilter(
-    private val token: Token,
-    private val getUserByIdUseCase: GetUserByIdUseCase
+    private val token: Token
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -36,11 +33,8 @@ class JwtAuthenticationFilter(
                 return
             }
 
-            val input = GetUserByIdInputDto(id = decoded.sub)
-            val user = getUserByIdUseCase.execute(input = input)
-
             val authentication = UsernamePasswordAuthenticationToken(
-                user.id,
+                decoded.sub,
                 null,
                 emptyList()
             )

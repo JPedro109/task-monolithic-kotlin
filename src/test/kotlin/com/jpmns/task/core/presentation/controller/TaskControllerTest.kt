@@ -27,7 +27,6 @@ import com.jpmns.task.core.application.usecase.task.UpdateTaskUseCase
 import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDto
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
-import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
 import com.jpmns.task.core.domain.task.TaskEntity
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.TaskFixture
@@ -59,9 +58,6 @@ class TaskControllerTest {
 
     @MockkBean
     private lateinit var token: Token
-
-    @MockkBean
-    private lateinit var getUserByIdUseCase: GetUserByIdUseCase
 
     @Nested
     @DisplayName("POST /api/v1/tasks")
