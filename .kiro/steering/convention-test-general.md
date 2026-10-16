@@ -37,6 +37,8 @@ src/test/kotlin/com/jpmns/task/
         └── factory/WithMockJwtTokenSecurityContextFactory.kt
 ```
 
+O scaffolding de integração — a classe base `IntegrationTestBase`, a configuração de container `PostgresContainerConfig` e a anotação de seed `SqlCreateSeed` — tem seu código de referência completo em `convention-test-layer-presentation.md` (seção "Testes de Integração de Controller"). Toda classe de teste de integração herda de `IntegrationTestBase`, e cada dependência externa possui sua própria configuração de container em `integration/common/container/`.
+
 # Geral
 
 - Use ou crie fixtures existentes para construir dados de teste. Nunca instancie entidades de domínio inline dentro dos testes. Nunca use valores aleatórios (`UUID.randomUUID()`, `Math.random()`, etc.) — sempre fixture.
@@ -164,6 +166,8 @@ As seguintes regras devem ser respeitadas:
 - Toda API externa deve possuir uma classe responsável por centralizar seus stubs.
 - Os testes nunca devem utilizar `stubFor(...)` diretamente.
 - Cada método da classe de stub deve representar um cenário de teste.
+- Os stubs devem validar método HTTP, URL, parâmetros, headers e corpo da requisição sempre que aplicável.
+- Cada teste deve configurar apenas os stubs necessários para o cenário em execução.
 - Devem existir cenários de sucesso, erro, timeout e indisponibilidade do serviço.
 - Nunca utilizar MockK para simular clientes HTTP concretos.
 

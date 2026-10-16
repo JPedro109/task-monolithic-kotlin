@@ -22,8 +22,9 @@ Exemplo:
 ```text
 src/test/kotlin/
 └── core/
-    └── controller/
-        └── SampleControllerTest.kt
+    └── presentation/
+        └── controller/
+            └── SampleControllerTest.kt
 ```
 
 ---
@@ -249,7 +250,7 @@ As seguintes regras devem ser respeitadas:
 - Cada Controller deve possuir uma classe de teste com o sufixo `IntegrationTest`.
 - Toda classe deve estender `IntegrationTestBase`.
 - Nunca configurar manualmente `MockMvc`, `SpringBootTest`, `Testcontainers` ou perfil de execução.
-- Todos os testes devem utilizar Testcontainers — nunca banco de dados em memória.
+- Testes de integração de controller devem utilizar Testcontainers — nunca banco de dados em memória. (Essa regra vale para a integração de controller; os testes de DAO com `@DataJpaTest`, que podem usar H2 em memória, são tratados em `convention-test-layer-persistence.md`.)
 - Nunca utilizar mocks da aplicação.
 - Todos os objetos válidos utilizados durante os testes devem ser construídos utilizando Fixtures.
 - Para cenários de dados inválidos, os campos válidos devem ser extraídos de Fixtures normalmente. Apenas o campo inválido deve ser declarado manualmente.

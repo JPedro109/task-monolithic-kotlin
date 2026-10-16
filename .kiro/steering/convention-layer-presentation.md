@@ -27,18 +27,19 @@ presentation/
     ├── SampleController.kt
     ├── documentation/
     │   └── payload/
-    │       ├── sample/
-    │       │   ├── request/
-    │       │   └── response/
+    │       └── sample/
+    │           ├── request/
+    │           └── response/
     ├── payload/
-    │   ├── sample/
-    │   │   ├── request/
-    │   │   └── response/
+    │   └── sample/
+    │       ├── request/
+    │       └── response/
     └── common/
         ├── handler/
-        ├── filter/
         └── resolver/
 ```
+
+> Filtros de requisição (ex.: autenticação JWT) **não** residem aqui. Por serem configuração técnica de bootstrap do framework, vivem em `configuration/filter/`, fora de `core/`, conforme o documento de arquitetura.
 
 As seguintes regras devem ser respeitadas:
 

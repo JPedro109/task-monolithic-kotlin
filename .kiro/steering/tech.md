@@ -70,6 +70,26 @@ inclusion: always
 cd docker && docker compose up -d
 ```
 
+## Variáveis de Ambiente
+
+A configuração de runtime fica em `src/main/resources/application.yaml` e é controlada por variáveis de ambiente, cada uma com um valor padrão adequado ao ambiente local.
+
+| Variável | Padrão | Observações |
+|----------|--------|-------------|
+| `ENVIRONMENT_NAME` | `local` | Define o profile Spring ativo |
+| `SERVER_PORT` | `8080` | Porta HTTP da aplicação |
+| `APP_LOG_LEVEL` | `INFO` | Nível de log de `com.jpmns.task` |
+| `DB_HOST` / `DB_PORT` / `DB_NAME` | `localhost` / `5432` / `task` | Conexão com o PostgreSQL |
+| `DB_USER` / `DB_PASSWORD` | `postgres` / `postgres` | Credenciais do banco |
+| `JWT_SECRET` | `change-me-...` | Deve ter ≥ 32 caracteres; sempre substituir em produção |
+| `JWT_ACCESS_EXPIRATION_MS` | `900000` (15 min) | Expiração do access token |
+| `JWT_REFRESH_EXPIRATION_MS` | `604800000` (7 dias) | Expiração do refresh token |
+| `DOC_ENABLED` | `false` | Habilita o Swagger UI (`/docs`) e os api-docs |
+| `ENABLE_TRACING` | `true` | Habilita a exportação de tracing |
+| `ENABLE_OTLP_COLLECTOR` | `false` | Define como `true` para enviar métricas via OTLP |
+| `OTLP_COLLECTOR_URL` | — | Obrigatório quando o OTLP estiver habilitado |
+| `OTLP_COLLECTOR_PUSH_INTERVAL` | `1s` | Intervalo de envio das métricas OTLP |
+
 ## Observações
 
 - O plugin `allOpen` abre entidades JPA, classes `@Service`, `@Component` e `@Repository`

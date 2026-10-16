@@ -22,7 +22,8 @@ src/test/kotlin/
 └── core/
     └── domain/
         └── sample/
-            └── SampleNameValueObjectTest.kt
+            └── valueobject/
+                └── SampleNameValueObjectTest.kt
 ```
 
 ---

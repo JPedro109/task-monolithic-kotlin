@@ -65,7 +65,7 @@ Os testes de DAO têm como objetivo validar o comportamento das consultas realiz
 - Devem utilizar `@DataJpaTest`.
 - Devem injetar o DAO com `@Autowired`.
 - Não devem herdar de `IntegrationTestBase`.
-- Podem usar H2 em memória para testes rápidos e isolados.
+- Podem usar H2 em memória para testes rápidos e isolados. Isso é intencional e **não** contraria a regra "nunca banco em memória" de `convention-test-layer-presentation.md`: aquela regra se aplica exclusivamente aos testes de **integração de controller** (que exercem o fluxo completo e exigem o banco real via Testcontainers). O `@DataJpaTest` valida apenas o mapeamento e as queries do DAO de forma isolada, cenário em que o H2 é suficiente e mais rápido.
 - Devem validar métodos derivados do Spring Data.
 - Devem validar consultas utilizando `@Query`.
 - Não devem testar regras de negócio.

@@ -110,7 +110,7 @@ class SampleEntity(
 ## ✔ Classe base
 
 ```kotlin
-abstract class Entity(id: String, createdAt: Instant?) {
+abstract class Entity(id: String, createdAt: Instant? = null) {
 
     val id: IdValueObject = IdValueObject.of(id).getValueResultOrThrow()
     val createdAt: Instant = createdAt ?: Instant.now()
@@ -118,7 +118,7 @@ abstract class Entity(id: String, createdAt: Instant?) {
     protected fun validateOrThrow(results: List<Result<*>>) {
         val errors = results
             .filter { it.isFailure }
-            .map { it.getError() as DomainException }
+            .map { it.getErrorResult() as DomainException }
 
         if (errors.isNotEmpty()) {
             throw DomainException.with(errors)
@@ -254,13 +254,15 @@ O `Result<T>` permite representar sucesso ou falha sem depender do lançamento i
 
 Ele deve ser utilizado principalmente na criação de Value Objects.
 
+> **Nota de API — nomes dos acessores.** O `Result` do projeto expõe `getValueResult()` (valor de sucesso), `getValueResultOrThrow()` (variante que lança) e `getErrorResult()` (erro de falha). Os nomes têm o sufixo `Result` de propósito: um `getValue()`/`getError()` colidiria com a convenção de getters do Kotlin (seriam interpretados como as propriedades `value`/`error`), causando conflito de compilação. Use sempre as variantes com sufixo `Result`; nunca `getValue()` ou `getError()`.
+
 ## ✔ Correto
 
 ```kotlin
 val result = SampleNameValueObject.of(value)
 
 if (result.isFailure) {
-    throw result.getError()
+    throw result.getErrorResult()
 }
 
 val sampleName = result.getValueResult()

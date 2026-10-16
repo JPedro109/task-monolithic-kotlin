@@ -199,6 +199,7 @@ Todas as implementações devem seguir as seguintes regras:
 * Toda conversão entre modelos deve ser explícita.
 * Nenhuma regra de negócio deve depender de detalhes técnicos.
 * Nenhuma implementação concreta deve ser utilizada quando existir um contrato equivalente.
+* Contratos (interfaces) existem para inverter dependências entre camadas (portas e adaptadores), não para envelopar componentes de implementação única. Componentes como os casos de uso, que possuem uma só implementação e nenhum ponto de variação, são utilizados diretamente, sem interface.
 * Objetos pertencentes a uma camada não devem ser reutilizados por outra camada sem uma conversão explícita.
 * Toda dependência deve possuir a menor abrangência possível.
 * O acoplamento entre módulos deve ser minimizado e a coesão interna maximizada.
