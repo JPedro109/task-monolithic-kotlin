@@ -1,6 +1,7 @@
 package com.jpmns.task.core.application.usecase.task
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
 import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDto
@@ -14,6 +15,7 @@ import com.jpmns.task.core.domain.task.TaskEntity
 class UpdateTaskUseCase(
     private val taskRepository: TaskRepository
 ) {
+    @Transactional
     fun execute(input: UpdateTaskInputDto): TaskOutputDto {
         val taskIdResult = IdValueObject.of(input.taskId).getValueResultOrThrow()
 

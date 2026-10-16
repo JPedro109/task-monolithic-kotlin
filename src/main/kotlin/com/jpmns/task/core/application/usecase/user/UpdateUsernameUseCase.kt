@@ -1,6 +1,7 @@
 package com.jpmns.task.core.application.usecase.user
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDto
@@ -15,6 +16,7 @@ import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 class UpdateUsernameUseCase(
     private val userRepository: UserRepository
 ) {
+    @Transactional
     fun execute(input: UpdateUsernameInputDto): UpdateUsernameOutputDto {
         val idResult = IdValueObject.of(input.userId).getValueResultOrThrow()
         val newUsernameResult = UsernameValueObject.of(input.newUsername).getValueResultOrThrow()

@@ -1,6 +1,7 @@
 package com.jpmns.task.core.application.usecase.user
 
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.port.security.PasswordEncoder
@@ -14,6 +15,7 @@ class UpdateUserPasswordUseCase(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
+    @Transactional
     fun execute(input: UpdateUserPasswordInputDto) {
         val idResult = IdValueObject.of(input.userId).getValueResultOrThrow()
 
