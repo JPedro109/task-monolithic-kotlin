@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.port.security.PasswordEncoder
 import com.jpmns.task.core.application.port.security.Token
-import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDto
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
@@ -44,7 +44,7 @@ class UserLoginUseCaseTest {
         val userIdString = userId.asString()
         val accessToken = "generated-access-token"
         val refreshToken = "generated-refresh-token"
-        val input = UserLoginInputDTO(
+        val input = UserLoginInputDto(
             username = usernameString,
             password = passwordString
         )
@@ -71,7 +71,7 @@ class UserLoginUseCaseTest {
         val password = user.password
         val usernameString = username.asString()
         val passwordString = password.asString()
-        val input = UserLoginInputDTO(
+        val input = UserLoginInputDto(
             username = usernameString,
             password = passwordString
         )
@@ -94,7 +94,7 @@ class UserLoginUseCaseTest {
         val usernameString = username.asString()
         val passwordString = password.asString()
         val wrongPassword = "wrong-password"
-        val input = UserLoginInputDTO(
+        val input = UserLoginInputDto(
             username = usernameString,
             password = wrongPassword
         )
@@ -116,7 +116,7 @@ class UserLoginUseCaseTest {
         val password = user.password
         val passwordString = password.asString()
         val invalidUsername = "ab"
-        val input = UserLoginInputDTO(
+        val input = UserLoginInputDto(
             username = invalidUsername,
             password = passwordString
         )

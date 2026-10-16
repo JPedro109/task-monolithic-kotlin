@@ -19,8 +19,8 @@ import com.jpmns.task.core.application.port.security.exception.InvalidTokenExcep
 import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
 import com.jpmns.task.core.application.usecase.user.RefreshUserTokenUseCase
 import com.jpmns.task.core.application.usecase.user.UserLoginUseCase
-import com.jpmns.task.core.application.usecase.user.dto.output.RefreshUserTokenOutputDTO
-import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDTO
+import com.jpmns.task.core.application.usecase.user.dto.output.RefreshUserTokenOutputDto
+import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDto
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.presentation.controller.common.handler.GlobalExceptionHandler
 import com.jpmns.task.shared.fixture.UserFixture
@@ -58,7 +58,7 @@ class AuthControllerTest {
             val passwordString = password.asString()
             val accessToken = "access-token"
             val refreshToken = "refresh-token"
-            val output = UserLoginOutputDTO(accessToken, refreshToken)
+            val output = UserLoginOutputDto(accessToken, refreshToken)
 
             every { userLoginUseCase.execute(any()) } returns output
 
@@ -124,7 +124,7 @@ class AuthControllerTest {
             val refreshTokenValue = "valid-refresh-token"
             val newAccessToken = "new-access-token"
             val newRefreshToken = "new-refresh-token"
-            val output = RefreshUserTokenOutputDTO(newAccessToken, newRefreshToken)
+            val output = RefreshUserTokenOutputDto(newAccessToken, newRefreshToken)
 
             every { refreshUserTokenUseCase.execute(any()) } returns output
 

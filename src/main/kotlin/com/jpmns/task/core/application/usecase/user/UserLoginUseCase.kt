@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.port.security.PasswordEncoder
 import com.jpmns.task.core.application.port.security.Token
-import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDTO
-import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDto
+import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDto
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 
@@ -16,7 +16,7 @@ class UserLoginUseCase(
     private val passwordEncoder: PasswordEncoder,
     private val token: Token
 ) {
-    fun execute(input: UserLoginInputDTO): UserLoginOutputDTO {
+    fun execute(input: UserLoginInputDto): UserLoginOutputDto {
         val usernameResult = UsernameValueObject.of(input.username).getValueResultOrThrow()
 
         val user = userRepository.findByUsername(usernameResult) ?: throw InvalidCredentialsException()
@@ -32,6 +32,6 @@ class UserLoginUseCase(
         val accessToken = token.generateAccessToken(user.id.asString())
         val refreshToken = token.generateRefreshToken(user.id.asString())
 
-        return UserLoginOutputDTO(accessToken = accessToken, refreshToken = refreshToken)
+        return UserLoginOutputDto(accessToken = accessToken, refreshToken = refreshToken)
     }
 }

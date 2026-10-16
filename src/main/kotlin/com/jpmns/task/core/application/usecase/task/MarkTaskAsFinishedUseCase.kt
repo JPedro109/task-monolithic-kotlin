@@ -3,7 +3,7 @@ package com.jpmns.task.core.application.usecase.task
 import org.springframework.stereotype.Service
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDto
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
@@ -12,7 +12,7 @@ import com.jpmns.task.core.domain.common.valueobject.IdValueObject
 class MarkTaskAsFinishedUseCase(
     private val taskRepository: TaskRepository
 ) {
-    fun execute(input: MarkTaskAsFinishedInputDTO) {
+    fun execute(input: MarkTaskAsFinishedInputDto) {
         val taskIdResult = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
         val task = taskRepository.findById(taskIdResult)

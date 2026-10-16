@@ -22,8 +22,8 @@ import com.jpmns.task.core.application.usecase.user.DeleteUserUseCase
 import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
 import com.jpmns.task.core.application.usecase.user.UpdateUserPasswordUseCase
 import com.jpmns.task.core.application.usecase.user.UpdateUsernameUseCase
-import com.jpmns.task.core.application.usecase.user.dto.output.CreateUserOutputDTO
-import com.jpmns.task.core.application.usecase.user.dto.output.UpdateUsernameOutputDTO
+import com.jpmns.task.core.application.usecase.user.dto.output.CreateUserOutputDto
+import com.jpmns.task.core.application.usecase.user.dto.output.UpdateUsernameOutputDto
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
@@ -70,7 +70,7 @@ class UserControllerTest {
             val userIdString = userId.asString()
             val usernameString = username.asString()
             val passwordString = password.asString()
-            val output = CreateUserOutputDTO(userIdString, usernameString)
+            val output = CreateUserOutputDto(userIdString, usernameString)
 
             every { createUserUseCase.execute(any()) } returns output
 
@@ -249,7 +249,7 @@ class UserControllerTest {
             val username = user.username
             val userIdString = userId.asString()
             val usernameString = username.asString()
-            val output = UpdateUsernameOutputDTO(userIdString, usernameString)
+            val output = UpdateUsernameOutputDto(userIdString, usernameString)
 
             every { updateUsernameUseCase.execute(any()) } returns output
 

@@ -3,8 +3,8 @@ package com.jpmns.task.core.application.usecase.task
 import org.springframework.stereotype.Service
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDTO
-import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDto
+import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDto
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
@@ -14,7 +14,7 @@ import com.jpmns.task.core.domain.task.TaskEntity
 class UpdateTaskUseCase(
     private val taskRepository: TaskRepository
 ) {
-    fun execute(input: UpdateTaskInputDTO): TaskOutputDTO {
+    fun execute(input: UpdateTaskInputDto): TaskOutputDto {
         val taskIdResult = IdValueObject.of(input.taskId).getValueResultOrThrow()
 
         val task = taskRepository.findById(taskIdResult) ?: throw TaskNotFoundException()
@@ -31,8 +31,8 @@ class UpdateTaskUseCase(
         return toOutput(saved)
     }
 
-    private fun toOutput(task: TaskEntity): TaskOutputDTO =
-        TaskOutputDTO(
+    private fun toOutput(task: TaskEntity): TaskOutputDto =
+        TaskOutputDto(
             id = task.id.asString(),
             userId = task.userId.asString(),
             taskName = task.taskName.asString(),

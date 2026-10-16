@@ -1,6 +1,6 @@
 package com.jpmns.task.core.presentation.controller.payload.user.response
 
-import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDTO
+import com.jpmns.task.core.application.usecase.user.dto.output.UserLoginOutputDto
 import com.jpmns.task.core.presentation.controller.documentation.payload.user.response.UserLoginResponseDoc
 
 data class UserLoginResponse(
@@ -11,7 +11,7 @@ data class UserLoginResponse(
         "UserLoginResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
 
     companion object {
-        fun of(dto: UserLoginOutputDTO): UserLoginResponse =
+        fun of(dto: UserLoginOutputDto): UserLoginResponse =
             UserLoginResponse(
                 accessToken = dto.accessToken,
                 refreshToken = dto.refreshToken

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDto
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
 import com.jpmns.task.core.domain.common.exception.DomainException
@@ -31,7 +31,7 @@ class MarkTaskAsFinishedUseCaseTest {
         val task = TaskFixture.aTask()
         val taskId = task.id
         val userId = task.userId
-        val input = MarkTaskAsFinishedInputDTO(
+        val input = MarkTaskAsFinishedInputDto(
             taskId = taskId.asString(),
             userId = userId.asString()
         )
@@ -50,7 +50,7 @@ class MarkTaskAsFinishedUseCaseTest {
         val task = TaskFixture.aTask()
         val taskId = task.id
         val userId = task.userId
-        val input = MarkTaskAsFinishedInputDTO(
+        val input = MarkTaskAsFinishedInputDto(
             taskId = taskId.asString(),
             userId = userId.asString()
         )
@@ -70,7 +70,7 @@ class MarkTaskAsFinishedUseCaseTest {
         val taskId = task.id
         val anotherUser = UserFixture.aUser()
         val anotherUserId = anotherUser.id
-        val input = MarkTaskAsFinishedInputDTO(
+        val input = MarkTaskAsFinishedInputDto(
             taskId = taskId.asString(),
             userId = anotherUserId.asString()
         )
@@ -88,7 +88,7 @@ class MarkTaskAsFinishedUseCaseTest {
         val task = TaskFixture.aTask()
         val userId = task.userId
         val invalidTaskId = "invalid-id"
-        val input = MarkTaskAsFinishedInputDTO(
+        val input = MarkTaskAsFinishedInputDto(
             taskId = invalidTaskId,
             userId = userId.asString()
         )

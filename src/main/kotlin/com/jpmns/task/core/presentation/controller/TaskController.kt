@@ -21,11 +21,11 @@ import com.jpmns.task.core.application.usecase.task.DeleteTaskUseCase
 import com.jpmns.task.core.application.usecase.task.ListTasksUseCase
 import com.jpmns.task.core.application.usecase.task.MarkTaskAsFinishedUseCase
 import com.jpmns.task.core.application.usecase.task.UpdateTaskUseCase
-import com.jpmns.task.core.application.usecase.task.dto.input.CreateTaskInputDTO
-import com.jpmns.task.core.application.usecase.task.dto.input.DeleteTaskInputDTO
-import com.jpmns.task.core.application.usecase.task.dto.input.ListTasksInputDTO
-import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDTO
-import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.CreateTaskInputDto
+import com.jpmns.task.core.application.usecase.task.dto.input.DeleteTaskInputDto
+import com.jpmns.task.core.application.usecase.task.dto.input.ListTasksInputDto
+import com.jpmns.task.core.application.usecase.task.dto.input.MarkTaskAsFinishedInputDto
+import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDto
 import com.jpmns.task.core.presentation.controller.common.resolver.AuthenticatedUserResolver
 import com.jpmns.task.core.presentation.controller.documentation.TaskControllerDoc
 import com.jpmns.task.core.presentation.controller.payload.task.request.CreateTaskRequest
@@ -47,7 +47,7 @@ class TaskController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = CreateTaskInputDTO(userId = userId, taskName = request.taskName)
+        val input = CreateTaskInputDto(userId = userId, taskName = request.taskName)
 
         val output = createTaskUseCase.execute(input)
 
@@ -63,7 +63,7 @@ class TaskController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = ListTasksInputDTO(userId = userId)
+        val input = ListTasksInputDto(userId = userId)
 
         val output = listTasksUseCase.execute(input)
 
@@ -82,7 +82,7 @@ class TaskController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = UpdateTaskInputDTO(taskId = taskId, userId = userId, taskName = request.taskName)
+        val input = UpdateTaskInputDto(taskId = taskId, userId = userId, taskName = request.taskName)
 
         val output = updateTaskUseCase.execute(input)
 
@@ -98,7 +98,7 @@ class TaskController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = DeleteTaskInputDTO(taskId = taskId, userId = userId)
+        val input = DeleteTaskInputDto(taskId = taskId, userId = userId)
 
         deleteTaskUseCase.execute(input)
 
@@ -112,7 +112,7 @@ class TaskController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = MarkTaskAsFinishedInputDTO(taskId = taskId, userId = userId)
+        val input = MarkTaskAsFinishedInputDto(taskId = taskId, userId = userId)
 
         markTaskAsFinishedUseCase.execute(input)
 

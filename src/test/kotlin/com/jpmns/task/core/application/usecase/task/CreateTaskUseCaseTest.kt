@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.CreateTaskInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.CreateTaskInputDto
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.TaskFixture
 import com.jpmns.task.shared.fixture.UserFixture
@@ -34,7 +34,7 @@ class CreateTaskUseCaseTest {
         val taskName = task.taskName
         val finished = task.finished
         val createdAt = task.createdAt
-        val input = CreateTaskInputDTO(
+        val input = CreateTaskInputDto(
             userId = userId.asString(),
             taskName = taskName.asString()
         )
@@ -56,7 +56,7 @@ class CreateTaskUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val invalidTaskName = "a".repeat(256)
-        val input = CreateTaskInputDTO(
+        val input = CreateTaskInputDto(
             userId = userId.asString(),
             taskName = invalidTaskName
         )

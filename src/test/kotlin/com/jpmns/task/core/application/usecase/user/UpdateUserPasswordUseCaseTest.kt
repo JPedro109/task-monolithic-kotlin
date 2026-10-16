@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.port.security.PasswordEncoder
-import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUserPasswordInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUserPasswordInputDto
 import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentialsException
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.domain.common.exception.DomainException
@@ -37,7 +37,7 @@ class UpdateUserPasswordUseCaseTest {
         val currentPasswordString = password.asString()
         val newPassword = "new-password"
         val encodedNewPassword = "encoded-password"
-        val input = UpdateUserPasswordInputDTO(
+        val input = UpdateUserPasswordInputDto(
             userId = userId.asString(),
             currentPassword = currentPasswordString,
             newPassword = newPassword
@@ -63,7 +63,7 @@ class UpdateUserPasswordUseCaseTest {
         val password = user.password
         val currentPasswordString = password.asString()
         val newPassword = "new-password"
-        val input = UpdateUserPasswordInputDTO(
+        val input = UpdateUserPasswordInputDto(
             userId = userId.asString(),
             currentPassword = currentPasswordString,
             newPassword = newPassword
@@ -87,7 +87,7 @@ class UpdateUserPasswordUseCaseTest {
         val currentPasswordString = password.asString()
         val wrongPassword = "wrong-password"
         val newPassword = "new-password"
-        val input = UpdateUserPasswordInputDTO(
+        val input = UpdateUserPasswordInputDto(
             userId = userId.asString(),
             currentPassword = wrongPassword,
             newPassword = newPassword
@@ -111,7 +111,7 @@ class UpdateUserPasswordUseCaseTest {
         val currentPasswordString = password.asString()
         val invalidUserId = "invalid-id"
         val newPassword = "new-password"
-        val input = UpdateUserPasswordInputDTO(
+        val input = UpdateUserPasswordInputDto(
             userId = invalidUserId,
             currentPassword = currentPasswordString,
             newPassword = newPassword

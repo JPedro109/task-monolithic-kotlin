@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController
 
 import com.jpmns.task.core.application.usecase.user.RefreshUserTokenUseCase
 import com.jpmns.task.core.application.usecase.user.UserLoginUseCase
-import com.jpmns.task.core.application.usecase.user.dto.input.RefreshUserTokenInputDTO
-import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.RefreshUserTokenInputDto
+import com.jpmns.task.core.application.usecase.user.dto.input.UserLoginInputDto
 import com.jpmns.task.core.presentation.controller.documentation.AuthControllerDoc
 import com.jpmns.task.core.presentation.controller.payload.user.request.RefreshTokenRequest
 import com.jpmns.task.core.presentation.controller.payload.user.request.UserLoginRequest
@@ -30,7 +30,7 @@ class AuthController(
     override fun login(@Valid @RequestBody request: UserLoginRequest): ResponseEntity<UserLoginResponse> {
         logger.info("Login request received for user: $request")
 
-        val input = UserLoginInputDTO(username = request.username, password = request.password)
+        val input = UserLoginInputDto(username = request.username, password = request.password)
 
         val output = userLoginUseCase.execute(input)
 
@@ -44,7 +44,7 @@ class AuthController(
     override fun refresh(@Valid @RequestBody request: RefreshTokenRequest): ResponseEntity<RefreshTokenResponse> {
         logger.info("Refresh token request received")
 
-        val input = RefreshUserTokenInputDTO(refreshToken = request.refreshToken)
+        val input = RefreshUserTokenInputDto(refreshToken = request.refreshToken)
 
         val output = refreshUserTokenUseCase.execute(input)
 

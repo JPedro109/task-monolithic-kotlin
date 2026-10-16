@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.UpdateTaskInputDto
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
 import com.jpmns.task.core.domain.common.exception.DomainException
@@ -38,7 +38,7 @@ class UpdateTaskUseCaseTest {
         val updatedTaskUserId = updatedTask.userId
         val updatedTaskFinished = updatedTask.finished
         val updatedTaskCreatedAt = updatedTask.createdAt
-        val input = UpdateTaskInputDTO(
+        val input = UpdateTaskInputDto(
             taskId = taskId.asString(),
             userId = userId.asString(),
             taskName = newTaskName
@@ -65,7 +65,7 @@ class UpdateTaskUseCaseTest {
         val taskId = task.id
         val userId = task.userId
         val newTaskName = "New name"
-        val input = UpdateTaskInputDTO(
+        val input = UpdateTaskInputDto(
             taskId = taskId.asString(),
             userId = userId.asString(),
             taskName = newTaskName
@@ -87,7 +87,7 @@ class UpdateTaskUseCaseTest {
         val anotherUser = UserFixture.aUser()
         val anotherUserId = anotherUser.id
         val newTaskName = "New name"
-        val input = UpdateTaskInputDTO(
+        val input = UpdateTaskInputDto(
             taskId = taskId.asString(),
             userId = anotherUserId.asString(),
             taskName = newTaskName
@@ -108,7 +108,7 @@ class UpdateTaskUseCaseTest {
         val taskId = task.id
         val userId = task.userId
         val longTaskName = "a".repeat(256)
-        val input = UpdateTaskInputDTO(
+        val input = UpdateTaskInputDto(
             taskId = taskId.asString(),
             userId = userId.asString(),
             taskName = longTaskName
@@ -129,7 +129,7 @@ class UpdateTaskUseCaseTest {
         val userId = task.userId
         val invalidTaskId = "invalid-id"
         val newTaskName = "New name"
-        val input = UpdateTaskInputDTO(
+        val input = UpdateTaskInputDto(
             taskId = invalidTaskId,
             userId = userId.asString(),
             taskName = newTaskName

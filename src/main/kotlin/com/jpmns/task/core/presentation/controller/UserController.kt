@@ -17,10 +17,10 @@ import com.jpmns.task.core.application.usecase.user.CreateUserUseCase
 import com.jpmns.task.core.application.usecase.user.DeleteUserUseCase
 import com.jpmns.task.core.application.usecase.user.UpdateUserPasswordUseCase
 import com.jpmns.task.core.application.usecase.user.UpdateUsernameUseCase
-import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDTO
-import com.jpmns.task.core.application.usecase.user.dto.input.DeleteUserInputDTO
-import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUserPasswordInputDTO
-import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDto
+import com.jpmns.task.core.application.usecase.user.dto.input.DeleteUserInputDto
+import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUserPasswordInputDto
+import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDto
 import com.jpmns.task.core.presentation.controller.common.resolver.AuthenticatedUserResolver
 import com.jpmns.task.core.presentation.controller.documentation.UserControllerDoc
 import com.jpmns.task.core.presentation.controller.payload.user.request.CreateUserRequest
@@ -41,7 +41,7 @@ class UserController(
     override fun createUser(@Valid @RequestBody request: CreateUserRequest): ResponseEntity<CreateUserResponse> {
         logger.info("Create user request received: $request")
 
-        val input = CreateUserInputDTO(username = request.username, password = request.password)
+        val input = CreateUserInputDto(username = request.username, password = request.password)
 
         val output = createUserUseCase.execute(input)
 
@@ -57,7 +57,7 @@ class UserController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = DeleteUserInputDTO(userId = userId)
+        val input = DeleteUserInputDto(userId = userId)
 
         deleteUserUseCase.execute(input)
 
@@ -73,7 +73,7 @@ class UserController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = UpdateUserPasswordInputDTO(
+        val input = UpdateUserPasswordInputDto(
             userId = userId,
             currentPassword = request.currentPassword,
             newPassword = request.newPassword
@@ -93,7 +93,7 @@ class UserController(
 
         val userId = AuthenticatedUserResolver.getUserId()
 
-        val input = UpdateUsernameInputDTO(userId = userId, newUsername = request.newUsername)
+        val input = UpdateUsernameInputDto(userId = userId, newUsername = request.newUsername)
 
         val output = updateUsernameUseCase.execute(input)
 

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.port.security.PasswordEncoder
-import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDTO
-import com.jpmns.task.core.application.usecase.user.dto.output.CreateUserOutputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDto
+import com.jpmns.task.core.application.usecase.user.dto.output.CreateUserOutputDto
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
 import com.jpmns.task.core.domain.user.UserEntity
 
@@ -16,7 +16,7 @@ class CreateUserUseCase(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder
 ) {
-    fun execute(input: CreateUserInputDTO): CreateUserOutputDTO {
+    fun execute(input: CreateUserInputDto): CreateUserOutputDto {
         val encodedPassword = passwordEncoder.encode(input.password)
         val user = UserEntity(
             id = UUID.randomUUID().toString(),
@@ -33,8 +33,8 @@ class CreateUserUseCase(
         return toOutput(saved)
     }
 
-    private fun toOutput(user: UserEntity): CreateUserOutputDTO =
-        CreateUserOutputDTO(
+    private fun toOutput(user: UserEntity): CreateUserOutputDto =
+        CreateUserOutputDto(
             id = user.id.asString(),
             username = user.username.asString()
         )

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.DeleteTaskInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.DeleteTaskInputDto
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
 import com.jpmns.task.core.domain.common.exception.DomainException
@@ -33,7 +33,7 @@ class DeleteTaskUseCaseTest {
         val task = TaskFixture.aTask()
         val taskId = task.id
         val userId = task.userId
-        val input = DeleteTaskInputDTO(
+        val input = DeleteTaskInputDto(
             taskId = taskId.asString(),
             userId = userId.asString()
         )
@@ -52,7 +52,7 @@ class DeleteTaskUseCaseTest {
         val task = TaskFixture.aTask()
         val taskId = task.id
         val userId = task.userId
-        val input = DeleteTaskInputDTO(
+        val input = DeleteTaskInputDto(
             taskId = taskId.asString(),
             userId = userId.asString()
         )
@@ -71,7 +71,7 @@ class DeleteTaskUseCaseTest {
         val taskId = task.id
         val anotherUser = UserFixture.aUser()
         val anotherUserId = anotherUser.id
-        val input = DeleteTaskInputDTO(
+        val input = DeleteTaskInputDto(
             taskId = taskId.asString(),
             userId = anotherUserId.asString()
         )
@@ -89,7 +89,7 @@ class DeleteTaskUseCaseTest {
         val task = TaskFixture.aTask()
         val userId = task.userId
         val invalidTaskId = "invalid-id"
-        val input = DeleteTaskInputDTO(
+        val input = DeleteTaskInputDto(
             taskId = invalidTaskId,
             userId = userId.asString()
         )

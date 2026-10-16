@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
-import com.jpmns.task.core.application.usecase.user.dto.input.GetUserByIdInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.GetUserByIdInputDto
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
@@ -32,7 +32,7 @@ class GetUserByIdUseCaseTest {
         val username = user.username
         val createdAt = user.createdAt
         val updatedAt = user.updatedAt
-        val input = GetUserByIdInputDTO(
+        val input = GetUserByIdInputDto(
             id = userId.asString()
         )
 
@@ -51,7 +51,7 @@ class GetUserByIdUseCaseTest {
     fun `should throw when user is not found`() {
         val user = UserFixture.aUser()
         val userId = user.id
-        val input = GetUserByIdInputDTO(
+        val input = GetUserByIdInputDto(
             id = userId.asString()
         )
 
@@ -65,7 +65,7 @@ class GetUserByIdUseCaseTest {
     @Test
     fun `should throw when user id is invalid`() {
         val invalidId = "invalid-id"
-        val input = GetUserByIdInputDTO(
+        val input = GetUserByIdInputDto(
             id = invalidId
         )
 

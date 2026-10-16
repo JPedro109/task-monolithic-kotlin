@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.TaskRepository
-import com.jpmns.task.core.application.usecase.task.dto.input.ListTasksInputDTO
+import com.jpmns.task.core.application.usecase.task.dto.input.ListTasksInputDto
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.TaskFixture
 import com.jpmns.task.shared.fixture.UserFixture
@@ -35,7 +35,7 @@ class ListTasksUseCaseTest {
         val finished = task.finished
         val createdAt = task.createdAt
         val userId = user.id
-        val input = ListTasksInputDTO(
+        val input = ListTasksInputDto(
             userId = userId.asString()
         )
 
@@ -56,7 +56,7 @@ class ListTasksUseCaseTest {
     fun `should return empty list when user has no tasks`() {
         val user = UserFixture.aUser()
         val userId = user.id
-        val input = ListTasksInputDTO(
+        val input = ListTasksInputDto(
             userId = userId.asString()
         )
 
@@ -71,7 +71,7 @@ class ListTasksUseCaseTest {
     @Test
     fun `should throw when user id is invalid`() {
         val invalidUserId = "invalid-id"
-        val input = ListTasksInputDTO(
+        val input = ListTasksInputDto(
             userId = invalidUserId
         )
 

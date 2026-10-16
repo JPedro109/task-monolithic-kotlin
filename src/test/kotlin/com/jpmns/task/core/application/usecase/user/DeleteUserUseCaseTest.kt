@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
-import com.jpmns.task.core.application.usecase.user.dto.input.DeleteUserInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.DeleteUserInputDto
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
@@ -30,7 +30,7 @@ class DeleteUserUseCaseTest {
     fun `should delete a user successfully`() {
         val user = UserFixture.aUser()
         val userId = user.id
-        val input = DeleteUserInputDTO(
+        val input = DeleteUserInputDto(
             userId = userId.asString()
         )
 
@@ -46,7 +46,7 @@ class DeleteUserUseCaseTest {
     fun `should throw when user is not found`() {
         val user = UserFixture.aUser()
         val userId = user.id
-        val input = DeleteUserInputDTO(
+        val input = DeleteUserInputDto(
             userId = userId.asString()
         )
 
@@ -62,7 +62,7 @@ class DeleteUserUseCaseTest {
     @Test
     fun `should throw when user id is invalid`() {
         val invalidUserId = "invalid-id"
-        val input = DeleteUserInputDTO(
+        val input = DeleteUserInputDto(
             userId = invalidUserId
         )
 

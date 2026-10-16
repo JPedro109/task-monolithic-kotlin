@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
-import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDto
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
 import com.jpmns.task.core.domain.common.exception.DomainException
@@ -31,7 +31,7 @@ class UpdateUsernameUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val newUsername = "newusername"
-        val input = UpdateUsernameInputDTO(
+        val input = UpdateUsernameInputDto(
             userId = userId.asString(),
             newUsername = newUsername
         )
@@ -53,7 +53,7 @@ class UpdateUsernameUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val newUsername = "newusername"
-        val input = UpdateUsernameInputDTO(
+        val input = UpdateUsernameInputDto(
             userId = userId.asString(),
             newUsername = newUsername
         )
@@ -72,7 +72,7 @@ class UpdateUsernameUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val newUsername = "existing_user"
-        val input = UpdateUsernameInputDTO(
+        val input = UpdateUsernameInputDto(
             userId = userId.asString(),
             newUsername = newUsername
         )
@@ -92,7 +92,7 @@ class UpdateUsernameUseCaseTest {
         val user = UserFixture.aUser()
         val userId = user.id
         val invalidUsername = "ab"
-        val input = UpdateUsernameInputDTO(
+        val input = UpdateUsernameInputDto(
             userId = userId.asString(),
             newUsername = invalidUsername
         )
@@ -109,7 +109,7 @@ class UpdateUsernameUseCaseTest {
     fun `should throw when user id is invalid`() {
         val invalidUserId = "invalid-id"
         val newUsername = "newusername"
-        val input = UpdateUsernameInputDTO(
+        val input = UpdateUsernameInputDto(
             userId = invalidUserId,
             newUsername = newUsername
         )

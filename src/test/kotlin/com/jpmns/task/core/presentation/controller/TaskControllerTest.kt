@@ -24,7 +24,7 @@ import com.jpmns.task.core.application.usecase.task.DeleteTaskUseCase
 import com.jpmns.task.core.application.usecase.task.ListTasksUseCase
 import com.jpmns.task.core.application.usecase.task.MarkTaskAsFinishedUseCase
 import com.jpmns.task.core.application.usecase.task.UpdateTaskUseCase
-import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDTO
+import com.jpmns.task.core.application.usecase.task.dto.output.TaskOutputDto
 import com.jpmns.task.core.application.usecase.task.exception.TaskAccessDeniedException
 import com.jpmns.task.core.application.usecase.task.exception.TaskNotFoundException
 import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
@@ -346,8 +346,8 @@ class TaskControllerTest {
             mockMvc.perform(patch("/api/v1/tasks/$taskId/finish"))
     }
 
-    private fun getTaskOutput(task: TaskEntity): TaskOutputDTO =
-        TaskOutputDTO(
+    private fun getTaskOutput(task: TaskEntity): TaskOutputDto =
+        TaskOutputDto(
             id = task.id.asString(),
             userId = task.userId.asString(),
             taskName = task.taskName.asString(),

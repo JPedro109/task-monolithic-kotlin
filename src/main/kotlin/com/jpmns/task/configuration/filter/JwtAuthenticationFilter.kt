@@ -12,7 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 import com.jpmns.task.core.application.port.security.Token
 import com.jpmns.task.core.application.usecase.user.GetUserByIdUseCase
-import com.jpmns.task.core.application.usecase.user.dto.input.GetUserByIdInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.GetUserByIdInputDto
 
 @Component
 class JwtAuthenticationFilter(
@@ -36,7 +36,7 @@ class JwtAuthenticationFilter(
                 return
             }
 
-            val input = GetUserByIdInputDTO(id = decoded.sub)
+            val input = GetUserByIdInputDto(id = decoded.sub)
             val user = getUserByIdUseCase.execute(input = input)
 
             val authentication = UsernamePasswordAuthenticationToken(

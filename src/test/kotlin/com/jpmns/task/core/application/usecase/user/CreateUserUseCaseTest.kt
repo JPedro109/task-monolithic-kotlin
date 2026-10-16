@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
 import com.jpmns.task.core.application.port.security.PasswordEncoder
-import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.CreateUserInputDto
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
@@ -34,7 +34,7 @@ class CreateUserUseCaseTest {
         val user = UserFixture.aUser()
         val username = user.username
         val password = user.password
-        val input = CreateUserInputDTO(
+        val input = CreateUserInputDto(
             username = username.asString(),
             password = password.asString()
         )
@@ -57,7 +57,7 @@ class CreateUserUseCaseTest {
         val user = UserFixture.aUser()
         val username = user.username
         val password = user.password
-        val input = CreateUserInputDTO(
+        val input = CreateUserInputDto(
             username = username.asString(),
             password = password.asString()
         )
@@ -77,7 +77,7 @@ class CreateUserUseCaseTest {
         val user = UserFixture.aUser()
         val password = user.password
         val invalidUsername = "ab"
-        val input = CreateUserInputDTO(
+        val input = CreateUserInputDto(
             username = invalidUsername,
             password = password.asString()
         )

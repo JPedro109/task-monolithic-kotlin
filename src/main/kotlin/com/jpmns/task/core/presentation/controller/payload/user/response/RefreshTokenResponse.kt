@@ -1,6 +1,6 @@
 package com.jpmns.task.core.presentation.controller.payload.user.response
 
-import com.jpmns.task.core.application.usecase.user.dto.output.RefreshUserTokenOutputDTO
+import com.jpmns.task.core.application.usecase.user.dto.output.RefreshUserTokenOutputDto
 import com.jpmns.task.core.presentation.controller.documentation.payload.user.response.RefreshTokenResponseDoc
 
 data class RefreshTokenResponse(
@@ -11,7 +11,7 @@ data class RefreshTokenResponse(
         "RefreshTokenResponse{accessToken='[PROTECTED]', refreshToken='[PROTECTED]'}"
 
     companion object {
-        fun of(dto: RefreshUserTokenOutputDTO): RefreshTokenResponse =
+        fun of(dto: RefreshUserTokenOutputDto): RefreshTokenResponse =
             RefreshTokenResponse(
                 accessToken = dto.accessToken,
                 refreshToken = dto.refreshToken

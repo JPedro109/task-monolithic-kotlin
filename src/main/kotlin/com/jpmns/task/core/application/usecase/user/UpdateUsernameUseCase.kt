@@ -3,8 +3,8 @@ package com.jpmns.task.core.application.usecase.user
 import org.springframework.stereotype.Service
 
 import com.jpmns.task.core.application.port.persistence.repository.UserRepository
-import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDTO
-import com.jpmns.task.core.application.usecase.user.dto.output.UpdateUsernameOutputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.UpdateUsernameInputDto
+import com.jpmns.task.core.application.usecase.user.dto.output.UpdateUsernameOutputDto
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
 import com.jpmns.task.core.domain.common.valueobject.IdValueObject
@@ -15,7 +15,7 @@ import com.jpmns.task.core.domain.user.valueobject.UsernameValueObject
 class UpdateUsernameUseCase(
     private val userRepository: UserRepository
 ) {
-    fun execute(input: UpdateUsernameInputDTO): UpdateUsernameOutputDTO {
+    fun execute(input: UpdateUsernameInputDto): UpdateUsernameOutputDto {
         val idResult = IdValueObject.of(input.userId).getValueResultOrThrow()
         val newUsernameResult = UsernameValueObject.of(input.newUsername).getValueResultOrThrow()
 
@@ -32,8 +32,8 @@ class UpdateUsernameUseCase(
         return toOutput(saved)
     }
 
-    private fun toOutput(user: UserEntity): UpdateUsernameOutputDTO =
-        UpdateUsernameOutputDTO(
+    private fun toOutput(user: UserEntity): UpdateUsernameOutputDto =
+        UpdateUsernameOutputDto(
             id = user.id.asString(),
             username = user.username.asString()
         )

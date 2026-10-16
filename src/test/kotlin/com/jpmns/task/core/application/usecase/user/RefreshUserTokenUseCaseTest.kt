@@ -9,7 +9,7 @@ import com.jpmns.task.core.application.port.persistence.repository.UserRepositor
 import com.jpmns.task.core.application.port.security.Token
 import com.jpmns.task.core.application.port.security.dto.DecodeTokenDto
 import com.jpmns.task.core.application.port.security.exception.InvalidTokenException
-import com.jpmns.task.core.application.usecase.user.dto.input.RefreshUserTokenInputDTO
+import com.jpmns.task.core.application.usecase.user.dto.input.RefreshUserTokenInputDto
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
@@ -40,7 +40,7 @@ class RefreshUserTokenUseCaseTest {
         val newAccessToken = "new-access-token"
         val newRefreshToken = "new-refresh-token"
         val decoded = DecodeTokenDto(sub = userIdString)
-        val input = RefreshUserTokenInputDTO(
+        val input = RefreshUserTokenInputDto(
             refreshToken = refreshTokenValue
         )
 
@@ -62,7 +62,7 @@ class RefreshUserTokenUseCaseTest {
     @Test
     fun `should throw when refresh token is invalid`() {
         val refreshTokenValue = "invalid-refresh-token"
-        val input = RefreshUserTokenInputDTO(
+        val input = RefreshUserTokenInputDto(
             refreshToken = refreshTokenValue
         )
 
@@ -83,7 +83,7 @@ class RefreshUserTokenUseCaseTest {
         val userIdString = userId.asString()
         val refreshTokenValue = "valid-refresh-token"
         val decoded = DecodeTokenDto(sub = userIdString)
-        val input = RefreshUserTokenInputDTO(
+        val input = RefreshUserTokenInputDto(
             refreshToken = refreshTokenValue
         )
 
@@ -102,7 +102,7 @@ class RefreshUserTokenUseCaseTest {
     fun `should throw when decoded sub is not a valid id`() {
         val refreshTokenValue = "valid-refresh-token"
         val decoded = DecodeTokenDto(sub = "invalid-id")
-        val input = RefreshUserTokenInputDTO(
+        val input = RefreshUserTokenInputDto(
             refreshToken = refreshTokenValue
         )
 
