@@ -12,6 +12,7 @@ import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExi
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -46,6 +47,7 @@ class UpdateUsernameUseCaseTest {
         verify { userRepository.findById(userId) }
         verify { userRepository.existsByUsername(any()) }
         verify { userRepository.save(any()) }
+        confirmVerified(userRepository)
     }
 
     @Test
@@ -65,6 +67,7 @@ class UpdateUsernameUseCaseTest {
         verify { userRepository.findById(userId) }
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
+        confirmVerified(userRepository)
     }
 
     @Test
@@ -85,6 +88,7 @@ class UpdateUsernameUseCaseTest {
         verify { userRepository.findById(userId) }
         verify { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
+        confirmVerified(userRepository)
     }
 
     @Test
@@ -101,8 +105,10 @@ class UpdateUsernameUseCaseTest {
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(DomainException::class.java)
+        verify(exactly = 0) { userRepository.findById(userId) }
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
+        confirmVerified(userRepository)
     }
 
     @Test
@@ -119,5 +125,6 @@ class UpdateUsernameUseCaseTest {
         verify(exactly = 0) { userRepository.findById(any()) }
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
+        confirmVerified(userRepository)
     }
 }

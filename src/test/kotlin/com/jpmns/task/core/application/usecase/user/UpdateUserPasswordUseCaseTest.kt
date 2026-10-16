@@ -12,6 +12,7 @@ import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundExcept
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -54,6 +55,7 @@ class UpdateUserPasswordUseCaseTest {
         verify { passwordEncoder.matches(currentPasswordString, currentPasswordString) }
         verify { passwordEncoder.encode(newPassword) }
         verify { userRepository.save(any()) }
+        confirmVerified(userRepository, passwordEncoder)
     }
 
     @Test
@@ -77,6 +79,7 @@ class UpdateUserPasswordUseCaseTest {
         verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
         verify(exactly = 0) { passwordEncoder.encode(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
+        confirmVerified(userRepository, passwordEncoder)
     }
 
     @Test
@@ -102,6 +105,7 @@ class UpdateUserPasswordUseCaseTest {
         verify { passwordEncoder.matches(wrongPassword, currentPasswordString) }
         verify(exactly = 0) { passwordEncoder.encode(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
+        confirmVerified(userRepository, passwordEncoder)
     }
 
     @Test
@@ -123,5 +127,6 @@ class UpdateUserPasswordUseCaseTest {
         verify(exactly = 0) { userRepository.save(any()) }
         verify(exactly = 0) { passwordEncoder.matches(any(), any()) }
         verify(exactly = 0) { passwordEncoder.encode(any()) }
+        confirmVerified(userRepository, passwordEncoder)
     }
 }

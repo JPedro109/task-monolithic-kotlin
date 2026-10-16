@@ -20,6 +20,8 @@ class UserPasswordValueObject private constructor(private val value: String) {
 
     override fun hashCode(): Int = value.hashCode()
 
+    override fun toString(): String = "UserPasswordValueObject(value='[PROTECTED]')"
+
     companion object {
         fun of(password: String): Result<UserPasswordValueObject> {
             if (password.isEmpty()) {

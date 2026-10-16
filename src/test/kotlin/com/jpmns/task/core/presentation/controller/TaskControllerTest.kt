@@ -79,16 +79,6 @@ class TaskControllerTest {
         }
 
         @Test
-        fun `should return 401 when request has no token`() {
-            val task = TaskFixture.aTask()
-            val taskName = task.taskName
-
-            val result = perform(taskName.asString())
-
-            result.andExpect(status().isUnauthorized)
-        }
-
-        @Test
         @WithJwtTokenMock
         fun `should return 400 when task name is blank`() {
             val emptyTaskName = ""
@@ -96,6 +86,16 @@ class TaskControllerTest {
             val result = perform(emptyTaskName)
 
             result.andExpect(status().isBadRequest)
+        }
+
+        @Test
+        fun `should return 401 when request has no token`() {
+            val task = TaskFixture.aTask()
+            val taskName = task.taskName
+
+            val result = perform(taskName.asString())
+
+            result.andExpect(status().isUnauthorized)
         }
 
         private fun perform(taskName: String): ResultActions {
@@ -170,6 +170,18 @@ class TaskControllerTest {
 
         @Test
         @WithJwtTokenMock
+        fun `should return 400 when task name is blank`() {
+            val task = TaskFixture.aTask()
+            val taskId = task.id
+            val emptyTaskName = ""
+
+            val result = perform(taskId.asString(), emptyTaskName)
+
+            result.andExpect(status().isBadRequest)
+        }
+
+        @Test
+        @WithJwtTokenMock
         fun `should return 404 when task is not found`() {
             val task = TaskFixture.aTask()
             val taskId = task.id
@@ -194,18 +206,6 @@ class TaskControllerTest {
             val result = perform(taskId.asString(), taskName.asString())
 
             result.andExpect(status().isForbidden)
-        }
-
-        @Test
-        @WithJwtTokenMock
-        fun `should return 400 when task name is blank`() {
-            val task = TaskFixture.aTask()
-            val taskId = task.id
-            val emptyTaskName = ""
-
-            val result = perform(taskId.asString(), emptyTaskName)
-
-            result.andExpect(status().isBadRequest)
         }
 
         @Test

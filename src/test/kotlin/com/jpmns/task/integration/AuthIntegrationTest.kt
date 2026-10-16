@@ -3,21 +3,16 @@ package com.jpmns.task.integration
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.jpmns.task.integration.common.abstracts.IntegrationTestBase
 import com.jpmns.task.integration.common.sql.SqlCreateSeed
 
 class AuthIntegrationTest : IntegrationTestBase() {
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
-
     @Nested
     @DisplayName("POST /api/v1/auth/login")
     inner class Login {

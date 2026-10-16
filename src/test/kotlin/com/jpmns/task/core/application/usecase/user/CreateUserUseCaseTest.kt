@@ -12,6 +12,7 @@ import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExi
 import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -50,6 +51,7 @@ class CreateUserUseCaseTest {
         verify { userRepository.existsByUsername(username) }
         verify { passwordEncoder.encode(password.asString()) }
         verify { userRepository.save(any()) }
+        confirmVerified(userRepository, passwordEncoder)
     }
 
     @Test
@@ -70,6 +72,7 @@ class CreateUserUseCaseTest {
         verify { userRepository.existsByUsername(username) }
         verify(exactly = 0) { userRepository.save(any()) }
         verify(exactly = 1) { passwordEncoder.encode(any()) }
+        confirmVerified(userRepository, passwordEncoder)
     }
 
     @Test
@@ -89,5 +92,6 @@ class CreateUserUseCaseTest {
         verify(exactly = 0) { userRepository.existsByUsername(any()) }
         verify(exactly = 0) { userRepository.save(any()) }
         verify(exactly = 1) { passwordEncoder.encode(any()) }
+        confirmVerified(userRepository, passwordEncoder)
     }
 }

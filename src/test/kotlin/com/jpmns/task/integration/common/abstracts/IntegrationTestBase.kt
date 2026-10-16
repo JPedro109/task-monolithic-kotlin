@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.jpmns.task.TaskApplication
 import com.jpmns.task.integration.common.container.PostgresContainerConfig
 
@@ -17,4 +18,7 @@ import com.jpmns.task.integration.common.container.PostgresContainerConfig
 abstract class IntegrationTestBase {
     @Autowired
     protected lateinit var mockMvc: MockMvc
+
+    @Autowired
+    protected lateinit var objectMapper: ObjectMapper
 }

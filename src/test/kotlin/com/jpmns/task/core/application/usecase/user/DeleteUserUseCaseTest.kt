@@ -11,6 +11,7 @@ import com.jpmns.task.core.domain.common.exception.DomainException
 import com.jpmns.task.shared.fixture.UserFixture
 
 import io.mockk.Runs
+import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -38,8 +39,10 @@ class DeleteUserUseCaseTest {
         every { userRepository.deleteById(userId) } just Runs
 
         useCase.execute(input)
+
         verify { userRepository.findById(userId) }
         verify { userRepository.deleteById(userId) }
+        confirmVerified(userRepository)
     }
 
     @Test
@@ -57,6 +60,7 @@ class DeleteUserUseCaseTest {
 
         verify { userRepository.findById(userId) }
         verify(exactly = 0) { userRepository.deleteById(any()) }
+        confirmVerified(userRepository)
     }
 
     @Test
@@ -71,5 +75,6 @@ class DeleteUserUseCaseTest {
 
         verify(exactly = 0) { userRepository.findById(any()) }
         verify(exactly = 0) { userRepository.deleteById(any()) }
+        confirmVerified(userRepository)
     }
 }

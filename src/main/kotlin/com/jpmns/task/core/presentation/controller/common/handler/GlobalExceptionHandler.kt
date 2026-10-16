@@ -17,6 +17,7 @@ import com.jpmns.task.core.application.usecase.user.exception.InvalidCredentials
 import com.jpmns.task.core.application.usecase.user.exception.UserNotFoundException
 import com.jpmns.task.core.application.usecase.user.exception.UsernameAlreadyExistsException
 import com.jpmns.task.core.domain.common.exception.DomainException
+import com.jpmns.task.core.presentation.controller.common.resolver.exception.UnauthenticatedException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -73,7 +74,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(
         InvalidCredentialsException::class,
-        InvalidTokenException::class
+        InvalidTokenException::class,
+        UnauthenticatedException::class
     )
     fun handleUnauthorized(ex: Exception): ProblemDetail {
         logger.error("Unauthorized access: ${ex.message}", ex)
