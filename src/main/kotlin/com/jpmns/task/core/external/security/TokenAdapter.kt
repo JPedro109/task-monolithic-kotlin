@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component
 
 import com.jpmns.task.configuration.security.SecurityConfigProperties
 import com.jpmns.task.core.application.port.security.Token
+import com.jpmns.task.core.application.port.security.TokenType
 import com.jpmns.task.core.application.port.security.dto.DecodeTokenDto
 import com.jpmns.task.core.application.port.security.exception.InvalidTokenException
 
+import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 
@@ -24,31 +26,48 @@ class TokenAdapter(
     }
 
     override fun generateAccessToken(sub: String): String =
-        buildToken(sub, TOKEN_TYPE_ACCESS, properties.jwt.accessTokenExpirationMs)
+        buildToken(sub, TokenType.ACCESS, properties.jwt.accessTokenExpirationMs)
 
     override fun generateRefreshToken(sub: String): String =
-        buildToken(sub, TOKEN_TYPE_REFRESH, properties.jwt.refreshTokenExpirationMs)
+        buildToken(sub, TokenType.REFRESH, properties.jwt.refreshTokenExpirationMs)
 
-    override fun tokenValidation(token: String): DecodeTokenDto = runCatching {
-        val claims = Jwts.parser()
+    override fun validateAccessToken(token: String): DecodeTokenDto =
+        validateToken(token, TokenType.ACCESS)
+
+    override fun validateRefreshToken(token: String): DecodeTokenDto =
+        validateToken(token, TokenType.REFRESH)
+
+    private fun validateToken(token: String, expectedType: TokenType): DecodeTokenDto = runCatching {
+        val claims = parseClaims(token)
+
+        val tokenType = TokenType.fromValue(claims[CLAIM_TOKEN_TYPE, String::class.java])
+
+        if (tokenType != expectedType) {
+            throw InvalidTokenException()
+        }
+
+        return DecodeTokenDto(sub = claims.subject)
+    }.getOrElse {
+        logger.warn("Invalid JWT token: ${it.message}")
+
+        throw InvalidTokenException()
+    }
+
+    private fun parseClaims(token: String): Claims =
+        Jwts.parser()
             .verifyWith(signingKey)
             .build()
             .parseSignedClaims(token)
             .payload
-        return DecodeTokenDto(sub = claims.subject)
-    }.getOrElse {
-        logger.error("Invalid token JWT ${it.message}", it)
-        throw InvalidTokenException()
-    }
 
-    private fun buildToken(sub: String, tokenType: String, expirationMs: Long): String {
+    private fun buildToken(sub: String, tokenType: TokenType, expirationMs: Long): String {
         val now = Date()
 
         val expiry = Date(now.time + expirationMs)
 
         return Jwts.builder()
             .subject(sub)
-            .claim(CLAIM_TOKEN_TYPE, tokenType)
+            .claim(CLAIM_TOKEN_TYPE, tokenType.value)
             .issuedAt(now)
             .expiration(expiry)
             .signWith(signingKey)
@@ -59,7 +78,5 @@ class TokenAdapter(
         val logger: Logger = LoggerFactory.getLogger(TokenAdapter::class.java)
 
         const val CLAIM_TOKEN_TYPE = "token_type"
-        const val TOKEN_TYPE_ACCESS = "access"
-        const val TOKEN_TYPE_REFRESH = "refresh"
     }
 }

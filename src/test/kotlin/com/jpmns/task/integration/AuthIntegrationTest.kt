@@ -106,6 +106,23 @@ class AuthIntegrationTest : IntegrationTestBase() {
         }
 
         @Test
+        @SqlCreateSeed
+        fun `should return 401 when an access token is used as a refresh token`() {
+            val loginResponse = mockMvc.perform(
+                post("/api/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""{"username": "$EXISTING_USERNAME", "password": "$EXISTING_PASSWORD"}""")
+            )
+                .andExpect(status().isOk)
+                .andReturn()
+            val json = objectMapper.readTree(loginResponse.response.contentAsString)
+            val accessToken = json.get("accessToken").asText()
+
+            perform(accessToken)
+                .andExpect(status().isUnauthorized)
+        }
+
+        @Test
         fun `should return 400 when refresh token is blank`() {
             val emptyToken = ""
 

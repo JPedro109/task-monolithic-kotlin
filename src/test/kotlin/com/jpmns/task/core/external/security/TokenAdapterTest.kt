@@ -63,7 +63,7 @@ class TokenAdapterTest {
         val sub = user.id.asString()
         val token = tokenAdapter.generateAccessToken(sub)
 
-        val decoded = tokenAdapter.tokenValidation(token)
+        val decoded = tokenAdapter.validateAccessToken(token)
 
         assertThat(decoded).isNotNull()
         assertThat(decoded.sub).isEqualTo(sub)
@@ -75,17 +75,37 @@ class TokenAdapterTest {
         val sub = user.id.asString()
         val token = tokenAdapter.generateRefreshToken(sub)
 
-        val decoded = tokenAdapter.tokenValidation(token)
+        val decoded = tokenAdapter.validateRefreshToken(token)
 
         assertThat(decoded).isNotNull()
         assertThat(decoded.sub).isEqualTo(sub)
     }
 
     @Test
+    fun `should throw InvalidTokenException when validating a refresh token as an access token`() {
+        val user = UserFixture.aUser()
+        val sub = user.id.asString()
+        val refreshToken = tokenAdapter.generateRefreshToken(sub)
+
+        assertThatThrownBy { tokenAdapter.validateAccessToken(refreshToken) }
+            .isInstanceOf(InvalidTokenException::class.java)
+    }
+
+    @Test
+    fun `should throw InvalidTokenException when validating an access token as a refresh token`() {
+        val user = UserFixture.aUser()
+        val sub = user.id.asString()
+        val accessToken = tokenAdapter.generateAccessToken(sub)
+
+        assertThatThrownBy { tokenAdapter.validateRefreshToken(accessToken) }
+            .isInstanceOf(InvalidTokenException::class.java)
+    }
+
+    @Test
     fun `should throw InvalidTokenException when token is malformed`() {
         val malformed = "this.is.not.a.valid.jwt"
 
-        assertThatThrownBy { tokenAdapter.tokenValidation(malformed) }
+        assertThatThrownBy { tokenAdapter.validateAccessToken(malformed) }
             .isInstanceOf(InvalidTokenException::class.java)
     }
 
@@ -93,7 +113,7 @@ class TokenAdapterTest {
     fun `should throw InvalidTokenException when token is empty`() {
         val emptyToken = ""
 
-        assertThatThrownBy { tokenAdapter.tokenValidation(emptyToken) }
+        assertThatThrownBy { tokenAdapter.validateAccessToken(emptyToken) }
             .isInstanceOf(InvalidTokenException::class.java)
     }
 
@@ -111,7 +131,7 @@ class TokenAdapterTest {
         val otherAdapter = TokenAdapter(otherProperties)
         val token = otherAdapter.generateAccessToken(sub)
 
-        assertThatThrownBy { tokenAdapter.tokenValidation(token) }
+        assertThatThrownBy { tokenAdapter.validateAccessToken(token) }
             .isInstanceOf(InvalidTokenException::class.java)
     }
 
@@ -129,7 +149,7 @@ class TokenAdapterTest {
         val expiredAdapter = TokenAdapter(expiredProperties)
         val token = expiredAdapter.generateAccessToken(sub)
 
-        assertThatThrownBy { tokenAdapter.tokenValidation(token) }
+        assertThatThrownBy { tokenAdapter.validateAccessToken(token) }
             .isInstanceOf(InvalidTokenException::class.java)
     }
 

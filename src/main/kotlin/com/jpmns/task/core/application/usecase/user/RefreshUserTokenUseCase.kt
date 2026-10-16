@@ -15,7 +15,7 @@ class RefreshUserTokenUseCase(
     private val token: Token
 ) {
     fun execute(input: RefreshUserTokenInputDto): RefreshUserTokenOutputDto {
-        val decoded = token.tokenValidation(input.refreshToken)
+        val decoded = token.validateRefreshToken(input.refreshToken)
 
         val idResult = IdValueObject.of(decoded.sub).getValueResultOrThrow()
 

@@ -29,7 +29,7 @@ class JwtAuthenticationFilter(
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             val jwt = authHeader.substring(BEARER_PREFIX_LENGTH)
 
-            val decoded = runCatching { token.tokenValidation(jwt) }.getOrNull()
+            val decoded = runCatching { token.validateAccessToken(jwt) }.getOrNull()
 
             if (decoded == null) {
                 filterChain.doFilter(request, response)

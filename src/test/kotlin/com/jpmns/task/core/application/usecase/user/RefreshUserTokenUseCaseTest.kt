@@ -44,7 +44,7 @@ class RefreshUserTokenUseCaseTest {
             refreshToken = refreshTokenValue
         )
 
-        every { token.tokenValidation(refreshTokenValue) } returns decoded
+        every { token.validateRefreshToken(refreshTokenValue) } returns decoded
         every { userRepository.findById(userId) } returns user
         every { token.generateAccessToken(userIdString) } returns newAccessToken
         every { token.generateRefreshToken(userIdString) } returns newRefreshToken
@@ -53,7 +53,7 @@ class RefreshUserTokenUseCaseTest {
 
         assertThat(output.accessToken).isEqualTo(newAccessToken)
         assertThat(output.refreshToken).isEqualTo(newRefreshToken)
-        verify { token.tokenValidation(refreshTokenValue) }
+        verify { token.validateRefreshToken(refreshTokenValue) }
         verify { userRepository.findById(userId) }
         verify { token.generateAccessToken(userIdString) }
         verify { token.generateRefreshToken(userIdString) }
@@ -66,11 +66,11 @@ class RefreshUserTokenUseCaseTest {
             refreshToken = refreshTokenValue
         )
 
-        every { token.tokenValidation(refreshTokenValue) } throws InvalidTokenException()
+        every { token.validateRefreshToken(refreshTokenValue) } throws InvalidTokenException()
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(InvalidTokenException::class.java)
-        verify { token.tokenValidation(refreshTokenValue) }
+        verify { token.validateRefreshToken(refreshTokenValue) }
         verify(exactly = 0) { userRepository.findById(any()) }
         verify(exactly = 0) { token.generateAccessToken(any()) }
         verify(exactly = 0) { token.generateRefreshToken(any()) }
@@ -87,12 +87,12 @@ class RefreshUserTokenUseCaseTest {
             refreshToken = refreshTokenValue
         )
 
-        every { token.tokenValidation(refreshTokenValue) } returns decoded
+        every { token.validateRefreshToken(refreshTokenValue) } returns decoded
         every { userRepository.findById(userId) } returns null
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(UserNotFoundException::class.java)
-        verify { token.tokenValidation(refreshTokenValue) }
+        verify { token.validateRefreshToken(refreshTokenValue) }
         verify { userRepository.findById(userId) }
         verify(exactly = 0) { token.generateAccessToken(any()) }
         verify(exactly = 0) { token.generateRefreshToken(any()) }
@@ -106,11 +106,11 @@ class RefreshUserTokenUseCaseTest {
             refreshToken = refreshTokenValue
         )
 
-        every { token.tokenValidation(refreshTokenValue) } returns decoded
+        every { token.validateRefreshToken(refreshTokenValue) } returns decoded
 
         assertThatThrownBy { useCase.execute(input) }
             .isInstanceOf(DomainException::class.java)
-        verify { token.tokenValidation(refreshTokenValue) }
+        verify { token.validateRefreshToken(refreshTokenValue) }
         verify(exactly = 0) { userRepository.findById(any()) }
         verify(exactly = 0) { token.generateAccessToken(any()) }
         verify(exactly = 0) { token.generateRefreshToken(any()) }

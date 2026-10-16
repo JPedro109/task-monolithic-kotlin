@@ -7,5 +7,7 @@ interface Token {
 
     fun generateRefreshToken(sub: String): String
 
-    fun tokenValidation(token: String): DecodeTokenDto
+    fun validateAccessToken(token: String): DecodeTokenDto
+
+    fun validateRefreshToken(token: String): DecodeTokenDto
 }
